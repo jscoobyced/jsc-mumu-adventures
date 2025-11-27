@@ -1,0 +1,24 @@
+{
+  "name": "jsc-mumu-adventures",
+  "version": "0.0.1",
+  "description": "The adventures of Mumu!",
+  "main": "index.js",
+  "repository": "https://github.com/jscoobyced/jsc-mumu-adventures",
+  "author": "Cedric Rochefolle",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "genmap": "ts-node code/generate-map-data.ts",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.3",
+    "prettier": "^3.7.4",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3",
+    "vite": "^7.2.4"
+  }
+}
