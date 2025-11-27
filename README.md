@@ -1,6 +1,6 @@
 # Mumu's Adventures 🕹️
 
-![Mumu's Adventures](/project/images/mumu-adventures.png)
+![Mumu's Adventures](/src/images/mumu-adventures.png)
 
 Live your life as Mumu, the heroic adventurer, to defeat the evil Maginta Llennaspom.
 
