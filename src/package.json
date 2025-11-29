@@ -1,0 +1,18 @@
+{
+  "name": "jsc-mumu-adventures",
+  "version": "0.0.1",
+  "description": "The adventures of Mumu!",
+  "main": "index.js",
+  "repository": "https://github.com/jscoobyced/jsc-mumu-adventures",
+  "author": "Cedric Rochefolle",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vite": "^7.2.4"
+  }
+}

@@ -1,50 +1,64 @@
-// https://youtu.be/zogxGGDJ2Ok?t=9829
-const canvas = document.querySelector("canvas");
-const c = canvas.getContext("2d");
-const dpr = Math.max(1, window.devicePixelRatio);
+import { Sprites } from "./models/Sprites";
+import { TilesetInfo, Tilesets } from "./models/TileSet";
+import { LayersData } from "./models/Layer";
+import { l_Terrain, l_Trees, l_FrontRender, l_Collisions } from "./data";
+import { Player } from "./classes/Player";
+import { Monster } from "./classes/Monster";
+import { CollisionBlock } from "./classes/CollisionBlock";
+import { loadImage } from "./utils/loadImage";
+import { Heart } from "./classes/Heart";
+import {
+  getLastTime,
+  setLastTime,
+  getKeys,
+  initializeEventListeners,
+} from "./utils/eventListeners";
+
+// Canvas setup
+const canvas = document.querySelector("canvas") as HTMLCanvasElement;
+const c = canvas.getContext("2d") as CanvasRenderingContext2D;
+const dpr: number = Math.max(1, window.devicePixelRatio);
 
 canvas.width = 1024 * dpr;
 canvas.height = 576 * dpr;
-const MAP_SCALE = dpr + 0.5;
+const MAP_SCALE: number = dpr + 0.5;
 
-const MAP_COLS = 50;
-const MAP_ROWS = 50;
+const MAP_COLS: number = 50;
+const MAP_ROWS: number = 50;
 
-const MAP_WIDTH = 16 * MAP_COLS;
-const MAP_HEIGHT = 16 * MAP_ROWS;
+const MAP_WIDTH: number = 16 * MAP_COLS;
+const MAP_HEIGHT: number = 16 * MAP_ROWS;
 
-const VIEWPORT_WIDTH = canvas.width / MAP_SCALE;
-const VIEWPORT_HEIGHT = canvas.height / MAP_SCALE;
+const VIEWPORT_WIDTH: number = canvas.width / MAP_SCALE;
+const VIEWPORT_HEIGHT: number = canvas.height / MAP_SCALE;
 
-const VIEWPORT_CENTER_X = VIEWPORT_WIDTH / 2;
-const VIEWPORT_CENTER_Y = VIEWPORT_HEIGHT / 2;
+const VIEWPORT_CENTER_X: number = VIEWPORT_WIDTH / 2;
+const VIEWPORT_CENTER_Y: number = VIEWPORT_HEIGHT / 2;
 
-const MAX_SCROLL_X = MAP_WIDTH - VIEWPORT_WIDTH;
-const MAX_SCROLL_Y = MAP_HEIGHT - VIEWPORT_HEIGHT;
+const MAX_SCROLL_X: number = MAP_WIDTH - VIEWPORT_WIDTH;
+const MAX_SCROLL_Y: number = MAP_HEIGHT - VIEWPORT_HEIGHT;
 
-const layersData = {
+const layersData: LayersData = {
   l_Terrain: l_Terrain,
   l_Trees: l_Trees,
-  l_Collisions: l_Collisions,
 };
 
-const frontRenderedLayersData = {
+const frontRenderedLayersData: LayersData = {
   l_FrontRender: l_FrontRender,
 };
 
-const tilesets = {
+const tilesets: Tilesets = {
   l_Terrain: { imageUrl: "./images/terrain.png", tileSize: 16 },
   l_Trees: { imageUrl: "./images/decorations.png", tileSize: 16 },
-  l_Collisions: { imageUrl: "./images/decorations.png", tileSize: 16 },
   l_FrontRender: { imageUrl: "./images/decorations.png", tileSize: 16 },
 };
 
 // Tile setup
-const collisionBlocks = [];
-const blockSize = 16; // Assuming each tile is 16x16 pixels
+const collisionBlocks: CollisionBlock[] = [];
+const blockSize: number = 16; // Assuming each tile is 16x16 pixels
 
-collisions.forEach((row, y) => {
-  row.forEach((symbol, x) => {
+l_Collisions.forEach((row: number[], y: number) => {
+  row.forEach((symbol: number, x: number) => {
     if (symbol === 1) {
       collisionBlocks.push(
         new CollisionBlock({
@@ -57,20 +71,25 @@ collisions.forEach((row, y) => {
   });
 });
 
-const renderLayer = (tilesData, tilesetImage, tileSize, context) => {
+const renderLayer = (
+  tilesData: number[][],
+  tilesetImage: HTMLImageElement,
+  tileSize: number,
+  context: CanvasRenderingContext2D
+): void => {
   // Calculate the number of tiles per row in the tileset
   // We use Math.ceil to ensure we get a whole number of tiles
-  const tilesPerRow = Math.ceil(tilesetImage.width / tileSize);
+  const tilesPerRow: number = Math.ceil(tilesetImage.width / tileSize);
 
-  tilesData.forEach((row, y) => {
-    row.forEach((symbol, x) => {
+  tilesData.forEach((row: number[], y: number) => {
+    row.forEach((symbol: number, x: number) => {
       if (symbol !== 0) {
         // Adjust index to be 0-based for calculations
-        const tileIndex = symbol - 1;
+        const tileIndex: number = symbol - 1;
 
         // Calculate source coordinates
-        const srcX = (tileIndex % tilesPerRow) * tileSize;
-        const srcY = Math.floor(tileIndex / tilesPerRow) * tileSize;
+        const srcX: number = (tileIndex % tilesPerRow) * tileSize;
+        const srcY: number = Math.floor(tileIndex / tilesPerRow) * tileSize;
 
         context.drawImage(
           tilesetImage, // source image
@@ -88,17 +107,23 @@ const renderLayer = (tilesData, tilesetImage, tileSize, context) => {
   });
 };
 
-const renderStaticLayers = async (layersData) => {
-  const offscreenCanvas = document.createElement("canvas");
+const renderStaticLayers = async (
+  layersData: LayersData
+): Promise<HTMLCanvasElement> => {
+  const offscreenCanvas: HTMLCanvasElement = document.createElement("canvas");
   offscreenCanvas.width = MAP_WIDTH;
   offscreenCanvas.height = MAP_HEIGHT;
-  const offscreenContext = offscreenCanvas.getContext("2d");
+  const offscreenContext = offscreenCanvas.getContext(
+    "2d"
+  ) as CanvasRenderingContext2D;
 
   for (const [layerName, tilesData] of Object.entries(layersData)) {
-    const tilesetInfo = tilesets[layerName];
+    const tilesetInfo: TilesetInfo | undefined = tilesets[layerName];
     if (tilesetInfo) {
       try {
-        const tilesetImage = await loadImage(tilesetInfo.imageUrl);
+        const tilesetImage: HTMLImageElement = await loadImage(
+          tilesetInfo.imageUrl
+        );
         renderLayer(
           tilesData,
           tilesetImage,
@@ -119,13 +144,13 @@ const renderStaticLayers = async (layersData) => {
 // END - Tile setup
 
 // Change xy coordinates to move player's default position
-const player = new Player({
+const player: Player = new Player({
   x: 100,
   y: 400,
   size: 15,
 });
 
-const monsterSprites = {
+const monsterSprites: Sprites = {
   walkDown: {
     x: 0,
     y: 0,
@@ -156,35 +181,20 @@ const monsterSprites = {
   },
 };
 
-const monsters = [
+const monsters: Monster[] = [
   new Monster({
     x: 380,
     y: 480,
     size: 15,
+    velocity: { x: 0, y: 0 },
     imageSrc: "./images/owl.png",
     sprites: monsterSprites,
   }),
 ];
 
-const keys = {
-  w: {
-    pressed: false,
-  },
-  a: {
-    pressed: false,
-  },
-  s: {
-    pressed: false,
-  },
-  d: {
-    pressed: false,
-  },
-};
+let frontRenderedCanvas: HTMLCanvasElement;
 
-let lastTime = performance.now();
-let frontRenderedCanvas;
-
-const hearts = [
+const hearts: Heart[] = [
   new Heart({
     x: 10,
     y: 10,
@@ -199,22 +209,22 @@ const hearts = [
   }),
 ];
 
-function animate(backgroundCanvas) {
+function animate(backgroundCanvas: HTMLCanvasElement): void {
   // Calculate delta time
-  const currentTime = performance.now();
-  const deltaTime = (currentTime - lastTime) / 1000;
-  lastTime = currentTime;
+  const currentTime: number = performance.now();
+  const deltaTime: number = (currentTime - getLastTime()) / 1000;
+  setLastTime(currentTime);
 
   // Update player position
-  player.handleInput(keys);
+  player.handleInput(getKeys());
   player.update(deltaTime, collisionBlocks);
 
-  const horizontalScrollDistance = Math.min(
+  const horizontalScrollDistance: number = Math.min(
     Math.max(0, player.center.x - VIEWPORT_CENTER_X),
     MAX_SCROLL_X
   );
 
-  const verticalScrollDistance = Math.min(
+  const verticalScrollDistance: number = Math.min(
     Math.max(0, player.center.y - VIEWPORT_CENTER_Y),
     MAX_SCROLL_Y
   );
@@ -229,7 +239,7 @@ function animate(backgroundCanvas) {
 
   // render out our monsters
   for (let i = monsters.length - 1; i >= 0; i--) {
-    const monster = monsters[i];
+    const monster: Monster = monsters[i];
     monster.update(deltaTime, collisionBlocks);
     monster.draw(c);
 
@@ -242,7 +252,9 @@ function animate(backgroundCanvas) {
       !player.isInvincible
     ) {
       player.receiveHit();
-      const filledHearts = hearts.filter((heart) => heart.currentFrame === 4);
+      const filledHearts: Heart[] = hearts.filter(
+        (heart: Heart) => heart.currentFrame === 4
+      );
 
       if (filledHearts.length > 0) {
         filledHearts[filledHearts.length - 1].currentFrame = 0;
@@ -259,7 +271,7 @@ function animate(backgroundCanvas) {
 
   c.save();
   c.scale(MAP_SCALE, MAP_SCALE);
-  hearts.forEach((heart) => {
+  hearts.forEach((heart: Heart) => {
     heart.draw(c);
   });
   c.restore();
@@ -267,9 +279,11 @@ function animate(backgroundCanvas) {
   requestAnimationFrame(() => animate(backgroundCanvas));
 }
 
-const startRendering = async () => {
+const startRendering = async (): Promise<void> => {
   try {
-    const backgroundCanvas = await renderStaticLayers(layersData);
+    const backgroundCanvas: HTMLCanvasElement = await renderStaticLayers(
+      layersData
+    );
     frontRenderedCanvas = await renderStaticLayers(frontRenderedLayersData);
     if (!backgroundCanvas) {
       console.error("Failed to create the background canvas");
@@ -282,4 +296,5 @@ const startRendering = async () => {
   }
 };
 
+initializeEventListeners();
 startRendering();
