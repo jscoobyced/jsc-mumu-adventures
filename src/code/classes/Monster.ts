@@ -1,10 +1,10 @@
-import { Vector, CharacterInitializationOptions, Sprites } from "../models";
+import { Vector, CharacterInitializationOptions } from "../models";
 import { CollisionBlock } from "./CollisionBlock";
 import { Character } from "./Character";
+import { characterSprites } from "../sprites";
 
 export class Monster extends Character {
   public originalPosition: Vector;
-  public sprites: Sprites;
   public health: number;
   public elapsedMovementTime: number;
 
@@ -12,9 +12,8 @@ export class Monster extends Character {
     x,
     y,
     size,
-    velocity = { x: 0, y: 0 },
     imageSrc,
-    sprites,
+    velocity = { x: 0, y: 0 },
     health = 3,
   }: CharacterInitializationOptions) {
     super(x, y, size, velocity);
@@ -24,16 +23,12 @@ export class Monster extends Character {
     this.elapsedMovementTime = 0;
     this.invincibilityInterval = 0.3;
 
-    if (imageSrc === undefined) {
-      throw new Error("Monster imageSrc is undefined");
-    }
     this.loadImage(imageSrc);
 
-    if (sprites === undefined) {
+    if (characterSprites === undefined) {
       throw new Error("Monster sprites is undefined");
     }
-    this.sprites = sprites;
-    this.currentSprite = Object.values(this.sprites)[0];
+    this.currentSprite = Object.values(characterSprites)[0];
   }
 
   public receiveHit(): void {
@@ -101,6 +96,12 @@ export class Monster extends Character {
       this.velocity.y = normalizedDeltaY * CIRCLE_RADIUS;
     }
 
+    this.currentSprite = Object.values(characterSprites)[0];
+    if (this.velocity.x > 0) {
+      this.currentSprite = characterSprites.walkRight;
+    } else if (this.velocity.x < 0) {
+      this.currentSprite = characterSprites.walkLeft;
+    }
     this.elapsedMovementTime += deltaTime;
   }
 

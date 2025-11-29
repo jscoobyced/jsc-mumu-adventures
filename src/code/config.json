@@ -1,0 +1,23 @@
+{
+  "tileSize": 16,
+  "canvasWidth": 1024,
+  "canvasHeight": 576,
+  "cols": 50,
+  "rows": 50,
+  "mapScale": 0.5,
+  "images": {
+    "tilesets": {
+      "terrain": "./images/terrain.png",
+      "decorations": "./images/decorations.png"
+    },
+    "player": {
+      "princess": "./images/princess.png"
+    },
+    "monsters": {
+      "owl": "./images/owl.png"
+    },
+    "decorations": {
+      "heart": "./images/heart.png"
+    }
+  }
+}

@@ -1,56 +1,25 @@
-import { CharacterInitializationOptions, Sprites, Keys } from "../models";
+import { CharacterInitializationOptions, Keys } from "../models";
 import { CollisionBlock } from "./CollisionBlock";
 import { Character } from "./Character";
+import { characterSprites } from "../sprites";
 
 const X_VELOCITY = 150;
 const Y_VELOCITY = 150;
 
 export class Player extends Character {
-  public sprites: Sprites;
-
   constructor({
     x,
     y,
     size,
+    imageSrc,
     velocity = { x: 0, y: 0 },
   }: CharacterInitializationOptions) {
     super(x, y, size, velocity);
 
     this.invincibilityInterval = 0.8;
-    this.loadImage("./images/princess.png");
+    this.loadImage(imageSrc);
 
-    this.sprites = {
-      walkDown: {
-        x: 0,
-        y: 0,
-        width: 16,
-        height: 16,
-        frameCount: 4,
-      },
-      walkUp: {
-        x: 16,
-        y: 0,
-        width: 16,
-        height: 16,
-        frameCount: 4,
-      },
-      walkLeft: {
-        x: 32,
-        y: 0,
-        width: 16,
-        height: 16,
-        frameCount: 4,
-      },
-      walkRight: {
-        x: 48,
-        y: 0,
-        width: 16,
-        height: 16,
-        frameCount: 4,
-      },
-    };
-
-    this.currentSprite = this.sprites.walkDown;
+    this.currentSprite = characterSprites.walkDown;
   }
 
   public draw(c: CanvasRenderingContext2D): void {
@@ -84,16 +53,16 @@ export class Player extends Character {
     this.currentSprite.frameCount = 4;
 
     if (keys.d.pressed) {
-      this.currentSprite = this.sprites.walkRight;
+      this.currentSprite = characterSprites.walkRight;
       this.velocity.x = X_VELOCITY;
     } else if (keys.a.pressed) {
-      this.currentSprite = this.sprites.walkLeft;
+      this.currentSprite = characterSprites.walkLeft;
       this.velocity.x = -X_VELOCITY;
     } else if (keys.w.pressed) {
-      this.currentSprite = this.sprites.walkUp;
+      this.currentSprite = characterSprites.walkUp;
       this.velocity.y = -Y_VELOCITY;
     } else if (keys.s.pressed) {
-      this.currentSprite = this.sprites.walkDown;
+      this.currentSprite = characterSprites.walkDown;
       this.velocity.y = Y_VELOCITY;
     } else {
       this.currentSprite.frameCount = 1;

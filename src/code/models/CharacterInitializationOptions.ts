@@ -5,8 +5,8 @@ export interface CharacterInitializationOptions {
   x: number;
   y: number;
   size: number;
+  imageSrc: string;
   velocity?: Vector;
-  imageSrc?: string;
   sprites?: Sprites;
   health?: number;
 }

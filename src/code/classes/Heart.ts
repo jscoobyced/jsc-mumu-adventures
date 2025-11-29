@@ -1,4 +1,5 @@
 import { Vector, SpriteConfig } from "../models";
+import config from "../config.json";
 
 export class Heart {
   public x: number;
@@ -26,7 +27,7 @@ export class Heart {
     this.image.onload = (): void => {
       this.loaded = true;
     };
-    this.image.src = "./images/heart.png";
+    this.image.src = config.images.decorations.heart;
     this.currentFrame = 4;
 
     this.currentSprite = {
