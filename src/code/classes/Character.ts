@@ -1,5 +1,10 @@
 import { Vector, SpriteConfig } from "../models";
 import { CollisionBlock } from "./CollisionBlock";
+import config from "../config.json";
+const MAP_WIDTH: number = config.tileSize * config.cols;
+const MAP_HEIGHT: number = config.tileSize * config.rows;
+
+const BUFFER = 0.0001;
 
 export abstract class Character {
   public x: number;
@@ -87,10 +92,12 @@ export abstract class Character {
     // Update horizontal position and check collisions
     this.updateHorizontalPosition(deltaTime);
     this.checkForHorizontalCollisions(collisionBlocks);
+    this.checkHorizontalMapCollision();
 
     // Update vertical position and check collisions
     this.updateVerticalPosition(deltaTime);
     this.checkForVerticalCollisions(collisionBlocks);
+    this.checkVerticalMapCollision();
 
     this.updateCenter();
   }
@@ -113,7 +120,6 @@ export abstract class Character {
   protected checkForHorizontalCollisions(
     collisionBlocks: CollisionBlock[]
   ): void {
-    const buffer = 0.0001;
     for (let i = 0; i < collisionBlocks.length; i++) {
       const collisionBlock = collisionBlocks[i];
 
@@ -124,13 +130,13 @@ export abstract class Character {
         this.y <= collisionBlock.y + collisionBlock.height
       ) {
         if (this.velocity.x < 0) {
-          this.x = collisionBlock.x + collisionBlock.width + buffer;
+          this.x = collisionBlock.x + collisionBlock.width + BUFFER;
           this.onHorizontalCollision();
           break;
         }
 
         if (this.velocity.x > 0) {
-          this.x = collisionBlock.x - this.width - buffer;
+          this.x = collisionBlock.x - this.width - BUFFER;
           this.onHorizontalCollision();
           break;
         }
@@ -141,7 +147,6 @@ export abstract class Character {
   protected checkForVerticalCollisions(
     collisionBlocks: CollisionBlock[]
   ): void {
-    const buffer = 0.0001;
     for (let i = 0; i < collisionBlocks.length; i++) {
       const collisionBlock = collisionBlocks[i];
 
@@ -152,17 +157,39 @@ export abstract class Character {
         this.y <= collisionBlock.y + collisionBlock.height
       ) {
         if (this.velocity.y < 0) {
-          this.y = collisionBlock.y + collisionBlock.height + buffer;
+          this.y = collisionBlock.y + collisionBlock.height + BUFFER;
           this.onVerticalCollision();
           break;
         }
 
         if (this.velocity.y > 0) {
-          this.y = collisionBlock.y - this.height - buffer;
+          this.y = collisionBlock.y - this.height - BUFFER;
           this.onVerticalCollision();
           break;
         }
       }
+    }
+  }
+
+  protected checkHorizontalMapCollision(): void {
+    if (this.x <= 0) {
+      this.x = 0 + BUFFER;
+      this.velocity.x = 0;
+    }
+    if (this.x + this.width >= MAP_WIDTH) {
+      this.x = MAP_WIDTH - this.width - BUFFER;
+      this.velocity.x = 0;
+    }
+  }
+
+  protected checkVerticalMapCollision(): void {
+    if (this.y <= 0) {
+      this.y = 0 + BUFFER;
+      this.velocity.y = 0;
+    }
+    if (this.y + this.height >= MAP_HEIGHT) {
+      this.y = MAP_HEIGHT - this.height - BUFFER;
+      this.velocity.y = 0;
     }
   }
 

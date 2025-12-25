@@ -3,7 +3,7 @@ import { Heart } from "./classes/Heart";
 import { initializeEventListeners } from "./utils/eventListeners";
 import { startRendering } from "./level";
 import config from "./config.json";
-import { levelData as LevelA1 } from "./levels/A/1/index";
+import { levelData as LevelA2 } from "./levels/A/2/index";
 
 const player: Player = new Player({
   x: 100,
@@ -28,4 +28,4 @@ const hearts: Heart[] = [
 ];
 
 initializeEventListeners();
-startRendering(LevelA1, player, hearts);
+startRendering(LevelA2, player, hearts);

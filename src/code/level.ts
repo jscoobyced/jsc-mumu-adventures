@@ -35,6 +35,7 @@ const MAX_SCROLL_Y: number = MAP_HEIGHT - VIEWPORT_HEIGHT;
 const collisionBlocks: CollisionBlock[] = [];
 
 const prepareLevel = (level: LevelData) => {
+  collisionBlocks.length = 0;
   level.l_Collisions.forEach((row: number[], y: number) => {
     row.forEach((symbol: number, x: number) => {
       if (symbol === 1) {
