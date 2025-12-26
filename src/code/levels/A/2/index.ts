@@ -57,6 +57,7 @@ const monsters: Monster[] = [
 ];
 
 export const levelData: LevelData = {
+  name: "Level A2",
   layersData,
   frontRenderedLayersData,
   tilesets,

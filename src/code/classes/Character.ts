@@ -1,6 +1,8 @@
 import { Vector, SpriteConfig } from "../models";
 import { CollisionBlock } from "./CollisionBlock";
 import config from "../config.json";
+import { LevelDirection } from "../models/LevelData";
+
 const MAP_WIDTH: number = config.tileSize * config.cols;
 const MAP_HEIGHT: number = config.tileSize * config.rows;
 
@@ -88,18 +90,25 @@ export abstract class Character {
   protected updatePosition(
     deltaTime: number,
     collisionBlocks: CollisionBlock[]
-  ): void {
+  ): LevelDirection {
     // Update horizontal position and check collisions
     this.updateHorizontalPosition(deltaTime);
     this.checkForHorizontalCollisions(collisionBlocks);
-    this.checkHorizontalMapCollision();
+    const horizontalMalCollision = this.checkHorizontalMapCollision();
 
     // Update vertical position and check collisions
     this.updateVerticalPosition(deltaTime);
     this.checkForVerticalCollisions(collisionBlocks);
-    this.checkVerticalMapCollision();
+    const verticalMalCollision = this.checkVerticalMapCollision();
 
     this.updateCenter();
+    if (horizontalMalCollision !== LevelDirection.NONE) {
+      return horizontalMalCollision;
+    }
+    if (verticalMalCollision !== LevelDirection.NONE) {
+      return verticalMalCollision;
+    }
+    return LevelDirection.NONE;
   }
 
   protected updateHorizontalPosition(deltaTime: number): void {
@@ -171,26 +180,32 @@ export abstract class Character {
     }
   }
 
-  protected checkHorizontalMapCollision(): void {
+  protected checkHorizontalMapCollision(): LevelDirection {
     if (this.x <= 0) {
       this.x = 0 + BUFFER;
       this.velocity.x = 0;
+      return LevelDirection.LEFT;
     }
     if (this.x + this.width >= MAP_WIDTH) {
       this.x = MAP_WIDTH - this.width - BUFFER;
       this.velocity.x = 0;
+      return LevelDirection.RIGHT;
     }
+    return LevelDirection.NONE;
   }
 
-  protected checkVerticalMapCollision(): void {
+  protected checkVerticalMapCollision(): LevelDirection {
     if (this.y <= 0) {
       this.y = 0 + BUFFER;
       this.velocity.y = 0;
+      return LevelDirection.UP;
     }
     if (this.y + this.height >= MAP_HEIGHT) {
       this.y = MAP_HEIGHT - this.height - BUFFER;
       this.velocity.y = 0;
+      return LevelDirection.DOWN;
     }
+    return LevelDirection.NONE;
   }
 
   // Abstract methods that must be implemented by subclasses

@@ -3,11 +3,12 @@ import { Heart } from "./classes/Heart";
 import { Monster } from "./classes/Monster";
 import Player from "./classes/Player";
 import { LayersData } from "./models/Layer";
-import { LevelData } from "./models/LevelData";
+import { LevelData, LevelDirection } from "./models/LevelData";
 import { TilesetInfo, Tilesets } from "./models/TileSet";
 import { getKeys, getLastTime, setLastTime } from "./utils/eventListeners";
 import { loadImage } from "./utils/loadImage";
 import config from "./config.json";
+import { mapConfig } from "./levels";
 
 const dpr: number = Math.max(1, window.devicePixelRatio);
 
@@ -17,6 +18,8 @@ const MAP_ROWS: number = config.rows;
 const MAP_WIDTH: number = config.tileSize * MAP_COLS;
 const MAP_HEIGHT: number = config.tileSize * MAP_ROWS;
 const MAP_SCALE: number = dpr + config.mapScale;
+
+const BUFFER = 0.0001;
 
 const canvas = document.querySelector("canvas") as HTMLCanvasElement;
 const c = canvas.getContext("2d") as CanvasRenderingContext2D;
@@ -121,7 +124,7 @@ const renderStaticLayers = async (
 const animate = (
   backgroundCanvas: HTMLCanvasElement,
   player: Player,
-  monsters: Monster[],
+  levelData: LevelData,
   hearts: Heart[],
   frontRenderedCanvas: HTMLCanvasElement
 ): void => {
@@ -132,7 +135,7 @@ const animate = (
 
   // Update player position
   player.handleInput(getKeys());
-  player.update(deltaTime, collisionBlocks);
+  const levelDirection = player.update(deltaTime, collisionBlocks);
 
   const horizontalScrollDistance: number = Math.min(
     Math.max(0, player.center.x - VIEWPORT_CENTER_X),
@@ -153,8 +156,11 @@ const animate = (
   player.draw(c);
 
   // render out our monsters
-  for (let i = monsters.length - 1; i >= 0; i--) {
-    const monster: Monster = monsters[i];
+  if (!levelData.monsters) {
+    levelData.monsters = [];
+  }
+  for (let i = levelData.monsters.length - 1; i >= 0; i--) {
+    const monster: Monster = levelData.monsters[i];
     monster.update(deltaTime, collisionBlocks);
     monster.draw(c);
 
@@ -191,8 +197,35 @@ const animate = (
   });
   c.restore();
 
+  // Check if change level
+  if (levelDirection !== LevelDirection.NONE) {
+    console.log("Level change detected:", levelDirection);
+    const currentConfig = mapConfig.find(
+      (config) => config.levelName === levelData.name
+    );
+    if (currentConfig) {
+      const connection = currentConfig.connectedLevels?.find(
+        (conn) => conn.direction === levelDirection
+      );
+      if (connection) {
+        if (levelDirection === LevelDirection.LEFT) {
+          player.x = MAP_WIDTH - player.width - BUFFER;
+        } else if (levelDirection === LevelDirection.RIGHT) {
+          player.x = 0 + BUFFER;
+        } else if (levelDirection === LevelDirection.UP) {
+          player.y = MAP_HEIGHT - player.height - BUFFER;
+        } else if (levelDirection === LevelDirection.DOWN) {
+          player.y = 0 + BUFFER;
+        }
+        const newLevelData = connection.level;
+        startRendering(newLevelData, player, hearts);
+        return;
+      }
+    }
+  }
+
   requestAnimationFrame(() =>
-    animate(backgroundCanvas, player, monsters, hearts, frontRenderedCanvas)
+    animate(backgroundCanvas, player, levelData, hearts, frontRenderedCanvas)
   );
 };
 
@@ -216,13 +249,7 @@ export const startRendering = async (
       return;
     }
 
-    animate(
-      backgroundCanvas,
-      player,
-      levelData.monsters,
-      hearts,
-      frontRenderedCanvas
-    );
+    animate(backgroundCanvas, player, levelData, hearts, frontRenderedCanvas);
   } catch (error) {
     console.error("Error during rendering:", error);
   }

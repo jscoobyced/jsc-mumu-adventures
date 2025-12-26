@@ -2,6 +2,7 @@ import { CharacterInitializationOptions, Keys } from "../models";
 import { CollisionBlock } from "./CollisionBlock";
 import { Character } from "./Character";
 import { characterSprites } from "../sprites";
+import { LevelDirection } from "../models/LevelData";
 
 const X_VELOCITY = 150;
 const Y_VELOCITY = 150;
@@ -38,12 +39,15 @@ export class Player extends Character {
     );
   }
 
-  public update(deltaTime: number, collisionBlocks: CollisionBlock[]): void {
-    if (!deltaTime) return;
+  public update(
+    deltaTime: number,
+    collisionBlocks: CollisionBlock[]
+  ): LevelDirection {
+    if (!deltaTime) return LevelDirection.NONE;
 
     this.updateInvincibility(deltaTime);
     this.updateAnimation(deltaTime);
-    this.updatePosition(deltaTime, collisionBlocks);
+    return this.updatePosition(deltaTime, collisionBlocks);
   }
 
   public handleInput(keys: Keys): void {
@@ -67,10 +71,6 @@ export class Player extends Character {
     } else {
       this.currentSprite.frameCount = 1;
     }
-  }
-
-  protected onVerticalCollision(): void {
-    this.velocity.y = 0;
   }
 }
 
