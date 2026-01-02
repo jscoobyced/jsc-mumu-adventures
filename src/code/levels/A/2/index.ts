@@ -1,10 +1,9 @@
 import { l_Collisions } from "./l_Collisions";
 import { l_Terrain } from "./l_Terrain";
-import { l_Terrain_2 } from "./l_Terrain_2";
 import { l_Trees } from "./l_Trees";
 import { l_Houses } from "./l_Houses";
-import { l_Large_Buildings } from "./l_Large_Buildings";
-import { l_FrontRender } from "./l_FrontRender";
+import { l_FrontRenderer } from "./l_FrontRenderer";
+import { l_Walls } from "./l_Walls";
 import { LayersData } from "../../../models/Layer";
 import { LevelData } from "../../../models/LevelData";
 import { Tilesets } from "../../../models/TileSet";
@@ -14,14 +13,13 @@ import { characterSprites } from "../../../sprites";
 
 const layersData: LayersData = {
   l_Terrain: l_Terrain,
-  l_Terrain_2: l_Terrain_2,
   l_Trees: l_Trees,
   l_Houses: l_Houses,
-  l_Large_Buildings: l_Large_Buildings,
+  l_Walls: l_Walls,
 };
 
 const frontRenderedLayersData: LayersData = {
-  l_FrontRender: l_FrontRender,
+  l_FrontRenderer: l_FrontRenderer,
 };
 
 const tilesets: Tilesets = {
@@ -41,11 +39,11 @@ const tilesets: Tilesets = {
     imageUrl: config.images.tilesets.decorations,
     tileSize: config.tileSize,
   },
-  l_Large_Buildings: {
+  l_FrontRenderer: {
     imageUrl: config.images.tilesets.decorations,
     tileSize: config.tileSize,
   },
-  l_FrontRender: {
+  l_Walls: {
     imageUrl: config.images.tilesets.decorations,
     tileSize: config.tileSize,
   },

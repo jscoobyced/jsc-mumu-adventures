@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
+    "target": "ES2023",
     "useDefineForClassFields": true,
     "module": "ESNext",
     "lib": ["ES2023", "DOM"],
@@ -20,6 +20,6 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["code/**/*.ts", "vite.config.ts"],
+  "include": ["code/**/*.ts"],
   "exclude": ["node_modules", "coverage", "dist"]
 }

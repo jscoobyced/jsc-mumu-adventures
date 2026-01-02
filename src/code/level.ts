@@ -100,7 +100,6 @@ const renderStaticLayers = async (
   ) as CanvasRenderingContext2D;
 
   for (const [layerName, tilesData] of Object.entries(layersData)) {
-    console.log(`Rendering layer: ${layerName}`);
     const tilesetInfo: TilesetInfo | undefined = tilesets[layerName];
     if (tilesetInfo) {
       try {
