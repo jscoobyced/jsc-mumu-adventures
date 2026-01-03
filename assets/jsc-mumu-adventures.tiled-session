@@ -1,11 +1,11 @@
 {
-    "activeFile": "levels/A/2/map.tmj",
+    "activeFile": "levels/A/1/map.tmj",
     "expandedProjectPaths": [
-        "levels",
-        "levels/A/1",
         "levels/A/2",
         ".",
-        "levels/A"
+        "levels/A/1",
+        "levels/A",
+        "levels"
     ],
     "fileStates": {
         "Decorations.tsx": {
@@ -37,7 +37,7 @@
     ],
     "project": "jsc-mumu-adventures.tiled-project",
     "recentFiles": [
-        "levels/A/1/map.tmj",
-        "levels/A/2/map.tmj"
+        "levels/A/2/map.tmj",
+        "levels/A/1/map.tmj"
     ]
 }
