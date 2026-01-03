@@ -1,9 +1,17 @@
 {
-    "activeFile": "",
+    "activeFile": "levels/A/2/map.tmj",
     "expandedProjectPaths": [
+        "levels",
+        "levels/A/1",
+        "levels/A/2",
+        ".",
+        "levels/A"
     ],
     "fileStates": {
         "Decorations.tsx": {
+            "scaleInDock": 1
+        },
+        "Terrain.tsx": {
             "scaleInDock": 1
         },
         "levels/A/1/map.tmj": {
@@ -24,8 +32,12 @@
         }
     },
     "openFiles": [
+        "levels/A/1/map.tmj",
+        "levels/A/2/map.tmj"
     ],
     "project": "jsc-mumu-adventures.tiled-project",
     "recentFiles": [
+        "levels/A/1/map.tmj",
+        "levels/A/2/map.tmj"
     ]
 }

@@ -4,8 +4,8 @@ import { Character } from "./Character";
 import { characterSprites } from "../sprites";
 import { LevelDirection } from "../models/LevelData";
 
-const X_VELOCITY = 150;
-const Y_VELOCITY = 150;
+const X_VELOCITY = 120;
+const Y_VELOCITY = 120;
 
 export class Player extends Character {
   constructor({
@@ -28,20 +28,20 @@ export class Player extends Character {
     if (!this.currentSprite) return;
     c.drawImage(
       this.image,
-      this.currentSprite.x,
-      this.currentSprite.height * this.currentFrame,
+      this.currentSprite.x + this.currentFrame * this.currentSprite.width,
+      this.currentSprite.y,
       this.currentSprite.width,
       this.currentSprite.height,
       this.x,
       this.y,
       this.width,
-      this.height,
+      this.height
     );
   }
 
   public update(
     deltaTime: number,
-    collisionBlocks: CollisionBlock[],
+    collisionBlocks: CollisionBlock[]
   ): LevelDirection {
     if (!deltaTime) return LevelDirection.NONE;
 

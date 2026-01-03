@@ -14,7 +14,8 @@
     "preview": "vite preview",
     "test": "vitest",
     "test:coverage": "vitest --coverage",
-    "genmap": "ts-node code/generate-map-data.ts",
+    "genmap": "ts-node code/utils/generate-map-data.ts",
+    "splitsprite": "ts-node code/utils/split-sprites.ts",
     "format": "prettier --write ."
   },
   "devDependencies": {
