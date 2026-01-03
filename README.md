@@ -1,6 +1,6 @@
 # JSC's Mumu's Adventures 🕹️
 
-![Mumu's Adventures](/src/images/mumu-adventures.png)
+![Mumu's Adventures](/src/public/mumu-adventures.png)
 
 Live your life as Mumu, the heroic adventurer, to defeat the evil Maginta Llennaspom.
 
