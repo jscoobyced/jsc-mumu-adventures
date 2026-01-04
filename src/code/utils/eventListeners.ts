@@ -16,6 +16,7 @@ const initializeKeys = (): void => {
     a: { pressed: false },
     s: { pressed: false },
     d: { pressed: false },
+    space: { pressed: false },
   };
 };
 
@@ -40,6 +41,9 @@ export const initializeEventListeners = (): void => {
       case "ArrowRight":
         keys.d.pressed = true;
         break;
+      case " ":
+        keys.space.pressed = true;
+        break;
       default:
         break;
     }
@@ -62,6 +66,8 @@ export const initializeEventListeners = (): void => {
       case "d":
       case "ArrowRight":
         keys.d.pressed = false;
+        break;
+      default:
         break;
     }
   });

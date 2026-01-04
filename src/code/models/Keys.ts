@@ -3,6 +3,7 @@ export interface Keys {
   a: KeyState;
   s: KeyState;
   d: KeyState;
+  space: KeyState;
 }
 
 export interface KeyState {

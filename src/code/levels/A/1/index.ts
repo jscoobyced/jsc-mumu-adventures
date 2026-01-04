@@ -41,7 +41,7 @@ const tilesets: Tilesets = {
 
 const monsters: Monster[] = [
   new Monster({
-    x: 380,
+    x: 300,
     y: 480,
     size: 15,
     velocity: { x: 0, y: 0 },

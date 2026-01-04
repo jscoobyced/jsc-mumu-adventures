@@ -7,18 +7,24 @@
   "mapScale": 0.5,
   "images": {
     "tilesets": {
-      "terrain": "./terrain.png",
-      "decorations": "./decorations.png",
-      "terrain_2": "./terrain_2.png"
+      "terrain": "./images/terrain.png",
+      "decorations": "./images/decorations.png"
     },
     "player": {
-      "princess": "./princess.png"
+      "princess": "./images/princess.png"
     },
     "monsters": {
-      "owl": "./owl.png"
+      "owl": "./images/owl.png"
     },
     "decorations": {
-      "heart": "./heart.png"
+      "heart": "./images/heart.png"
+    },
+    "ui": {
+      "banner": {
+        "path": "./images/banner.png",
+        "width": 1024,
+        "height": 340
+      }
     }
   }
 }
