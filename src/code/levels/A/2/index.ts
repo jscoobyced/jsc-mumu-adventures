@@ -27,10 +27,6 @@ const tilesets: Tilesets = {
     imageUrl: config.images.tilesets.terrain,
     tileSize: config.tileSize,
   },
-  l_Terrain_2: {
-    imageUrl: config.images.tilesets.terrain_2,
-    tileSize: config.tileSize,
-  },
   l_Trees: {
     imageUrl: config.images.tilesets.decorations,
     tileSize: config.tileSize,
