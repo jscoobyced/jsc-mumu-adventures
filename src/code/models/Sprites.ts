@@ -1,8 +1,8 @@
-import { SpriteConfig } from "./SpriteConfig";
+import { SpriteConfig } from './SpriteConfig'
 
 export interface Sprites {
-  walkDown: SpriteConfig;
-  walkUp: SpriteConfig;
-  walkLeft: SpriteConfig;
-  walkRight: SpriteConfig;
+  walkDown: SpriteConfig
+  walkUp: SpriteConfig
+  walkLeft: SpriteConfig
+  walkRight: SpriteConfig
 }

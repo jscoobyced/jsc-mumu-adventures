@@ -1,17 +1,17 @@
-import { Heart } from "../classes/Heart";
-import { Player } from "../classes/Player";
-import { startRendering } from "../level";
-import { levelData as initialLevel } from "../levels/A/1/index";
-import config from "../config.json";
-import { LevelData } from "../models/LevelData";
-import { Banner } from "../classes/Banner";
+import { Banner } from '../classes/Banner'
+import { Heart } from '../classes/Heart'
+import { Player } from '../classes/Player'
+import config from '../config.json'
+import { startRendering } from '../level'
+import { levelData as initialLevel } from '../levels/A/1/index'
+import { LevelData } from '../models/LevelData'
 
 export interface Game {
-  playing: boolean;
-  levelData: LevelData;
-  player: Player;
-  hearts: Heart[];
-  banner: Banner;
+  playing: boolean
+  levelData: LevelData
+  player: Player
+  hearts: Heart[]
+  banner: Banner
 }
 
 export const startGame = (): void => {
@@ -28,20 +28,20 @@ export const startGame = (): void => {
       x: 54,
       y: 10,
     }),
-  ];
+  ]
 
   const initialPlayer: Player = new Player({
     x: 200,
     y: 550,
     size: 15,
     imageSrc: config.images.player.princess,
-  });
+  })
   const game = {
     playing: true,
     levelData: initialLevel,
     player: initialPlayer,
     hearts: initialHearts,
     banner: new Banner({ x: 10, y: 10 }),
-  };
-  startRendering(game);
-};
+  }
+  startRendering(game)
+}

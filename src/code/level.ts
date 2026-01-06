@@ -1,45 +1,45 @@
-import { CollisionBlock } from "./classes/CollisionBlock";
-import { Heart } from "./classes/Heart";
-import { Monster } from "./classes/Monster";
-import { LayersData } from "./models/Layer";
-import { LevelData, LevelDirection } from "./models/LevelData";
-import { TilesetInfo, Tilesets } from "./models/TileSet";
-import { getKeys, getLastTime, setLastTime } from "./utils/eventListeners";
-import { loadImage } from "./utils/loadImage";
-import config from "./config.json";
-import { mapConfig } from "./levels";
-import { isDebugMode } from "./utils/debug";
-import { Game, startGame } from "./utils/game";
+import { CollisionBlock } from './classes/CollisionBlock'
+import { Heart } from './classes/Heart'
+import { Monster } from './classes/Monster'
+import config from './config.json'
+import { mapConfig } from './levels'
+import { LayersData } from './models/Layer'
+import { LevelData, LevelDirection } from './models/LevelData'
+import { TilesetInfo, Tilesets } from './models/TileSet'
+import { isDebugMode } from './utils/debug'
+import { getKeys, getLastTime, setLastTime } from './utils/eventListeners'
+import { Game, startGame } from './utils/game'
+import { loadImage } from './utils/loadImage'
 
-const dpr: number = Math.max(1, window.devicePixelRatio);
+const dpr: number = Math.max(1, window.devicePixelRatio)
 
-const MAP_COLS: number = config.cols;
-const MAP_ROWS: number = config.rows;
+const MAP_COLS: number = config.cols
+const MAP_ROWS: number = config.rows
 
-const MAP_WIDTH: number = config.tileSize * MAP_COLS;
-const MAP_HEIGHT: number = config.tileSize * MAP_ROWS;
-const MAP_SCALE: number = dpr + config.mapScale;
+const MAP_WIDTH: number = config.tileSize * MAP_COLS
+const MAP_HEIGHT: number = config.tileSize * MAP_ROWS
+const MAP_SCALE: number = dpr + config.mapScale
 
-const BUFFER = 0.0001;
+const BUFFER = 0.0001
 
-const canvas = document.querySelector("canvas") as HTMLCanvasElement;
-const c = canvas.getContext("2d") as CanvasRenderingContext2D;
-canvas.width = config.canvasWidth * dpr;
-canvas.height = config.canvasHeight * dpr;
+const canvas = document.querySelector('canvas') as HTMLCanvasElement
+const c = canvas.getContext('2d') as CanvasRenderingContext2D
+canvas.width = config.canvasWidth * dpr
+canvas.height = config.canvasHeight * dpr
 
-const VIEWPORT_WIDTH: number = canvas.width / MAP_SCALE;
-const VIEWPORT_HEIGHT: number = canvas.height / MAP_SCALE;
+const VIEWPORT_WIDTH: number = canvas.width / MAP_SCALE
+const VIEWPORT_HEIGHT: number = canvas.height / MAP_SCALE
 
-const VIEWPORT_CENTER_X: number = VIEWPORT_WIDTH / 2;
-const VIEWPORT_CENTER_Y: number = VIEWPORT_HEIGHT / 2;
+const VIEWPORT_CENTER_X: number = VIEWPORT_WIDTH / 2
+const VIEWPORT_CENTER_Y: number = VIEWPORT_HEIGHT / 2
 
-const MAX_SCROLL_X: number = MAP_WIDTH - VIEWPORT_WIDTH;
-const MAX_SCROLL_Y: number = MAP_HEIGHT - VIEWPORT_HEIGHT;
+const MAX_SCROLL_X: number = MAP_WIDTH - VIEWPORT_WIDTH
+const MAX_SCROLL_Y: number = MAP_HEIGHT - VIEWPORT_HEIGHT
 
-const collisionBlocks: CollisionBlock[] = [];
+const collisionBlocks: CollisionBlock[] = []
 
 const prepareLevel = (level: LevelData) => {
-  collisionBlocks.length = 0;
+  collisionBlocks.length = 0
   level.l_Collisions.forEach((row: number[], y: number) => {
     row.forEach((symbol: number, x: number) => {
       if (symbol === 1) {
@@ -48,30 +48,30 @@ const prepareLevel = (level: LevelData) => {
             x: x * config.tileSize,
             y: y * config.tileSize,
             size: config.tileSize,
-          })
-        );
+          }),
+        )
       }
-    });
-  });
-};
+    })
+  })
+}
 
-let frontRenderedCanvas: HTMLCanvasElement;
+let frontRenderedCanvas: HTMLCanvasElement
 
 const renderLayer = (
   tilesData: number[][],
   tilesetImage: HTMLImageElement,
   tileSize: number,
-  context: CanvasRenderingContext2D
+  context: CanvasRenderingContext2D,
 ): void => {
-  const tilesPerRow: number = Math.ceil(tilesetImage.width / tileSize);
+  const tilesPerRow: number = Math.ceil(tilesetImage.width / tileSize)
 
   tilesData.forEach((row: number[], y: number) => {
     row.forEach((symbol: number, x: number) => {
       if (symbol !== 0) {
-        const tileIndex: number = symbol - 1;
+        const tileIndex: number = symbol - 1
 
-        const srcX: number = (tileIndex % tilesPerRow) * tileSize;
-        const srcY: number = Math.floor(tileIndex / tilesPerRow) * tileSize;
+        const srcX: number = (tileIndex % tilesPerRow) * tileSize
+        const srcY: number = Math.floor(tileIndex / tilesPerRow) * tileSize
 
         context.drawImage(
           tilesetImage,
@@ -82,91 +82,91 @@ const renderLayer = (
           x * tileSize,
           y * tileSize,
           tileSize,
-          tileSize
-        );
+          tileSize,
+        )
       }
-    });
-  });
-};
+    })
+  })
+}
 
 const renderStaticLayers = async (
   layersData: LayersData,
-  tilesets: Tilesets
+  tilesets: Tilesets,
 ): Promise<HTMLCanvasElement> => {
-  const offscreenCanvas: HTMLCanvasElement = document.createElement("canvas");
-  offscreenCanvas.width = MAP_WIDTH;
-  offscreenCanvas.height = MAP_HEIGHT;
+  const offscreenCanvas: HTMLCanvasElement = document.createElement('canvas')
+  offscreenCanvas.width = MAP_WIDTH
+  offscreenCanvas.height = MAP_HEIGHT
   const offscreenContext = offscreenCanvas.getContext(
-    "2d"
-  ) as CanvasRenderingContext2D;
+    '2d',
+  ) as CanvasRenderingContext2D
 
   for (const [layerName, tilesData] of Object.entries(layersData)) {
-    const tilesetInfo: TilesetInfo | undefined = tilesets[layerName];
+    const tilesetInfo: TilesetInfo | undefined = tilesets[layerName]
     if (tilesetInfo) {
       try {
         const tilesetImage: HTMLImageElement = await loadImage(
-          tilesetInfo.imageUrl
-        );
+          tilesetInfo.imageUrl,
+        )
         renderLayer(
           tilesData,
           tilesetImage,
           tilesetInfo.tileSize,
-          offscreenContext
-        );
+          offscreenContext,
+        )
       } catch (error) {
-        console.error(`Failed to load image for layer ${layerName}:`, error);
+        console.error(`Failed to load image for layer ${layerName}:`, error)
       }
     }
   }
 
-  return offscreenCanvas;
-};
+  return offscreenCanvas
+}
 
 const animate = (
   backgroundCanvas: HTMLCanvasElement,
   game: Game,
-  frontRenderedCanvas: HTMLCanvasElement
+  frontRenderedCanvas: HTMLCanvasElement,
 ): void => {
   // Calculate delta time
-  const currentTime: number = performance.now();
-  const deltaTime: number = (currentTime - getLastTime()) / 1000;
-  setLastTime(currentTime);
+  const currentTime: number = performance.now()
+  const deltaTime: number = (currentTime - getLastTime()) / 1000
+  setLastTime(currentTime)
 
   // Update player position
-  if (game.playing) game.player.handleInput(getKeys());
+  if (game.playing) game.player.handleInput(getKeys())
   const levelDirection = game.playing
     ? game.player.update(deltaTime, collisionBlocks)
-    : LevelDirection.NONE;
+    : LevelDirection.NONE
 
   const horizontalScrollDistance: number = Math.min(
     Math.max(0, game.player.center.x - VIEWPORT_CENTER_X),
-    MAX_SCROLL_X
-  );
+    MAX_SCROLL_X,
+  )
 
   const verticalScrollDistance: number = Math.min(
     Math.max(0, game.player.center.y - VIEWPORT_CENTER_Y),
-    MAX_SCROLL_Y
-  );
+    MAX_SCROLL_Y,
+  )
 
   // Render scene
-  c.save();
-  c.scale(MAP_SCALE, MAP_SCALE);
-  c.translate(-horizontalScrollDistance, -verticalScrollDistance);
-  c.clearRect(0, 0, canvas.width, canvas.height);
-  c.drawImage(backgroundCanvas, 0, 0);
+  c.save()
+  c.scale(MAP_SCALE, MAP_SCALE)
+  c.translate(-horizontalScrollDistance, -verticalScrollDistance)
+  c.clearRect(0, 0, canvas.width, canvas.height)
+  c.drawImage(backgroundCanvas, 0, 0)
   if (isDebugMode()) {
-    debugCollisions(c);
+    debugCollisions(c)
   }
-  game.player.draw(c);
+  game.player.draw(c)
 
   // render out our monsters
   if (!game.levelData.monsters) {
-    game.levelData.monsters = [];
+    game.levelData.monsters = []
   }
   for (let i = game.levelData.monsters.length - 1; i >= 0; i--) {
-    const monster: Monster = game.levelData.monsters[i];
-    monster.update(deltaTime, collisionBlocks);
-    monster.draw(c);
+    const monster: Monster = game.levelData.monsters[i]
+    monster.update(deltaTime, collisionBlocks)
+    monster.draw(c)
 
     // Detect for collision
     if (
@@ -176,92 +176,92 @@ const animate = (
       game.player.y <= monster.y + monster.height &&
       !game.player.isInvincible
     ) {
-      game.player.receiveHit();
+      game.player.receiveHit()
       const filledHearts: Heart[] = game.hearts.filter(
-        (heart: Heart) => heart.currentFrame === 4
-      );
+        (heart: Heart) => heart.currentFrame === 4,
+      )
 
       if (filledHearts.length > 0) {
-        filledHearts[filledHearts.length - 1].currentFrame = 0;
+        filledHearts[filledHearts.length - 1].currentFrame = 0
       }
 
       if (filledHearts.length <= 1) {
-        game.banner.show("Game over. Press SPACE to restart.");
-        game.playing = false;
+        game.banner.show('Game over. Press SPACE to restart.')
+        game.playing = false
       }
     }
   }
 
-  c.drawImage(frontRenderedCanvas, 0, 0);
-  c.restore();
+  c.drawImage(frontRenderedCanvas, 0, 0)
+  c.restore()
 
-  c.save();
-  c.scale(MAP_SCALE, MAP_SCALE);
+  c.save()
+  c.scale(MAP_SCALE, MAP_SCALE)
   game.hearts.forEach((heart: Heart) => {
-    heart.draw(c);
-  });
-  c.restore();
+    heart.draw(c)
+  })
+  c.restore()
 
-  const bannerClosed = game.banner.draw(c, getKeys());
+  const bannerClosed = game.banner.draw(c, getKeys())
   if (!game.playing && bannerClosed) {
-    startGame();
-    return;
+    startGame()
+    return
   }
 
   // Check if change level
   if (levelDirection !== LevelDirection.NONE) {
     const currentConfig = mapConfig.find(
-      (config) => config.levelName === game.levelData.name
-    );
+      (config) => config.levelName === game.levelData.name,
+    )
     if (currentConfig) {
       const connection = currentConfig.connectedLevels?.find(
-        (conn) => conn.direction === levelDirection
-      );
+        (conn) => conn.direction === levelDirection,
+      )
       if (connection) {
         if (levelDirection === LevelDirection.LEFT) {
-          game.player.x = MAP_WIDTH - game.player.width - BUFFER;
+          game.player.x = MAP_WIDTH - game.player.width - BUFFER
         } else if (levelDirection === LevelDirection.RIGHT) {
-          game.player.x = 0 + BUFFER;
+          game.player.x = 0 + BUFFER
         } else if (levelDirection === LevelDirection.UP) {
-          game.player.y = MAP_HEIGHT - game.player.height - BUFFER;
+          game.player.y = MAP_HEIGHT - game.player.height - BUFFER
         } else if (levelDirection === LevelDirection.DOWN) {
-          game.player.y = 0 + BUFFER;
+          game.player.y = 0 + BUFFER
         }
-        game.levelData = connection.level;
-        startRendering(game);
-        return;
+        game.levelData = connection.level
+        startRendering(game)
+        return
       }
     }
   }
 
   requestAnimationFrame(() =>
-    animate(backgroundCanvas, game, frontRenderedCanvas)
-  );
-};
+    animate(backgroundCanvas, game, frontRenderedCanvas),
+  )
+}
 
 const debugCollisions = (c: CanvasRenderingContext2D): void => {
   collisionBlocks.forEach((block: CollisionBlock) => {
-    block.draw(c);
-  });
-};
+    block.draw(c)
+  })
+}
 
 export const startRendering = async (game: Game): Promise<void> => {
-  prepareLevel(game.levelData);
+  prepareLevel(game.levelData)
   try {
     const backgroundCanvas: HTMLCanvasElement = await renderStaticLayers(
       game.levelData.layersData,
-      game.levelData.tilesets
-    );
+      game.levelData.tilesets,
+    )
     frontRenderedCanvas = await renderStaticLayers(
       game.levelData.frontRenderedLayersData,
-      game.levelData.tilesets
-    );
+      game.levelData.tilesets,
+    )
     if (!backgroundCanvas) {
-      console.error("Failed to create the background canvas");
-      return;
+      console.error('Failed to create the background canvas')
+      return
     }
-    animate(backgroundCanvas, game, frontRenderedCanvas);
+    animate(backgroundCanvas, game, frontRenderedCanvas)
   } catch (error) {
-    console.error("Error during rendering:", error);
+    console.error('Error during rendering:', error)
   }
-};
+}

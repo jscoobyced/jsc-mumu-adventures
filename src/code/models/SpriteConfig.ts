@@ -1,7 +1,7 @@
 export interface SpriteConfig {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  frameCount: number;
+  x: number
+  y: number
+  width: number
+  height: number
+  frameCount: number
 }

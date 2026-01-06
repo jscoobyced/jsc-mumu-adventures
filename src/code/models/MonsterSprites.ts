@@ -1,5 +1,5 @@
-import { SpriteConfig } from "./SpriteConfig";
+import { SpriteConfig } from './SpriteConfig'
 
 export interface MonsterSprites {
-  [key: string]: SpriteConfig;
+  [key: string]: SpriteConfig
 }

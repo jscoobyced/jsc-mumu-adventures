@@ -1,4 +1,4 @@
-import { defineConfig } from "vitest/config";
+import { defineConfig } from 'vitest/config'
 
 // https://vite.dev/config/
-export default defineConfig({});
+export default defineConfig({})

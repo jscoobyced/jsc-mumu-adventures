@@ -1,9 +1,9 @@
 declare global {
   interface Window {
-    jscDebug?: boolean;
+    jscDebug?: boolean
   }
 }
 
 export const isDebugMode = (): boolean => {
-  return window.jscDebug === true;
-};
+  return window.jscDebug === true
+}

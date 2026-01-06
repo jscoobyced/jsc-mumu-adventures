@@ -1,9 +1,9 @@
-import { initializeEventListeners } from "./utils/eventListeners";
-import { startGame } from "./utils/game";
+import { initializeEventListeners } from './utils/eventListeners'
+import { startGame } from './utils/game'
 
-initializeEventListeners();
-const myFont = new FontFace("MumuFont", "url(fonts/mumu.ttf)");
+initializeEventListeners()
+const myFont = new FontFace('MumuFont', 'url(fonts/mumu.ttf)')
 myFont.load().then(() => {
-  document.fonts.add(myFont);
-  startGame();
-});
+  document.fonts.add(myFont)
+  startGame()
+})

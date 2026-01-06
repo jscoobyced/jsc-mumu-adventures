@@ -1,14 +1,14 @@
-import { Keys } from "../models/Keys";
+import { Keys } from '../models/Keys'
 
 // Declare global variables (these should be defined elsewhere in your project)
-let keys!: Keys;
+let keys!: Keys
 
-export const getKeys = (): Keys => keys;
-export let lastTime: number = performance.now();
-export const getLastTime = (): number => lastTime;
+export const getKeys = (): Keys => keys
+export let lastTime: number = performance.now()
+export const getLastTime = (): number => lastTime
 export const setLastTime = (time: number): void => {
-  lastTime = time;
-};
+  lastTime = time
+}
 
 const initializeKeys = (): void => {
   keys = {
@@ -17,65 +17,65 @@ const initializeKeys = (): void => {
     s: { pressed: false },
     d: { pressed: false },
     space: { pressed: false },
-  };
-};
+  }
+}
 
-initializeKeys();
+initializeKeys()
 
 export const initializeEventListeners = (): void => {
-  window.addEventListener("keydown", (event: KeyboardEvent): void => {
+  window.addEventListener('keydown', (event: KeyboardEvent): void => {
     switch (event.key) {
-      case "w":
-      case "ArrowUp":
-        keys.w.pressed = true;
-        break;
-      case "a":
-      case "ArrowLeft":
-        keys.a.pressed = true;
-        break;
-      case "s":
-      case "ArrowDown":
-        keys.s.pressed = true;
-        break;
-      case "d":
-      case "ArrowRight":
-        keys.d.pressed = true;
-        break;
-      case " ":
-        keys.space.pressed = true;
-        break;
+      case 'w':
+      case 'ArrowUp':
+        keys.w.pressed = true
+        break
+      case 'a':
+      case 'ArrowLeft':
+        keys.a.pressed = true
+        break
+      case 's':
+      case 'ArrowDown':
+        keys.s.pressed = true
+        break
+      case 'd':
+      case 'ArrowRight':
+        keys.d.pressed = true
+        break
+      case ' ':
+        keys.space.pressed = true
+        break
       default:
-        break;
+        break
     }
-  });
+  })
 
-  window.addEventListener("keyup", (event: KeyboardEvent): void => {
+  window.addEventListener('keyup', (event: KeyboardEvent): void => {
     switch (event.key) {
-      case "w":
-      case "ArrowUp":
-        keys.w.pressed = false;
-        break;
-      case "a":
-      case "ArrowLeft":
-        keys.a.pressed = false;
-        break;
-      case "s":
-      case "ArrowDown":
-        keys.s.pressed = false;
-        break;
-      case "d":
-      case "ArrowRight":
-        keys.d.pressed = false;
-        break;
+      case 'w':
+      case 'ArrowUp':
+        keys.w.pressed = false
+        break
+      case 'a':
+      case 'ArrowLeft':
+        keys.a.pressed = false
+        break
+      case 's':
+      case 'ArrowDown':
+        keys.s.pressed = false
+        break
+      case 'd':
+      case 'ArrowRight':
+        keys.d.pressed = false
+        break
       default:
-        break;
+        break
     }
-  });
+  })
 
   // On return to game's tab, ensure delta time is reset
-  document.addEventListener("visibilitychange", (): void => {
+  document.addEventListener('visibilitychange', (): void => {
     if (!document.hidden) {
-      lastTime = performance.now();
+      lastTime = performance.now()
     }
-  });
-};
+  })
+}

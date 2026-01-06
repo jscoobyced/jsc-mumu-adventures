@@ -1,3 +1,3 @@
 export interface LayersData {
-  [key: string]: number[][];
+  [key: string]: number[][]
 }

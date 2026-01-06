@@ -1,5 +1,5 @@
-import { Sprites } from "./models";
-import config from "./config.json";
+import config from './config.json'
+import { Sprites } from './models'
 
 export const characterSprites: Sprites = {
   walkDown: {
@@ -30,4 +30,4 @@ export const characterSprites: Sprites = {
     height: config.tileSize,
     frameCount: 4,
   },
-};
+}
