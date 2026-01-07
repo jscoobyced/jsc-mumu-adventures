@@ -48,8 +48,8 @@ export class Monster extends Character {
     if (!this.currentSprite) return
     c.drawImage(
       this.image,
-      this.currentSprite.x,
-      this.currentSprite.height * this.currentFrame + 0.5,
+      this.currentSprite.x + this.currentFrame * this.currentSprite.width,
+      this.currentSprite.y,
       this.currentSprite.width,
       this.currentSprite.height,
       this.x,

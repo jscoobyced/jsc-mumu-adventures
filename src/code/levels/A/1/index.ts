@@ -45,7 +45,7 @@ const monsters: Monster[] = [
     y: 480,
     size: 15,
     velocity: { x: 0, y: 0 },
-    imageSrc: config.images.monsters.owl,
+    imageSrc: config.images.monsters.blond,
     sprites: characterSprites,
   }),
 ];

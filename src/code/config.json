@@ -14,7 +14,7 @@
       "princess": "./images/princess.png"
     },
     "monsters": {
-      "owl": "./images/owl.png"
+      "blond": "./images/npc_f_blond.png"
     },
     "decorations": {
       "heart": "./images/heart.png"
