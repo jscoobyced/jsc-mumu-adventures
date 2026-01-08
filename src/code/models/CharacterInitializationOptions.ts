@@ -9,4 +9,6 @@ export interface CharacterInitializationOptions {
   velocity?: Vector
   sprites?: Sprites
   health?: number
+  attacking?: boolean
+  messages?: string[]
 }

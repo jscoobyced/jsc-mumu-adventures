@@ -1,5 +1,7 @@
 import { Banner } from '../classes/Banner'
+import { CollisionBlock } from '../classes/CollisionBlock'
 import { Heart } from '../classes/Heart'
+import { Npc } from '../classes/Npc'
 import { Player } from '../classes/Player'
 import config from '../config.json'
 import { startRendering } from '../level'
@@ -8,6 +10,7 @@ import { LevelData } from '../models/LevelData'
 
 export interface Game {
   playing: boolean
+  paused: boolean
   levelData: LevelData
   player: Player
   hearts: Heart[]
@@ -36,12 +39,59 @@ export const startGame = (): void => {
     size: 15,
     imageSrc: config.images.player.princess,
   })
-  const game = {
+
+  const game: Game = {
     playing: true,
+    paused: false,
     levelData: initialLevel,
     player: initialPlayer,
     hearts: initialHearts,
     banner: new Banner({ x: 10, y: 10 }),
   }
   startRendering(game)
+}
+
+export const handleNpcs = (
+  game: Game,
+  canvas: CanvasRenderingContext2D,
+  collisionBlocks: CollisionBlock[],
+  deltaTime: number,
+): void => {
+  for (let i = game.levelData.npcs.length - 1; i >= 0; i--) {
+    const npcs: Npc = game.levelData.npcs[i]
+    if (!game.paused) npcs.update(deltaTime, collisionBlocks)
+    npcs.draw(canvas)
+
+    // Detect for collision
+    if (
+      game.player.x + game.player.width >= npcs.x &&
+      game.player.x <= npcs.x + npcs.width &&
+      game.player.y + game.player.height >= npcs.y &&
+      game.player.y <= npcs.y + npcs.height
+    ) {
+      // If the NPC has a message, show it in the banner
+      const npcMessage = npcs.getMessage?.() // optional chaining for safety
+      if (npcMessage) {
+        game.paused = true
+        game.banner.show(npcMessage)
+        continue
+      }
+      // Otherwise, if the NPC is attacking and player is not invincible
+      if (!game.player.isInvincible && npcs.isAttacking?.()) {
+        game.player.receiveHit()
+        const filledHearts: Heart[] = game.hearts.filter(
+          (heart: Heart) => heart.currentFrame === 4,
+        )
+
+        if (filledHearts.length > 0) {
+          filledHearts[filledHearts.length - 1].currentFrame = 0
+        }
+
+        if (filledHearts.length <= 1) {
+          game.banner.show('Game over. Press SPACE to restart.')
+          game.playing = false
+        }
+      }
+    }
+  }
 }

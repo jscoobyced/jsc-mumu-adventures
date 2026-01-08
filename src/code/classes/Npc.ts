@@ -3,10 +3,12 @@ import { characterSprites } from '../sprites'
 import { Character } from './Character'
 import { CollisionBlock } from './CollisionBlock'
 
-export class Monster extends Character {
+export class Npc extends Character {
   public originalPosition: Vector
   public health: number
   public elapsedMovementTime: number
+  private attacking: boolean
+  private messages: string[]
 
   constructor({
     x,
@@ -15,6 +17,8 @@ export class Monster extends Character {
     imageSrc,
     velocity = { x: 0, y: 0 },
     health = 3,
+    attacking = false,
+    messages = [],
   }: CharacterInitializationOptions) {
     super(x, y, size, velocity)
 
@@ -22,13 +26,23 @@ export class Monster extends Character {
     this.health = health
     this.elapsedMovementTime = 0
     this.invincibilityInterval = 0.3
+    this.attacking = attacking
+    this.messages = [...messages]
 
     this.loadImage(imageSrc)
 
     if (characterSprites === undefined) {
-      throw new Error('Monster sprites is undefined')
+      throw new Error('NPC sprites is undefined')
     }
     this.currentSprite = Object.values(characterSprites)[0]
+  }
+
+  public getMessage = (): string | undefined => {
+    return this.messages.shift()
+  }
+
+  public isAttacking = (): boolean => {
+    return this.attacking
   }
 
   public receiveHit(): void {
@@ -114,4 +128,4 @@ export class Monster extends Character {
   }
 }
 
-export default Monster
+export default Npc

@@ -1,6 +1,5 @@
 import { CollisionBlock } from './classes/CollisionBlock'
 import { Heart } from './classes/Heart'
-import { Monster } from './classes/Monster'
 import config from './config.json'
 import { mapConfig } from './levels'
 import { LayersData } from './models/Layer'
@@ -8,7 +7,7 @@ import { LevelData, LevelDirection } from './models/LevelData'
 import { TilesetInfo, Tilesets } from './models/TileSet'
 import { isDebugMode } from './utils/debug'
 import { getKeys, getLastTime, setLastTime } from './utils/eventListeners'
-import { Game, startGame } from './utils/game'
+import { Game, handleNpcs, startGame } from './utils/game'
 import { loadImage } from './utils/loadImage'
 
 const dpr: number = Math.max(1, window.devicePixelRatio)
@@ -133,10 +132,11 @@ const animate = (
   setLastTime(currentTime)
 
   // Update player position
-  if (game.playing) game.player.handleInput(getKeys())
-  const levelDirection = game.playing
-    ? game.player.update(deltaTime, collisionBlocks)
-    : LevelDirection.NONE
+  if (game.playing && !game.paused) game.player.handleInput(getKeys())
+  const levelDirection =
+    game.playing && !game.paused
+      ? game.player.update(deltaTime, collisionBlocks)
+      : LevelDirection.NONE
 
   const horizontalScrollDistance: number = Math.min(
     Math.max(0, game.player.center.x - VIEWPORT_CENTER_X),
@@ -159,38 +159,7 @@ const animate = (
   }
   game.player.draw(c)
 
-  // render out our monsters
-  if (!game.levelData.monsters) {
-    game.levelData.monsters = []
-  }
-  for (let i = game.levelData.monsters.length - 1; i >= 0; i--) {
-    const monster: Monster = game.levelData.monsters[i]
-    monster.update(deltaTime, collisionBlocks)
-    monster.draw(c)
-
-    // Detect for collision
-    if (
-      game.player.x + game.player.width >= monster.x &&
-      game.player.x <= monster.x + monster.width &&
-      game.player.y + game.player.height >= monster.y &&
-      game.player.y <= monster.y + monster.height &&
-      !game.player.isInvincible
-    ) {
-      game.player.receiveHit()
-      const filledHearts: Heart[] = game.hearts.filter(
-        (heart: Heart) => heart.currentFrame === 4,
-      )
-
-      if (filledHearts.length > 0) {
-        filledHearts[filledHearts.length - 1].currentFrame = 0
-      }
-
-      if (filledHearts.length <= 1) {
-        game.banner.show('Game over. Press SPACE to restart.')
-        game.playing = false
-      }
-    }
-  }
+  if (!game.paused) handleNpcs(game, c, collisionBlocks, deltaTime)
 
   c.drawImage(frontRenderedCanvas, 0, 0)
   c.restore()
@@ -203,6 +172,11 @@ const animate = (
   c.restore()
 
   const bannerClosed = game.banner.draw(c, getKeys())
+  if (game.paused && bannerClosed) {
+    game.paused = false
+  }
+
+  // Check if restart game
   if (!game.playing && bannerClosed) {
     startGame()
     return

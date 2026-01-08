@@ -1,6 +1,6 @@
 export { type CharacterInitializationOptions } from './CharacterInitializationOptions'
 export { type Keys } from './Keys'
-export { type MonsterSprites } from './MonsterSprites'
+export { type NpcSprites } from './NpcSprites'
 export { type SpriteConfig } from './SpriteConfig'
 export { type Sprites } from './Sprites'
 export { type Vector } from './Vector'

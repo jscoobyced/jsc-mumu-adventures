@@ -6,7 +6,7 @@ import { l_FrontRenderer } from "./l_FrontRenderer";
 import { LayersData } from "../../../models/Layer";
 import { LevelData } from "../../../models/LevelData";
 import { Tilesets } from "../../../models/TileSet";
-import { Monster } from "../../../classes/Monster";
+import { Npc } from "../../../classes/Npc";
 import config from "../../../config.json";
 import { characterSprites } from "../../../sprites";
 
@@ -39,14 +39,15 @@ const tilesets: Tilesets = {
   },
 };
 
-const monsters: Monster[] = [
-  new Monster({
+const npcs: Npc[] = [
+  new Npc({
     x: 300,
     y: 480,
     size: 15,
     velocity: { x: 0, y: 0 },
-    imageSrc: config.images.monsters.blond,
+    imageSrc: config.images.npcs.blond,
     sprites: characterSprites,
+    messages: ["Hello there! Welcome to our village.", "Feel free to explore around."],
   }),
 ];
 
@@ -56,5 +57,5 @@ export const levelData: LevelData = {
   frontRenderedLayersData,
   tilesets,
   l_Collisions,
-  monsters,
+  npcs,
 };

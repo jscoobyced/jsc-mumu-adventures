@@ -7,7 +7,7 @@ import { l_Walls } from "./l_Walls";
 import { LayersData } from "../../../models/Layer";
 import { LevelData } from "../../../models/LevelData";
 import { Tilesets } from "../../../models/TileSet";
-import { Monster } from "../../../classes/Monster";
+import { Npc } from "../../../classes/Npc";
 import config from "../../../config.json";
 import { characterSprites } from "../../../sprites";
 
@@ -45,14 +45,16 @@ const tilesets: Tilesets = {
   },
 };
 
-const monsters: Monster[] = [
-  new Monster({
+const npcs: Npc[] = [
+  new Npc({
     x: 380,
     y: 480,
     size: 15,
     velocity: { x: 0, y: 0 },
-    imageSrc: config.images.monsters.blond,
+    imageSrc: config.images.npcs.blond,
     sprites: characterSprites,
+    health: 1,
+    attacking: true,
   }),
 ];
 
@@ -62,5 +64,5 @@ export const levelData: LevelData = {
   frontRenderedLayersData,
   tilesets,
   l_Collisions,
-  monsters,
+  npcs: npcs,
 };

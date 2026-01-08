@@ -1,4 +1,4 @@
-import { Monster } from '../classes/Monster'
+import { Npc } from '../classes/Npc'
 import { LayersData } from './Layer'
 import { Tilesets } from './TileSet'
 
@@ -8,7 +8,7 @@ export interface LevelData {
   frontRenderedLayersData: LayersData
   tilesets: Tilesets
   l_Collisions: number[][]
-  monsters: Monster[]
+  npcs: Npc[]
 }
 
 export interface LevelConfig {

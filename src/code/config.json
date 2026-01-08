@@ -13,7 +13,7 @@
     "player": {
       "princess": "./images/princess.png"
     },
-    "monsters": {
+    "npcs": {
       "blond": "./images/npc_f_blond.png"
     },
     "decorations": {

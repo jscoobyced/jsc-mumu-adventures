@@ -1,5 +1,5 @@
 import { SpriteConfig } from './SpriteConfig'
 
-export interface MonsterSprites {
+export interface NpcSprites {
   [key: string]: SpriteConfig
 }
