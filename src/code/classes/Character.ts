@@ -9,8 +9,7 @@ const MAP_HEIGHT: number = config.tileSize * config.rows
 const BUFFER = 0.0001
 
 export abstract class Character {
-  public x: number
-  public y: number
+  public position: Vector
   public width: number
   public height: number
   public velocity: Vector
@@ -25,19 +24,17 @@ export abstract class Character {
   public invincibilityInterval?: number
 
   constructor(
-    x: number,
-    y: number,
+    position: Vector,
     size: number,
     velocity: Vector = { x: 0, y: 0 },
   ) {
-    this.x = x
-    this.y = y
+    this.position = position
     this.width = size
     this.height = size
     this.velocity = velocity
     this.center = {
-      x: this.x + this.width / 2,
-      y: this.y + this.height / 2,
+      x: this.position.x + this.width / 2,
+      y: this.position.y + this.height / 2,
     }
 
     this.image = new Image()
@@ -55,7 +52,7 @@ export abstract class Character {
     this.image.src = imageSrc
   }
 
-  public receiveHit(): void {
+  public collide(): void {
     if (this.isInvincible) return
     this.isInvincible = true
   }
@@ -112,17 +109,17 @@ export abstract class Character {
   }
 
   protected updateHorizontalPosition(deltaTime: number): void {
-    this.x += this.velocity.x * deltaTime
+    this.position.x += this.velocity.x * deltaTime
   }
 
   protected updateVerticalPosition(deltaTime: number): void {
-    this.y += this.velocity.y * deltaTime
+    this.position.y += this.velocity.y * deltaTime
   }
 
   protected updateCenter(): void {
     this.center = {
-      x: this.x + this.width / 2,
-      y: this.y + this.height / 2,
+      x: this.position.x + this.width / 2,
+      y: this.position.y + this.height / 2,
     }
   }
 
@@ -133,19 +130,19 @@ export abstract class Character {
       const collisionBlock = collisionBlocks[i]
 
       if (
-        this.x <= collisionBlock.x + collisionBlock.width &&
-        this.x + this.width >= collisionBlock.x &&
-        this.y + this.height >= collisionBlock.y &&
-        this.y <= collisionBlock.y + collisionBlock.height
+        this.position.x <= collisionBlock.x + collisionBlock.width &&
+        this.position.x + this.width >= collisionBlock.x &&
+        this.position.y + this.height >= collisionBlock.y &&
+        this.position.y <= collisionBlock.y + collisionBlock.height
       ) {
         if (this.velocity.x < 0) {
-          this.x = collisionBlock.x + collisionBlock.width + BUFFER
+          this.position.x = collisionBlock.x + collisionBlock.width + BUFFER
           this.onHorizontalCollision()
           break
         }
 
         if (this.velocity.x > 0) {
-          this.x = collisionBlock.x - this.width - BUFFER
+          this.position.x = collisionBlock.x - this.width - BUFFER
           this.onHorizontalCollision()
           break
         }
@@ -160,19 +157,19 @@ export abstract class Character {
       const collisionBlock = collisionBlocks[i]
 
       if (
-        this.x <= collisionBlock.x + collisionBlock.width &&
-        this.x + this.width >= collisionBlock.x &&
-        this.y + this.height >= collisionBlock.y &&
-        this.y <= collisionBlock.y + collisionBlock.height
+        this.position.x <= collisionBlock.x + collisionBlock.width &&
+        this.position.x + this.width >= collisionBlock.x &&
+        this.position.y + this.height >= collisionBlock.y &&
+        this.position.y <= collisionBlock.y + collisionBlock.height
       ) {
         if (this.velocity.y < 0) {
-          this.y = collisionBlock.y + collisionBlock.height + BUFFER
+          this.position.y = collisionBlock.y + collisionBlock.height + BUFFER
           this.onVerticalCollision()
           break
         }
 
         if (this.velocity.y > 0) {
-          this.y = collisionBlock.y - this.height - BUFFER
+          this.position.y = collisionBlock.y - this.height - BUFFER
           this.onVerticalCollision()
           break
         }
@@ -181,13 +178,13 @@ export abstract class Character {
   }
 
   protected checkHorizontalMapCollision(): LevelDirection {
-    if (this.x <= 0) {
-      this.x = 0 + BUFFER
+    if (this.position.x <= 0) {
+      this.position.x = 0 + BUFFER
       this.velocity.x = 0
       return LevelDirection.LEFT
     }
-    if (this.x + this.width >= MAP_WIDTH) {
-      this.x = MAP_WIDTH - this.width - BUFFER
+    if (this.position.x + this.width >= MAP_WIDTH) {
+      this.position.x = MAP_WIDTH - this.width - BUFFER
       this.velocity.x = 0
       return LevelDirection.RIGHT
     }
@@ -195,13 +192,13 @@ export abstract class Character {
   }
 
   protected checkVerticalMapCollision(): LevelDirection {
-    if (this.y <= 0) {
-      this.y = 0 + BUFFER
+    if (this.position.y <= 0) {
+      this.position.y = 0 + BUFFER
       this.velocity.y = 0
       return LevelDirection.UP
     }
-    if (this.y + this.height >= MAP_HEIGHT) {
-      this.y = MAP_HEIGHT - this.height - BUFFER
+    if (this.position.y + this.height >= MAP_HEIGHT) {
+      this.position.y = MAP_HEIGHT - this.height - BUFFER
       this.velocity.y = 0
       return LevelDirection.DOWN
     }

@@ -41,13 +41,14 @@ const tilesets: Tilesets = {
 
 const npcs: Npc[] = [
   new Npc({
-    x: 300,
-    y: 480,
+    position: { x: 300, y: 480 },
     size: 15,
     velocity: { x: 0, y: 0 },
     imageSrc: config.images.npcs.blond,
     sprites: characterSprites,
-    messages: ["Hello there! Welcome to our village.", "Feel free to explore around."],
+    messages: ["Hello there! Welcome to our village. Do you have the key?"],
+    expectedObject: "Key",
+    postObjectMessages: ["Thank you for the key!", "You can now enter the castle."],
   }),
 ];
 

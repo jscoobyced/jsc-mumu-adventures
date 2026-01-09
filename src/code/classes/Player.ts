@@ -9,13 +9,12 @@ const Y_VELOCITY = 120
 
 export class Player extends Character {
   constructor({
-    x,
-    y,
+    position,
     size,
     imageSrc,
     velocity = { x: 0, y: 0 },
   }: CharacterInitializationOptions) {
-    super(x, y, size, velocity)
+    super(position, size, velocity)
 
     this.invincibilityInterval = 0.8
     this.loadImage(imageSrc)
@@ -32,8 +31,8 @@ export class Player extends Character {
       this.currentSprite.y,
       this.currentSprite.width,
       this.currentSprite.height,
-      this.x,
-      this.y,
+      this.position.x,
+      this.position.y,
       this.width,
       this.height,
     )

@@ -1,4 +1,5 @@
-import { CharacterInitializationOptions, Vector } from '../models'
+import { Vector } from '../models'
+import { NpcInitializationOptions } from '../models/CharacterInitializationOptions'
 import { characterSprites } from '../sprites'
 import { Character } from './Character'
 import { CollisionBlock } from './CollisionBlock'
@@ -9,25 +10,35 @@ export class Npc extends Character {
   public elapsedMovementTime: number
   private attacking: boolean
   private messages: string[]
+  private isKeyNpc: boolean
+  private expectedObject?: string
+  private hasReceivedObject: boolean
+  private postObjectMessages: string[]
 
   constructor({
-    x,
-    y,
+    position,
     size,
     imageSrc,
     velocity = { x: 0, y: 0 },
     health = 3,
     attacking = false,
     messages = [],
-  }: CharacterInitializationOptions) {
-    super(x, y, size, velocity)
+    isKeyNpc = false,
+    expectedObject,
+    postObjectMessages = [],
+  }: NpcInitializationOptions) {
+    super(position, size, velocity)
 
-    this.originalPosition = { x, y }
+    this.originalPosition = { ...position }
     this.health = health
     this.elapsedMovementTime = 0
-    this.invincibilityInterval = 0.3
+    this.invincibilityInterval = 3
     this.attacking = attacking
     this.messages = [...messages]
+    this.isKeyNpc = isKeyNpc
+    this.expectedObject = expectedObject
+    this.hasReceivedObject = false
+    this.postObjectMessages = [...postObjectMessages]
 
     this.loadImage(imageSrc)
 
@@ -38,14 +49,38 @@ export class Npc extends Character {
   }
 
   public getMessage = (): string | undefined => {
-    return this.messages.shift()
+    if (this.isInvincible) return undefined
+    // Key NPC logic
+    if (this.isKeyNpc) {
+      if (!this.hasReceivedObject) {
+        return this.getNextOrLastMessage()
+      } else {
+        // NPC has received the object, deliver post-object messages then stop
+        if (this.postObjectMessages.length > 0) {
+          return this.postObjectMessages.shift()
+        } else {
+          return undefined
+        }
+      }
+    }
+    // Simple NPC: pick a random message
+    return this.getNextOrLastMessage()
+  }
+
+  private getNextOrLastMessage = (): string => {
+    if (this.messages.length > 1) {
+      return this.messages.shift()!
+    } else if (this.messages.length === 1) {
+      return this.messages[0]
+    }
+    return ''
   }
 
   public isAttacking = (): boolean => {
     return this.attacking
   }
 
-  public receiveHit(): void {
+  public collide(): void {
     if (this.isInvincible) return
 
     this.health--
@@ -66,8 +101,8 @@ export class Npc extends Character {
       this.currentSprite.y,
       this.currentSprite.width,
       this.currentSprite.height,
-      this.x,
-      this.y,
+      this.position.x,
+      this.position.y,
       this.width,
       this.height,
     )
@@ -99,8 +134,8 @@ export class Npc extends Character {
         y: this.originalPosition.y + Math.sin(angle) * CIRCLE_RADIUS,
       }
 
-      const deltaX = targetLocation.x - this.x
-      const deltaY = targetLocation.y - this.y
+      const deltaX = targetLocation.x - this.position.x
+      const deltaY = targetLocation.y - this.position.y
 
       const hypotenuse = Math.sqrt(deltaX * deltaX + deltaY * deltaY)
       const normalizedDeltaX = deltaX / hypotenuse
@@ -125,6 +160,21 @@ export class Npc extends Character {
 
   protected onVerticalCollision(): void {
     this.velocity.y = -this.velocity.y
+  }
+
+  /**
+   * Call this when the Player gives the expected object to the NPC
+   */
+  public receiveObjectFromPlayer(objectName: string): boolean {
+    if (
+      this.isKeyNpc &&
+      this.expectedObject === objectName &&
+      !this.hasReceivedObject
+    ) {
+      this.hasReceivedObject = true
+      return true
+    }
+    return false
   }
 }
 

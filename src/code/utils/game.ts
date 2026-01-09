@@ -34,8 +34,7 @@ export const startGame = (): void => {
   ]
 
   const initialPlayer: Player = new Player({
-    x: 200,
-    y: 550,
+    position: { x: 200, y: 550 },
     size: 15,
     imageSrc: config.images.player.princess,
   })
@@ -58,27 +57,30 @@ export const handleNpcs = (
   deltaTime: number,
 ): void => {
   for (let i = game.levelData.npcs.length - 1; i >= 0; i--) {
-    const npcs: Npc = game.levelData.npcs[i]
-    if (!game.paused) npcs.update(deltaTime, collisionBlocks)
-    npcs.draw(canvas)
+    const npc: Npc = game.levelData.npcs[i]
+    if (!game.paused) npc.update(deltaTime, collisionBlocks)
+    npc.draw(canvas)
 
     // Detect for collision
     if (
-      game.player.x + game.player.width >= npcs.x &&
-      game.player.x <= npcs.x + npcs.width &&
-      game.player.y + game.player.height >= npcs.y &&
-      game.player.y <= npcs.y + npcs.height
+      game.player.position.x + game.player.width >= npc.position.x &&
+      game.player.position.x <= npc.position.x + npc.width &&
+      game.player.position.y + game.player.height >= npc.position.y &&
+      game.player.position.y <= npc.position.y + npc.height
     ) {
-      // If the NPC has a message, show it in the banner
-      const npcMessage = npcs.getMessage?.() // optional chaining for safety
-      if (npcMessage) {
-        game.paused = true
-        game.banner.show(npcMessage)
-        continue
+      if (!npc.isInvincible) {
+        // If the NPC has a message, show it in the banner
+        const npcMessage = npc.getMessage?.() // optional chaining for safety
+        if (npcMessage) {
+          game.paused = true
+          game.banner.show(npcMessage)
+          npc.collide()
+          continue
+        }
       }
       // Otherwise, if the NPC is attacking and player is not invincible
-      if (!game.player.isInvincible && npcs.isAttacking?.()) {
-        game.player.receiveHit()
+      if (!game.player.isInvincible && npc.isAttacking?.()) {
+        game.player.collide()
         const filledHearts: Heart[] = game.hearts.filter(
           (heart: Heart) => heart.currentFrame === 4,
         )

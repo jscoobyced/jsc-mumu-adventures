@@ -193,13 +193,13 @@ const animate = (
       )
       if (connection) {
         if (levelDirection === LevelDirection.LEFT) {
-          game.player.x = MAP_WIDTH - game.player.width - BUFFER
+          game.player.position.x = MAP_WIDTH - game.player.width - BUFFER
         } else if (levelDirection === LevelDirection.RIGHT) {
-          game.player.x = 0 + BUFFER
+          game.player.position.x = 0 + BUFFER
         } else if (levelDirection === LevelDirection.UP) {
-          game.player.y = MAP_HEIGHT - game.player.height - BUFFER
+          game.player.position.y = MAP_HEIGHT - game.player.height - BUFFER
         } else if (levelDirection === LevelDirection.DOWN) {
-          game.player.y = 0 + BUFFER
+          game.player.position.y = 0 + BUFFER
         }
         game.levelData = connection.level
         startRendering(game)

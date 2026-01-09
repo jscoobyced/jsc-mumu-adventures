@@ -47,8 +47,10 @@ const tilesets: Tilesets = {
 
 const npcs: Npc[] = [
   new Npc({
-    x: 380,
-    y: 480,
+    position: {
+      x: 380,
+      y: 480,
+    },
     size: 15,
     velocity: { x: 0, y: 0 },
     imageSrc: config.images.npcs.blond,
