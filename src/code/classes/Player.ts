@@ -1,6 +1,7 @@
 import { CharacterInitializationOptions, Keys } from '../models'
 import { LevelDirection } from '../models/LevelData'
 import { characterSprites } from '../sprites'
+import { jscLog } from '../utils/log'
 import { Character } from './Character'
 import { CollisionBlock } from './CollisionBlock'
 
@@ -8,6 +9,8 @@ const X_VELOCITY = 120
 const Y_VELOCITY = 120
 
 export class Player extends Character {
+  private objects: string[] = []
+
   constructor({
     position,
     size,
@@ -67,9 +70,32 @@ export class Player extends Character {
     } else if (keys.s.pressed) {
       this.currentSprite = characterSprites.walkDown
       this.velocity.y = Y_VELOCITY
+    } else if (keys.g.pressed) {
+      this.objectFound('key')
     } else {
       this.currentSprite.frameCount = 1
     }
+  }
+
+  public hasObject(object: string): boolean {
+    return this.objects.includes(object)
+  }
+
+  public objectFound(object: string): void {
+    if (!this.hasObject(object)) {
+      jscLog(`Picked up a ${object}!`)
+      this.objects.push(object.toLocaleLowerCase())
+    }
+  }
+
+  public getObject(object: string): string {
+    return this.objects.includes(object)
+      ? this.objects.find((obj) => obj === object)!
+      : ''
+  }
+
+  public removeObject(object: string): void {
+    this.objects = this.objects.filter((obj) => obj !== object)
   }
 }
 

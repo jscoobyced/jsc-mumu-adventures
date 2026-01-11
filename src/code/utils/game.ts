@@ -7,6 +7,7 @@ import config from '../config.json'
 import { startRendering } from '../level'
 import { levelData as initialLevel } from '../levels/A/1/index'
 import { LevelData } from '../models/LevelData'
+import { jscLog } from './log'
 
 export interface Game {
   playing: boolean
@@ -69,29 +70,46 @@ export const handleNpcs = (
       game.player.position.y <= npc.position.y + npc.height
     ) {
       if (!npc.isInvincible) {
+        // Check if NPC is expecting an object
+        const expectedObject = npc.expectingObjectName()
+        jscLog(`NPC is expecting a ${expectedObject}`)
+        if (expectedObject) {
+          // If the NPC is expecting an object, check if player has it
+          if (game.player.hasObject(expectedObject)) {
+            if (
+              npc.receiveObjectFromPlayer(
+                game.player.getObject(expectedObject)!,
+              )
+            ) {
+              game.player.removeObject(expectedObject)
+            }
+          }
+        }
+
         // If the NPC has a message, show it in the banner
-        const npcMessage = npc.getMessage?.() // optional chaining for safety
+        const npcMessage = npc.getMessage?.()
         if (npcMessage) {
           game.paused = true
+          npc.setInvincible()
           game.banner.show(npcMessage)
-          npc.collide()
           continue
         }
-      }
-      // Otherwise, if the NPC is attacking and player is not invincible
-      if (!game.player.isInvincible && npc.isAttacking?.()) {
-        game.player.collide()
-        const filledHearts: Heart[] = game.hearts.filter(
-          (heart: Heart) => heart.currentFrame === 4,
-        )
 
-        if (filledHearts.length > 0) {
-          filledHearts[filledHearts.length - 1].currentFrame = 0
-        }
+        // If the NPC is attacking and player is not invincible
+        if (!game.player.isInvincible && npc.isAttacking?.()) {
+          game.player.hitReceived()
+          const filledHearts: Heart[] = game.hearts.filter(
+            (heart: Heart) => heart.currentFrame === 4,
+          )
 
-        if (filledHearts.length <= 1) {
-          game.banner.show('Game over. Press SPACE to restart.')
-          game.playing = false
+          if (filledHearts.length > 0) {
+            filledHearts[filledHearts.length - 1].currentFrame = 0
+          }
+
+          if (filledHearts.length <= 1) {
+            game.banner.show('Game over. Press SPACE to restart.')
+            game.playing = false
+          }
         }
       }
     }

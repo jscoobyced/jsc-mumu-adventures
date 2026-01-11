@@ -35,8 +35,8 @@ export class Npc extends Character {
     this.invincibilityInterval = 3
     this.attacking = attacking
     this.messages = [...messages]
-    this.isKeyNpc = isKeyNpc
-    this.expectedObject = expectedObject
+    this.isKeyNpc = isKeyNpc || expectedObject !== undefined
+    this.expectedObject = expectedObject?.toLowerCase()
     this.hasReceivedObject = false
     this.postObjectMessages = [...postObjectMessages]
 
@@ -76,11 +76,19 @@ export class Npc extends Character {
     return ''
   }
 
+  public isAtLastMessage(): boolean {
+    return this.messages.length <= 1
+  }
+
   public isAttacking = (): boolean => {
     return this.attacking
   }
 
-  public collide(): void {
+  public setInvincible(): void {
+    this.isInvincible = true
+  }
+
+  public hitReceived(): void {
     if (this.isInvincible) return
 
     this.health--
@@ -172,9 +180,30 @@ export class Npc extends Character {
       !this.hasReceivedObject
     ) {
       this.hasReceivedObject = true
+      this.messages = [...this.postObjectMessages]
       return true
     }
     return false
+  }
+
+  public expectingObjectName(): string | false {
+    if (
+      this.isKeyNpc &&
+      !this.hasReceivedObject &&
+      this.expectedObject !== undefined
+    ) {
+      return this.expectedObject
+    }
+    return false
+  }
+
+  public isExpectingSpecificObject(object: string): boolean {
+    return (
+      this.isKeyNpc &&
+      !this.hasReceivedObject &&
+      this.expectedObject !== undefined &&
+      this.expectedObject === object
+    )
   }
 }
 

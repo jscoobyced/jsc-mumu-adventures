@@ -52,7 +52,7 @@ export abstract class Character {
     this.image.src = imageSrc
   }
 
-  public collide(): void {
+  public hitReceived(): void {
     if (this.isInvincible) return
     this.isInvincible = true
   }
