@@ -48,36 +48,8 @@ export class Npc extends Character {
     this.currentSprite = Object.values(characterSprites)[0]
   }
 
-  public getMessage = (): string | undefined => {
-    if (this.isInvincible) return undefined
-    // Key NPC logic
-    if (this.isKeyNpc) {
-      if (!this.hasReceivedObject) {
-        return this.getNextOrLastMessage()
-      } else {
-        // NPC has received the object, deliver post-object messages then stop
-        if (this.postObjectMessages.length > 0) {
-          return this.postObjectMessages.shift()
-        } else {
-          return undefined
-        }
-      }
-    }
-    // Simple NPC: pick a random message
-    return this.getNextOrLastMessage()
-  }
-
-  private getNextOrLastMessage = (): string => {
-    if (this.messages.length > 1) {
-      return this.messages.shift()!
-    } else if (this.messages.length === 1) {
-      return this.messages[0]
-    }
-    return ''
-  }
-
-  public isAtLastMessage(): boolean {
-    return this.messages.length <= 1
+  public getMessages = (): string[] => {
+    return this.messages
   }
 
   public isAttacking = (): boolean => {

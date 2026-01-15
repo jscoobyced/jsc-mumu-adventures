@@ -46,7 +46,7 @@ const npcs: Npc[] = [
     velocity: { x: 0, y: 0 },
     imageSrc: config.images.npcs.blond,
     sprites: characterSprites,
-    messages: ["Hello there! Welcome to our village. Do you have the key?"],
+    messages: ["Hello there!", "Welcome to our village.", "Do you have the key?"],
     expectedObject: "Key",
     postObjectMessages: ["Thank you for the key!", "You can now enter the castle."],
   }),

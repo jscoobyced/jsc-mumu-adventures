@@ -87,11 +87,11 @@ export const handleNpcs = (
         }
 
         // If the NPC has a message, show it in the banner
-        const npcMessage = npc.getMessage?.()
-        if (npcMessage) {
+        const npcMessages = npc.getMessages()
+        if (npcMessages?.length > 0) {
           game.paused = true
           npc.setInvincible()
-          game.banner.show(npcMessage)
+          game.banner.show(npcMessages)
           continue
         }
 
@@ -107,7 +107,7 @@ export const handleNpcs = (
           }
 
           if (filledHearts.length <= 1) {
-            game.banner.show('Game over. Press SPACE to restart.')
+            game.banner.show(['Game over. Press SPACE to restart.'])
             game.playing = false
           }
         }

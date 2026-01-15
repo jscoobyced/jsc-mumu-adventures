@@ -8,7 +8,8 @@ export class Banner {
   public height: number
   public loaded: boolean
   public image: HTMLImageElement
-  private text: string = ''
+  private texts: string[] = []
+  private currentIndex: number = 0
 
   constructor({ x, y }: Vector) {
     const ratio = (config.canvasWidth - 2 * x) / config.images.ui.banner.width
@@ -26,37 +27,44 @@ export class Banner {
     this.image.src = config.images.ui.banner.path
   }
 
-  public show(text: string): void {
-    this.text = text
+  public show(texts: string[]): void {
+    this.texts = texts
+    this.currentIndex = 0
   }
 
   public close(): void {
-    this.text = ''
+    this.texts = []
+    this.currentIndex = 0
   }
 
   public draw(c: CanvasRenderingContext2D, keys: Keys): boolean {
-    if (!this.loaded || this.text === '') return false
+    if (!this.loaded || this.texts.length === 0) return false
     if (keys.space.pressed) {
       keys.space.pressed = false
-      this.close()
-      return true
+      this.currentIndex++
+      if (this.currentIndex >= this.texts.length) {
+        this.close()
+        return true
+      }
     }
 
-    c.drawImage(this.image, this.x, this.y, this.width, this.height)
+    if (this.currentIndex < this.texts.length) {
+      c.drawImage(this.image, this.x, this.y, this.width, this.height)
 
-    c.save()
-    c.font = '24px MumuFont'
-    c.textAlign = 'center'
-    c.fillStyle = 'brown'
-    this.wrapText(
-      c,
-      this.text,
-      this.x + this.width / 2,
-      this.y + this.height / 2 - 20,
-      this.width - 40,
-      30,
-    )
-    c.restore()
+      c.save()
+      c.font = '24px MumuFont'
+      c.textAlign = 'center'
+      c.fillStyle = 'brown'
+      this.wrapText(
+        c,
+        this.texts[this.currentIndex],
+        this.x + this.width / 2,
+        this.y + this.height / 2 - 20,
+        this.width - 40,
+        30,
+      )
+      c.restore()
+    }
     return false
   }
 
