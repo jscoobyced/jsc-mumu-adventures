@@ -17,8 +17,8 @@
     "gen-map": "ts-node code/utils/generate-map-data.ts",
     "split-sprite": "ts-node code/utils/split-sprites.ts",
     "format": "prettier --write .",
-    "update-version": "../etc/bin/update-version.sh",
-    "create-tag": "../etc/bin/create-tag.sh",
+    "update-version": "./scripts/update-version.sh",
+    "create-tag": "./scripts/create-tag.sh",
     "full-tag": "yarn update-version && yarn create-tag"
   },
   "devDependencies": {
