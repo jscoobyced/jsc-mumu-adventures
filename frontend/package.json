@@ -14,12 +14,13 @@
     "preview": "vite preview",
     "test": "vitest",
     "test:coverage": "vitest --coverage",
-    "gen-map": "ts-node code/utils/generate-map-data.ts",
-    "split-sprite": "ts-node code/utils/split-sprites.ts",
+    "gen-map": "ts-node src/utils/generate-map-data.ts",
+    "split-sprite": "ts-node src/utils/split-sprites.ts",
     "format": "prettier --write .",
     "update-version": "./scripts/update-version.sh",
     "create-tag": "./scripts/create-tag.sh",
-    "full-tag": "yarn update-version && yarn create-tag"
+    "full-tag": "yarn update-version && yarn create-tag",
+    "prepare": "cd .. && git init --quiet"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",

@@ -11,7 +11,7 @@ env:
   IMAGE_NAME: jsc-mu-game
   IMAGE_TITLE: JSC's Mumu's Adventures
   IMAGE_DESCRIPTION: This is the image for JSC's Mumu's Adventures game.
-  SRC_PATH: src/
+  SRC_PATH: frontend/
   DOCKERFILE_PATH: etc/docker/Dockerfile
   NODE_VERSION: "24"
 

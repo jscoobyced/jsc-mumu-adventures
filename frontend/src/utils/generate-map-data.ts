@@ -62,7 +62,7 @@ const tilesets = tmjJson.tilesets || []
 console.log(`Found ${tilesets.length} tilesets.`)
 
 // Output directory: same as .tmj file
-const outputDir = path.join('./code/levels/', path.dirname(tmjFilePath))
+const outputDir = path.join('./src/levels/', path.dirname(tmjFilePath))
 
 for (const layer of tmjJson.layers) {
   processLayer(layer, tilesets, outputDir)

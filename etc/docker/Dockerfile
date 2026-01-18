@@ -1,13 +1,16 @@
-FROM node:24-alpine AS builder
+FROM node:24-alpine3.19 AS builder
+
+RUN apk update && apk upgrade
+RUN apk add --no-cache git
 
 WORKDIR /app
-COPY src/ ./
+COPY frontend/ ./
 
 ARG VITE_APP_NAME ${VITE_APP_NAME}
 ARG VITE_APP_VERSION ${VITE_APP_VERSION}
 
-RUN yarn --cwd src install
-RUN yarn --cwd src build
+RUN yarn --cwd frontend install
+RUN yarn --cwd frontend build
 
 FROM nginx:alpine
 
