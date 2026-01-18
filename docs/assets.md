@@ -21,7 +21,7 @@ Note the terrain image was modified to add path/grass borders missing in the ori
 To convert a .tmj file, navigate to the `src` folder and run the command:
 
 ```
-yarn genmap A/1/map.tmj
+yarn gen-map A/1/map.tmj
 ```
 
 This will create (or replace) the files in `src/code/levels/A/1/`. It will create a TypeScript file for each tileset in the map.

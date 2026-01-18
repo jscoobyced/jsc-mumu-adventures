@@ -1,6 +1,6 @@
 {
   "name": "jsc-mumu-adventures",
-  "version": "0.0.1",
+  "version": "0.0.64",
   "description": "The adventures of Mumu!",
   "main": "index.js",
   "repository": "https://github.com/jscoobyced/jsc-mumu-adventures",
@@ -14,9 +14,12 @@
     "preview": "vite preview",
     "test": "vitest",
     "test:coverage": "vitest --coverage",
-    "genmap": "ts-node code/utils/generate-map-data.ts",
-    "splitsprite": "ts-node code/utils/split-sprites.ts",
-    "format": "prettier --write ."
+    "gen-map": "ts-node code/utils/generate-map-data.ts",
+    "split-sprite": "ts-node code/utils/split-sprites.ts",
+    "format": "prettier --write .",
+    "update-version": "../etc/bin/update-version.sh",
+    "create-tag": "../etc/bin/create-tag.sh",
+    "full-tag": "yarn update-version && yarn create-tag"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
