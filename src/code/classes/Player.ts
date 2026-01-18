@@ -61,19 +61,30 @@ export class Player extends Character {
     if (keys.d.pressed) {
       this.currentSprite = characterSprites.walkRight
       this.velocity.x = X_VELOCITY
-    } else if (keys.a.pressed) {
+    }
+    if (keys.a.pressed) {
       this.currentSprite = characterSprites.walkLeft
       this.velocity.x = -X_VELOCITY
-    } else if (keys.w.pressed) {
+    }
+    if (keys.w.pressed) {
       this.currentSprite = characterSprites.walkUp
       this.velocity.y = -Y_VELOCITY
-    } else if (keys.s.pressed) {
+    }
+    if (keys.s.pressed) {
       this.currentSprite = characterSprites.walkDown
       this.velocity.y = Y_VELOCITY
-    } else if (keys.g.pressed) {
+    }
+    if (keys.g.pressed) {
       this.objectFound('key')
-    } else {
+    }
+
+    if (this.velocity.x === 0 && this.velocity.y === 0) {
       this.currentSprite.frameCount = 1
+    }
+
+    if (this.velocity.x !== 0 && this.velocity.y !== 0) {
+      this.velocity.x *= Math.SQRT1_2
+      this.velocity.y *= Math.SQRT1_2
     }
   }
 

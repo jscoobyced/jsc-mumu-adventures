@@ -7,6 +7,7 @@
   "mapScale": 0.5,
   "images": {
     "tilesets": {
+      "intro": "./images/intro.png",
       "terrain": "./images/terrain.png",
       "decorations": "./images/decorations.png"
     },

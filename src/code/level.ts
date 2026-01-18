@@ -5,12 +5,11 @@ import { mapConfig } from './levels'
 import { LayersData } from './models/Layer'
 import { LevelData, LevelDirection } from './models/LevelData'
 import { TilesetInfo, Tilesets } from './models/TileSet'
+import { dpr, getContext } from './utils/context'
 import { isDebugMode } from './utils/debug'
 import { getKeys, getLastTime, setLastTime } from './utils/eventListeners'
 import { Game, handleNpcs, startGame } from './utils/game'
 import { loadImage } from './utils/loadImage'
-
-const dpr: number = Math.max(1, window.devicePixelRatio)
 
 const MAP_COLS: number = config.cols
 const MAP_ROWS: number = config.rows
@@ -21,13 +20,14 @@ const MAP_SCALE: number = dpr + config.mapScale
 
 const BUFFER = 0.0001
 
-const canvas = document.querySelector('canvas') as HTMLCanvasElement
-const c = canvas.getContext('2d') as CanvasRenderingContext2D
-canvas.width = config.canvasWidth * dpr
-canvas.height = config.canvasHeight * dpr
+const context = getContext()
 
-const VIEWPORT_WIDTH: number = canvas.width / MAP_SCALE
-const VIEWPORT_HEIGHT: number = canvas.height / MAP_SCALE
+if (!context) {
+  throw new Error('Failed to get 2D context from canvas')
+}
+
+const VIEWPORT_WIDTH: number = context.canvas.width / MAP_SCALE
+const VIEWPORT_HEIGHT: number = context.canvas.height / MAP_SCALE
 
 const VIEWPORT_CENTER_X: number = VIEWPORT_WIDTH / 2
 const VIEWPORT_CENTER_Y: number = VIEWPORT_HEIGHT / 2
@@ -149,29 +149,29 @@ const animate = (
   )
 
   // Render scene
-  c.save()
-  c.scale(MAP_SCALE, MAP_SCALE)
-  c.translate(-horizontalScrollDistance, -verticalScrollDistance)
-  c.clearRect(0, 0, canvas.width, canvas.height)
-  c.drawImage(backgroundCanvas, 0, 0)
+  context.save()
+  context.scale(MAP_SCALE, MAP_SCALE)
+  context.translate(-horizontalScrollDistance, -verticalScrollDistance)
+  context.clearRect(0, 0, context.canvas.width, context.canvas.height)
+  context.drawImage(backgroundCanvas, 0, 0)
   if (isDebugMode()) {
-    debugCollisions(c)
+    debugCollisions(context)
   }
-  game.player.draw(c)
+  game.player.draw(context)
 
-  if (!game.paused) handleNpcs(game, c, collisionBlocks, deltaTime)
+  if (!game.paused) handleNpcs(game, context, collisionBlocks, deltaTime)
 
-  c.drawImage(frontRenderedCanvas, 0, 0)
-  c.restore()
+  context.drawImage(frontRenderedCanvas, 0, 0)
+  context.restore()
 
-  c.save()
-  c.scale(MAP_SCALE, MAP_SCALE)
+  context.save()
+  context.scale(MAP_SCALE, MAP_SCALE)
   game.hearts.forEach((heart: Heart) => {
-    heart.draw(c)
+    heart.draw(context)
   })
-  c.restore()
+  context.restore()
 
-  const bannerClosed = game.banner.draw(c, getKeys())
+  const bannerClosed = game.banner.draw(context, getKeys())
   if (game.paused && bannerClosed) {
     game.paused = false
   }

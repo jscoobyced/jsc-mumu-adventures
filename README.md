@@ -1,6 +1,6 @@
 # JSC's Mumu's Adventures 🕹️
 
-![Mumu's Adventures](/src/public/mumu-adventures.png)
+![Mumu's Adventures](/docs/mumu-adventures.png)
 
 Live your life as Mumu, the heroic adventurer, to defeat the evil Maginta Llennaspom.
 
@@ -10,10 +10,13 @@ You can play the current version [here](https://mumu.rochefolle.net).
 
 The game is under heavy development. It is a new rewrite, without using the original code that what based on Phaser. The code is much simpler, plain TypeScript with no dependencies. It will also allow for Unit Testing to bring quality to the codebase.
 
-## Release 0.0.1-beta
+## Release 0.0.51
 
-The game only supports desktop.
-The game only allows to navigate between 2 maps.
+The current features of the game are:
+
+- Intro screen (press SPACE to start)
+- A single map divided in 2 screens
+- Simple NPC interactions
 
 # Credits
 
