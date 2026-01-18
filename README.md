@@ -1,5 +1,7 @@
 # JSC's Mumu's Adventures 🕹️
 
+[![Build](https://github.com/jscoobyced/jsc-mumu-adventures/actions/workflows/build.yml/badge.svg)](https://github.com/jscoobyced/jsc-mumu-adventures/actions/workflows/build.yml)
+
 ![Mumu's Adventures](/docs/mumu-adventures.png)
 
 Live your life as Mumu, the heroic adventurer, to defeat the evil Maginta Llennaspom.
