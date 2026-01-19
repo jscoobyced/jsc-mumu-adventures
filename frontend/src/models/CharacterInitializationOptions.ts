@@ -12,6 +12,9 @@ export interface CharacterInitializationOptions {
 
 export interface NpcInitializationOptions extends CharacterInitializationOptions {
   attacking?: boolean
+}
+
+export interface TalkingNpcInitializationOptions extends NpcInitializationOptions {
   messages?: string[]
   isKeyNpc?: boolean
   expectedObject?: string

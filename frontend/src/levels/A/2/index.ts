@@ -7,9 +7,9 @@ import { l_Walls } from "./l_Walls";
 import { LayersData } from "../../../models/Layer";
 import { LevelData } from "../../../models/LevelData";
 import { Tilesets } from "../../../models/TileSet";
-import { Npc } from "../../../classes/Npc";
 import config from "../../../config.json";
 import { characterSprites } from "../../../sprites";
+import { ActiveNpc } from "../../../classes/ActiveNpc";
 
 const layersData: LayersData = {
   l_Terrain: l_Terrain,
@@ -45,8 +45,8 @@ const tilesets: Tilesets = {
   },
 };
 
-const npcs: Npc[] = [
-  new Npc({
+const npcs: ActiveNpc[] = [
+  new ActiveNpc({
     position: {
       x: 380,
       y: 480,

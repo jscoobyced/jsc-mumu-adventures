@@ -1,4 +1,4 @@
-import { Npc } from '../classes/Npc'
+import { SimpleNpc } from '../classes/SimpleNpc'
 import { LayersData } from './Layer'
 import { Tilesets } from './TileSet'
 
@@ -8,7 +8,7 @@ export interface LevelData {
   frontRenderedLayersData: LayersData
   tilesets: Tilesets
   l_Collisions: number[][]
-  npcs: Npc[]
+  npcs: SimpleNpc[]
 }
 
 export interface LevelConfig {

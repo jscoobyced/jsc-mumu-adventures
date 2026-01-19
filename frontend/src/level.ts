@@ -158,8 +158,9 @@ const animate = (
     debugCollisions(context)
   }
   game.player.draw(context)
+  const keys = getKeys()
 
-  if (!game.paused) handleNpcs(game, context, collisionBlocks, deltaTime)
+  if (!game.paused) handleNpcs(game, context, collisionBlocks, deltaTime, keys)
 
   context.drawImage(frontRenderedCanvas, 0, 0)
   context.restore()
@@ -171,7 +172,7 @@ const animate = (
   })
   context.restore()
 
-  const bannerClosed = game.banner.draw(context, getKeys())
+  const bannerClosed = game.banner.draw(context, keys)
   if (game.paused && bannerClosed) {
     game.paused = false
   }

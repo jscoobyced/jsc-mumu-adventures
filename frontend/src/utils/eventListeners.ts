@@ -18,6 +18,7 @@ const initializeKeys = (): void => {
     d: { pressed: false },
     g: { pressed: false },
     space: { pressed: false },
+    spaceEnabled: false,
   }
 }
 
@@ -43,7 +44,9 @@ export const initializeEventListeners = (): void => {
         keys.d.pressed = true
         break
       case ' ':
-        keys.space.pressed = true
+        if (keys.spaceEnabled) {
+          keys.space.pressed = true
+        }
         break
       case 'g':
         keys.g.pressed = true

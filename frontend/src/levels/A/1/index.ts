@@ -6,9 +6,9 @@ import { l_FrontRenderer } from "./l_FrontRenderer";
 import { LayersData } from "../../../models/Layer";
 import { LevelData } from "../../../models/LevelData";
 import { Tilesets } from "../../../models/TileSet";
-import { Npc } from "../../../classes/Npc";
 import config from "../../../config.json";
 import { characterSprites } from "../../../sprites";
+import { InteractiveNpc } from "../../../classes/InteractiveNpc";
 
 const layersData: LayersData = {
   l_Terrain: l_Terrain,
@@ -39,8 +39,8 @@ const tilesets: Tilesets = {
   },
 };
 
-const npcs: Npc[] = [
-  new Npc({
+const npcs: InteractiveNpc[] = [
+  new InteractiveNpc({
     position: { x: 300, y: 480 },
     size: 15,
     velocity: { x: 0, y: 0 },

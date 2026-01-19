@@ -43,6 +43,7 @@ export class Banner {
       keys.space.pressed = false
       this.currentIndex++
       if (this.currentIndex >= this.texts.length) {
+        keys.spaceEnabled = false
         this.close()
         return true
       }
