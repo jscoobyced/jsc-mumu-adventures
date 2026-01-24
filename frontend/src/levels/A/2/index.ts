@@ -10,6 +10,7 @@ import { Tilesets } from "../../../models/TileSet";
 import config from "../../../config.json";
 import { characterSprites } from "../../../sprites";
 import { ActiveNpc } from "../../../classes/ActiveNpc";
+import { NpcInitializationOptions } from "../../../models/CharacterInitializationOptions";
 
 const layersData: LayersData = {
   l_Terrain: l_Terrain,
@@ -45,21 +46,18 @@ const tilesets: Tilesets = {
   },
 };
 
-const npcs: ActiveNpc[] = [
-  new ActiveNpc({
-    position: {
-      x: 380,
-      y: 480,
-    },
+const initializationOptions: NpcInitializationOptions = {
+  characterInitializationOptions: {
+    position: { x: 380, y: 480 },
     size: 15,
     velocity: { x: 0, y: 0 },
     imageSrc: config.images.npcs.blond,
     sprites: characterSprites,
     health: 1,
-    attacking: true,
-  }),
-];
-
+  },
+  attacking: true,
+};
+const npcs: ActiveNpc[] = [new ActiveNpc(initializationOptions)];
 export const levelData: LevelData = {
   name: "A-2",
   layersData,

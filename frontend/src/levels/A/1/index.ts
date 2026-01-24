@@ -9,6 +9,7 @@ import { Tilesets } from "../../../models/TileSet";
 import config from "../../../config.json";
 import { characterSprites } from "../../../sprites";
 import { InteractiveNpc } from "../../../classes/InteractiveNpc";
+import { TalkingNpcInitializationOptions } from "../../../models/CharacterInitializationOptions";
 
 const layersData: LayersData = {
   l_Terrain: l_Terrain,
@@ -39,18 +40,23 @@ const tilesets: Tilesets = {
   },
 };
 
-const npcs: InteractiveNpc[] = [
-  new InteractiveNpc({
-    position: { x: 300, y: 480 },
-    size: 15,
-    velocity: { x: 0, y: 0 },
-    imageSrc: config.images.npcs.blond,
-    sprites: characterSprites,
-    messages: ["Hello there!", "Welcome to our village.", "Do you have the key?"],
-    expectedObject: "Key",
-    postObjectMessages: ["Thank you for the key!", "You can now enter the castle."],
-  }),
-];
+const initializationOptions: TalkingNpcInitializationOptions = {
+  npcInitializationOptions: {
+    characterInitializationOptions: {
+      position: { x: 300, y: 480 },
+      size: 15,
+      velocity: { x: 0, y: 0 },
+      imageSrc: config.images.npcs.blond,
+      sprites: characterSprites,
+    },
+    attacking: false,
+  },
+  messages: ["Hello there!", "Welcome to our village.", "Do you have the key?"],
+  expectedObject: "Key",
+  postObjectMessages: ["Thank you for the key!", "You can now enter the castle."],
+};
+
+const npcs: InteractiveNpc[] = [new InteractiveNpc(initializationOptions)];
 
 export const levelData: LevelData = {
   name: "A-1",

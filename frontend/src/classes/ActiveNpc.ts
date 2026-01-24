@@ -1,33 +1,25 @@
-import { TalkingNpcInitializationOptions } from '../models/CharacterInitializationOptions'
+import { NpcInitializationOptions } from '../models/CharacterInitializationOptions'
 import { characterSprites } from '../sprites'
 import SimpleNpc from './SimpleNpc'
 
 export class ActiveNpc extends SimpleNpc {
   private attacking: boolean
 
-  constructor({
-    position,
-    size,
-    imageSrc,
-    velocity = { x: 0, y: 0 },
-    health = 3,
-    attacking = false,
-  }: TalkingNpcInitializationOptions) {
-    super({
-      position,
-      size,
-      imageSrc,
-      velocity,
-      health,
-    })
+  constructor(npcInitializationOptions: NpcInitializationOptions) {
+    super(npcInitializationOptions.characterInitializationOptions)
 
-    this.originalPosition = { ...position }
-    this.health = health
+    this.originalPosition = {
+      ...npcInitializationOptions.characterInitializationOptions.position,
+    }
+    this.health =
+      npcInitializationOptions.characterInitializationOptions.health || 3
     this.elapsedMovementTime = 0
     this.invincibilityInterval = 3
-    this.attacking = attacking
+    this.attacking = npcInitializationOptions.attacking || false
 
-    this.loadImage(imageSrc)
+    this.loadImage(
+      npcInitializationOptions.characterInitializationOptions.imageSrc,
+    )
 
     if (characterSprites === undefined) {
       throw new Error('NPC sprites is undefined')

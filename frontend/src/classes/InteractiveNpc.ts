@@ -1,5 +1,4 @@
 import { TalkingNpcInitializationOptions } from '../models/CharacterInitializationOptions'
-import { characterSprites } from '../sprites'
 import ActiveNpc from './ActiveNpc'
 
 export class InteractiveNpc extends ActiveNpc {
@@ -9,43 +8,20 @@ export class InteractiveNpc extends ActiveNpc {
   private hasReceivedObject: boolean
   private postObjectMessages: string[]
 
-  constructor({
-    position,
-    size,
-    imageSrc,
-    velocity = { x: 0, y: 0 },
-    health = 3,
-    attacking = false,
-    messages = [],
-    isKeyNpc = false,
-    expectedObject,
-    postObjectMessages = [],
-  }: TalkingNpcInitializationOptions) {
-    super({
-      position,
-      size,
-      imageSrc,
-      velocity,
-      health,
-      attacking,
-    })
+  constructor(initializationOptions: TalkingNpcInitializationOptions) {
+    super(initializationOptions.npcInitializationOptions)
 
-    this.originalPosition = { ...position }
-    this.health = health
-    this.elapsedMovementTime = 0
-    this.invincibilityInterval = 3
-    this.messages = [...messages]
-    this.isKeyNpc = isKeyNpc || expectedObject !== undefined
-    this.expectedObject = expectedObject?.toLowerCase()
+    this.messages = initializationOptions.messages
+      ? [...initializationOptions.messages]
+      : []
+    this.isKeyNpc =
+      initializationOptions.isKeyNpc ||
+      initializationOptions.expectedObject !== undefined
+    this.expectedObject = initializationOptions.expectedObject?.toLowerCase()
     this.hasReceivedObject = false
-    this.postObjectMessages = [...postObjectMessages]
-
-    this.loadImage(imageSrc)
-
-    if (characterSprites === undefined) {
-      throw new Error('NPC sprites is undefined')
-    }
-    this.currentSprite = Object.values(characterSprites)[0]
+    this.postObjectMessages = initializationOptions.postObjectMessages
+      ? [...initializationOptions.postObjectMessages]
+      : []
   }
 
   public getMessages = (): string[] => {

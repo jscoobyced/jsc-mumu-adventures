@@ -10,11 +10,13 @@ export interface CharacterInitializationOptions {
   health?: number
 }
 
-export interface NpcInitializationOptions extends CharacterInitializationOptions {
+export interface NpcInitializationOptions {
+  characterInitializationOptions: CharacterInitializationOptions
   attacking?: boolean
 }
 
-export interface TalkingNpcInitializationOptions extends NpcInitializationOptions {
+export interface TalkingNpcInitializationOptions {
+  npcInitializationOptions: NpcInitializationOptions
   messages?: string[]
   isKeyNpc?: boolean
   expectedObject?: string
