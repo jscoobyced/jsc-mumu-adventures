@@ -15,10 +15,7 @@ export class SimpleNpc extends Character {
     this.originalPosition = initializationOptions.position
     this.health = initializationOptions.health
 
-    if (characterSprites === undefined) {
-      throw new Error('NPC sprites is undefined')
-    }
-    this.currentSprite = Object.values(characterSprites)[0]
+    this.currentSprite = initializationOptions.sprites.walkDown
   }
 
   public draw(c: CanvasRenderingContext2D): void {

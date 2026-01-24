@@ -19,12 +19,7 @@ export class Player extends Character {
     super(initializationOptions)
 
     this.invincibilityInterval = 0.8
-    if (characterSprites === undefined) {
-      throw new Error('NPC sprites is undefined')
-    }
-    this.currentSprite = Object.values(characterSprites)[0]
-
-    this.currentSprite = characterSprites.walkDown
+    this.currentSprite = initializationOptions.sprites.walkDown
     this.objects = [...initialInventory]
   }
 

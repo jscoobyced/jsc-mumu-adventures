@@ -15,6 +15,7 @@ import {
   defaultStatusData,
 } from '../models/CurrentStatusData'
 import { LevelData } from '../models/LevelData'
+import { characterSprites } from '../sprites'
 import { getLastTime } from './eventListeners'
 import { jscLog } from './log'
 import { setCurrentStatus } from './storage'
@@ -38,6 +39,9 @@ export const startGame = (restart = false): void => {
       position: currentStatusData.playerData.position,
       size: 15,
       imageSrc: config.images.player.princess,
+      health: currentStatusData.health,
+      velocity: { x: 0, y: 0 },
+      sprites: characterSprites,
     },
     currentStatusData.playerData.inventory,
   )

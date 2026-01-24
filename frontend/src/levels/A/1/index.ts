@@ -48,6 +48,7 @@ const initializationOptions: TalkingNpcInitializationOptions = {
       velocity: { x: 0, y: 0 },
       imageSrc: config.images.npcs.blond,
       sprites: characterSprites,
+      health: 1,
     },
     attacking: false,
   },
