@@ -21,4 +21,7 @@ export interface TalkingNpcInitializationOptions {
   isKeyNpc?: boolean
   expectedObject?: string
   postObjectMessages?: string[]
+  waitingMessages: string[]
+  finalMessages: string[]
+  portraitImageSrc?: string
 }

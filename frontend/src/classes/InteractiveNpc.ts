@@ -1,4 +1,5 @@
 import { TalkingNpcInitializationOptions } from '../models/CharacterInitializationOptions'
+import { loadImage } from '../utils/loadImage'
 import ActiveNpc from './ActiveNpc'
 
 export class InteractiveNpc extends ActiveNpc {
@@ -7,6 +8,9 @@ export class InteractiveNpc extends ActiveNpc {
   private expectedObject?: string
   private hasReceivedObject: boolean
   private postObjectMessages: string[]
+  private waitingMessages: string[]
+  private finalMessages: string[]
+  private portraitImage?: HTMLImageElement
 
   constructor(initializationOptions: TalkingNpcInitializationOptions) {
     super(initializationOptions.npcInitializationOptions)
@@ -22,10 +26,25 @@ export class InteractiveNpc extends ActiveNpc {
     this.postObjectMessages = initializationOptions.postObjectMessages
       ? [...initializationOptions.postObjectMessages]
       : []
+    this.waitingMessages = initializationOptions.waitingMessages
+    this.finalMessages = initializationOptions.finalMessages
+    if (initializationOptions.portraitImageSrc)
+      loadImage(initializationOptions.portraitImageSrc).then((img) => {
+        this.portraitImage = img
+      })
   }
 
   public getMessages = (): string[] => {
     return this.messages
+  }
+
+  public setHasSpoken = () => {
+    this.setInvincible()
+    if (this.hasReceivedObject && this.finalMessages.length > 0) {
+      this.messages = this.finalMessages
+      return
+    }
+    if (this.waitingMessages) this.messages = this.waitingMessages
   }
 
   /**
@@ -62,6 +81,10 @@ export class InteractiveNpc extends ActiveNpc {
       this.expectedObject !== undefined &&
       this.expectedObject === object
     )
+  }
+
+  public getPortraitImageSrc(): HTMLImageElement | undefined {
+    return this.portraitImage
   }
 }
 

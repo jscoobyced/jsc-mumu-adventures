@@ -10,6 +10,8 @@ export class Banner {
   public image: HTMLImageElement
   private texts: string[] = []
   private currentIndex: number = 0
+  private portraitImage?: HTMLImageElement
+  private textIndent = 0
 
   constructor({ x, y }: Vector) {
     const ratio = (config.canvasWidth - 2 * x) / config.images.ui.banner.width
@@ -27,9 +29,10 @@ export class Banner {
     this.image.src = config.images.ui.banner.path
   }
 
-  public show(texts: string[]): void {
+  public show(texts: string[], portrait?: HTMLImageElement): void {
     this.texts = texts
     this.currentIndex = 0
+    this.portraitImage = portrait
   }
 
   public close(): void {
@@ -48,10 +51,10 @@ export class Banner {
         return true
       }
     }
+    this.textIndent = this.portraitImage ? this.portraitImage.width + 20 : 0
 
     if (this.currentIndex < this.texts.length) {
       c.drawImage(this.image, this.x, this.y, this.width, this.height)
-
       c.save()
       c.font = '24px MumuFont'
       c.textAlign = 'center'
@@ -59,13 +62,24 @@ export class Banner {
       this.wrapText(
         c,
         this.texts[this.currentIndex],
-        this.x + this.width / 2,
+        this.x + (this.width - this.textIndent) / 2 + this.textIndent,
         this.y + this.height / 2 - 20,
-        this.width - 40,
+        this.width - this.textIndent - 40,
         30,
       )
       c.restore()
     }
+    if (this.portraitImage) {
+      const portraitSize = this.portraitImage.height
+      c.drawImage(
+        this.portraitImage,
+        this.x + 20,
+        this.y + 20,
+        portraitSize,
+        portraitSize,
+      )
+    }
+
     return false
   }
 

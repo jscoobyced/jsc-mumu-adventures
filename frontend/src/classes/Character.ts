@@ -6,6 +6,7 @@ import {
   Vector,
 } from '../models'
 import { LevelDirection } from '../models/LevelData'
+import { loadImage } from '../utils/loadImage'
 import { CollisionBlock } from './CollisionBlock'
 
 const MAP_WIDTH: number = config.tileSize * config.cols
@@ -20,7 +21,6 @@ export abstract class Character {
   public velocity: Vector
   public center: Vector
   public image: HTMLImageElement
-  public imageLoaded: boolean
   public currentFrame: number
   public elapsedTime: number
   public currentSprite?: SpriteConfig
@@ -29,6 +29,7 @@ export abstract class Character {
   public elapsedInvincibilityTime: number
   public invincibilityInterval?: number
   public health: number
+  public imageLoaded: boolean = false
 
   constructor(initializationOptions: CharacterInitializationOptions) {
     this.position = initializationOptions.position
@@ -43,19 +44,14 @@ export abstract class Character {
     }
 
     this.image = new Image()
-    this.loadImage(initializationOptions.imageSrc)
-    this.imageLoaded = false
+    loadImage(initializationOptions.imageSrc).then((img) => {
+      this.imageLoaded = true
+      this.image = img
+    })
     this.currentFrame = 0
     this.elapsedTime = 0
     this.isInvincible = false
     this.elapsedInvincibilityTime = 0
-  }
-
-  private loadImage(imageSrc: string): void {
-    this.image.onload = (): void => {
-      this.imageLoaded = true
-    }
-    this.image.src = imageSrc
   }
 
   public hitReceived(): void {

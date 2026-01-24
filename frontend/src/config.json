@@ -12,13 +12,16 @@
       "decorations": "./images/decorations.png"
     },
     "player": {
-      "princess": "./images/princess.png"
+      "princess": "./images/sprites/princess.png"
     },
     "npcs": {
-      "blond": "./images/npc_f_blond.png"
+      "blond": {
+        "sprite": "./images/sprites/blond-purple-dress.png",
+        "portrait": "./images/portraits/blond-purple-dress.png"
+      }
     },
     "decorations": {
-      "heart": "./images/heart.png"
+      "heart": "./images/sprites/heart.png"
     },
     "ui": {
       "banner": {

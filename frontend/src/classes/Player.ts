@@ -73,7 +73,7 @@ export class Player extends Character {
       this.velocity.y = Y_VELOCITY
     }
     if (keys.g.pressed) {
-      this.objectFound('key')
+      this.objectFound('coffee')
     }
 
     if (this.velocity.x === 0 && this.velocity.y === 0) {

@@ -51,7 +51,7 @@ const initializationOptions: NpcInitializationOptions = {
     position: { x: 380, y: 480 },
     size: 15,
     velocity: { x: 0, y: 0 },
-    imageSrc: config.images.npcs.blond,
+    imageSrc: config.images.npcs.blond.sprite,
     sprites: characterSprites,
     health: 1,
   },

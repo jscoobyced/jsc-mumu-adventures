@@ -133,9 +133,9 @@ export const handleNpcs = (
           const npcMessages = interactiveNpc.getMessages()
           if (npcMessages?.length > 0) {
             game.paused = true
-            interactiveNpc.setInvincible()
+            interactiveNpc.setHasSpoken()
             keys.spaceEnabled = true
-            game.banner.show(npcMessages)
+            game.banner.show(npcMessages, interactiveNpc.getPortraitImageSrc())
             continue
           }
         }

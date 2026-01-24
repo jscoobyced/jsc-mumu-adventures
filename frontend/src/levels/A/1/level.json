@@ -1,0 +1,22 @@
+{
+  "npcs": [
+    {
+      "type": "TalkingNpc",
+      "name": "Yana",
+      "position": { "x": 300, "y": 480 },
+      "size": 15,
+      "imageSrc": "./images/sprites/blond-purple-dress.png",
+      "health": 1,
+      "messages": ["Hello Mumu! You are finally here!. Welcome to our village. We have been waiting for you. We need your help urgently!", "But I am so sleepy now. Can you help me find some coffee to wake me up?"],
+      "waitingMessages": ["I'm still so tired... Have you found the coffee?"],
+      "expectedObject": "Coffee",
+      "postObjectMessages": [
+        "Thank you for the coffee! I feel so much better now.",
+        "Here is the story of the evil black witch. There is a powerful and evil sorceress named Maginta Llennaspom. She was the most feared witch in the land and the most evil curse that she has ever cast was to unleash a black plague on the forest.",
+        "Mumu, you must help and find the antidote for this sickness and break her spell! You need to go and find the ingredients for the antidote. That's all I know. I wish you good luck!"
+      ],
+      "finalMessages": ["I wish you goodluck on your quest, Mumu!"],
+      "portraitImageSrc": "./images/portraits/blond-purple-dress.png"
+    }
+  ]
+}

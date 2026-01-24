@@ -12,7 +12,7 @@ export class SimpleNpc extends Character {
     super(initializationOptions)
 
     this.elapsedMovementTime = 0
-    this.originalPosition = initializationOptions.position
+    this.originalPosition = { ...initializationOptions.position }
     this.health = initializationOptions.health
 
     this.currentSprite = initializationOptions.sprites.walkDown

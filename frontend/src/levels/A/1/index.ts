@@ -7,6 +7,7 @@ import { LayersData } from "../../../models/Layer";
 import { LevelData } from "../../../models/LevelData";
 import { Tilesets } from "../../../models/TileSet";
 import config from "../../../config.json";
+import level from "./level.json";
 import { characterSprites } from "../../../sprites";
 import { InteractiveNpc } from "../../../classes/InteractiveNpc";
 import { TalkingNpcInitializationOptions } from "../../../models/CharacterInitializationOptions";
@@ -40,24 +41,32 @@ const tilesets: Tilesets = {
   },
 };
 
-const initializationOptions: TalkingNpcInitializationOptions = {
-  npcInitializationOptions: {
-    characterInitializationOptions: {
-      position: { x: 300, y: 480 },
-      size: 15,
-      velocity: { x: 0, y: 0 },
-      imageSrc: config.images.npcs.blond,
-      sprites: characterSprites,
-      health: 1,
-    },
-    attacking: false,
-  },
-  messages: ["Hello there!", "Welcome to our village.", "Do you have the key?"],
-  expectedObject: "Key",
-  postObjectMessages: ["Thank you for the key!", "You can now enter the castle."],
-};
+const npcs: InteractiveNpc[] = [];
 
-const npcs: InteractiveNpc[] = [new InteractiveNpc(initializationOptions)];
+for (const npcData of level.npcs) {
+  if (npcData.type === "TalkingNpc") {
+    const initializationOptions: TalkingNpcInitializationOptions = {
+      npcInitializationOptions: {
+        characterInitializationOptions: {
+          position: { x: npcData.position.x, y: npcData.position.y },
+          size: npcData.size,
+          velocity: { x: 0, y: 0 },
+          imageSrc: npcData.imageSrc,
+          sprites: characterSprites,
+          health: npcData.health,
+        },
+        attacking: false,
+      },
+      messages: npcData.messages,
+      expectedObject: npcData.expectedObject,
+      postObjectMessages: npcData.postObjectMessages,
+      waitingMessages: npcData.waitingMessages,
+      finalMessages: npcData.finalMessages,
+      portraitImageSrc: npcData.portraitImageSrc,
+    };
+    npcs.push(new InteractiveNpc(initializationOptions));
+  }
+}
 
 export const levelData: LevelData = {
   name: "A-1",
