@@ -18,7 +18,7 @@ const initializeKeys = (): void => {
     d: { pressed: false },
     g: { pressed: false },
     space: { pressed: false },
-    spaceEnabled: false,
+    spaceEnabled: true,
   }
 }
 

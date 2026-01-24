@@ -53,7 +53,7 @@ const npcs: InteractiveNpc[] = [
 ];
 
 export const levelData: LevelData = {
-  name: "Level A1",
+  name: "A-1",
   layersData,
   frontRenderedLayersData,
   tilesets,

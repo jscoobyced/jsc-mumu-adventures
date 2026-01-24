@@ -1,4 +1,5 @@
 import { CharacterInitializationOptions, Keys } from '../models'
+import { PlayerData } from '../models/CurrentStatusData'
 import { LevelDirection } from '../models/LevelData'
 import { characterSprites } from '../sprites'
 import { jscLog } from '../utils/log'
@@ -11,18 +12,21 @@ const Y_VELOCITY = 120
 export class Player extends Character {
   private objects: string[] = []
 
-  constructor({
-    position,
-    size,
-    imageSrc,
-    velocity = { x: 0, y: 0 },
-  }: CharacterInitializationOptions) {
+  constructor(
+    {
+      position,
+      size,
+      imageSrc,
+      velocity = { x: 0, y: 0 },
+    }: CharacterInitializationOptions,
+    initialInventory: string[] = [],
+  ) {
     super(position, size, velocity)
 
     this.invincibilityInterval = 0.8
     this.loadImage(imageSrc)
-
     this.currentSprite = characterSprites.walkDown
+    this.objects = [...initialInventory]
   }
 
   public draw(c: CanvasRenderingContext2D): void {
@@ -107,6 +111,13 @@ export class Player extends Character {
 
   public removeObject(object: string): void {
     this.objects = this.objects.filter((obj) => obj !== object)
+  }
+
+  public getCurrentPlayerData(): PlayerData {
+    return {
+      position: this.position,
+      inventory: this.objects,
+    }
   }
 }
 

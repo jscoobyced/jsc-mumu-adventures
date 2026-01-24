@@ -61,7 +61,7 @@ const npcs: ActiveNpc[] = [
 ];
 
 export const levelData: LevelData = {
-  name: "Level A2",
+  name: "A-2",
   layersData,
   frontRenderedLayersData,
   tilesets,

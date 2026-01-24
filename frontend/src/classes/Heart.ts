@@ -12,11 +12,11 @@ export class Heart {
   public currentFrame: number
   public currentSprite: SpriteConfig
 
-  constructor({ x, y }: Vector) {
+  constructor({ x, y }: Vector, size: number, currentFrame = 0) {
     this.x = x
     this.y = y
-    this.width = 20
-    this.height = 20
+    this.width = size
+    this.height = size
     this.center = {
       x: this.x + this.width / 2,
       y: this.y + this.height / 2,
@@ -28,7 +28,7 @@ export class Heart {
       this.loaded = true
     }
     this.image.src = config.images.decorations.heart
-    this.currentFrame = 4
+    this.currentFrame = currentFrame
 
     this.currentSprite = {
       x: 0,

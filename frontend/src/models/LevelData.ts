@@ -12,7 +12,7 @@ export interface LevelData {
 }
 
 export interface LevelConfig {
-  levelName: string
+  level: LevelData
   connectedLevels?: LevelConnection[]
 }
 

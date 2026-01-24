@@ -7,10 +7,16 @@ import { Player } from '../classes/Player'
 import { SimpleNpc } from '../classes/SimpleNpc'
 import config from '../config.json'
 import { startRendering } from '../level'
-import { levelData as initialLevel } from '../levels/A/1/index'
+import { levelConfig } from '../levels'
 import { Keys } from '../models'
+import {
+  CurrentStatusData,
+  defaultStatusData,
+} from '../models/CurrentStatusData'
 import { LevelData } from '../models/LevelData'
+import { getLastTime } from './eventListeners'
 import { jscLog } from './log'
+import { setCurrentStatus } from './storage'
 
 export interface Game {
   playing: boolean
@@ -21,27 +27,50 @@ export interface Game {
   banner: Banner
 }
 
-export const startGame = (): void => {
-  const initialHearts: Heart[] = [
-    new Heart({
-      x: 10,
-      y: 10,
-    }),
-    new Heart({
-      x: 32,
-      y: 10,
-    }),
-    new Heart({
-      x: 54,
-      y: 10,
-    }),
-  ]
+export const startGame = (restart = false): void => {
+  const currentStatusData = restart
+    ? defaultStatusData
+    : window.currentStatusData || defaultStatusData
+  const initialPlayer: Player = new Player(
+    {
+      position: currentStatusData.playerData.position,
+      size: 15,
+      imageSrc: config.images.player.princess,
+    },
+    currentStatusData.playerData.inventory,
+  )
 
-  const initialPlayer: Player = new Player({
-    position: { x: 200, y: 550 },
-    size: 15,
-    imageSrc: config.images.player.princess,
-  })
+  const heartPosition = 10
+  const heartSize = 20
+  const initialHearts: Heart[] = [
+    new Heart(
+      {
+        x: heartPosition,
+        y: heartPosition,
+      },
+      heartSize,
+      currentStatusData.health > 0 ? 4 : 0,
+    ),
+    new Heart(
+      {
+        x: heartPosition + heartSize + 2,
+        y: heartPosition,
+      },
+      heartSize,
+      currentStatusData.health > 1 ? 4 : 0,
+    ),
+    new Heart(
+      {
+        x: heartPosition + (heartSize + 2) * 2,
+        y: heartPosition,
+      },
+      heartSize,
+      currentStatusData.health > 2 ? 4 : 0,
+    ),
+  ]
+  const initialLevel =
+    levelConfig.find((config) => config.level.name === currentStatusData.level)!
+      .level || levelConfig[0].level
 
   const game: Game = {
     playing: true,
@@ -53,6 +82,8 @@ export const startGame = (): void => {
   }
   startRendering(game)
 }
+
+let lastSaveTime = 0
 
 export const handleNpcs = (
   game: Game,
@@ -124,6 +155,19 @@ export const handleNpcs = (
           }
         }
       }
+    }
+
+    // Save current status asynchronously every 5 seconds
+    if (getLastTime() - lastSaveTime > 1000) {
+      const playerData = game.player.getCurrentPlayerData()
+      const currentStatusData: CurrentStatusData = {
+        level: game.levelData.name,
+        health: game.hearts.filter((heart: Heart) => heart.currentFrame === 4)
+          .length,
+        playerData: playerData,
+      }
+      lastSaveTime = getLastTime()
+      setCurrentStatus(currentStatusData)
     }
   }
 }

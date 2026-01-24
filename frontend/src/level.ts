@@ -1,12 +1,12 @@
 import { CollisionBlock } from './classes/CollisionBlock'
 import { Heart } from './classes/Heart'
 import config from './config.json'
-import { mapConfig } from './levels'
+import { levelConfig } from './levels'
 import { LayersData } from './models/Layer'
 import { LevelData, LevelDirection } from './models/LevelData'
 import { TilesetInfo, Tilesets } from './models/TileSet'
-import { dpr, getContext } from './utils/context'
 import { isDebugMode } from './utils/debug'
+import { dpr, getDrawContext } from './utils/drawContext'
 import { getKeys, getLastTime, setLastTime } from './utils/eventListeners'
 import { Game, handleNpcs, startGame } from './utils/game'
 import { loadImage } from './utils/loadImage'
@@ -20,7 +20,7 @@ const MAP_SCALE: number = dpr + config.mapScale
 
 const BUFFER = 0.0001
 
-const context = getContext()
+const context = getDrawContext()
 
 if (!context) {
   throw new Error('Failed to get 2D context from canvas')
@@ -179,14 +179,14 @@ const animate = (
 
   // Check if restart game
   if (!game.playing && bannerClosed) {
-    startGame()
+    startGame(true)
     return
   }
 
   // Check if change level
   if (levelDirection !== LevelDirection.NONE) {
-    const currentConfig = mapConfig.find(
-      (config) => config.levelName === game.levelData.name,
+    const currentConfig = levelConfig.find(
+      (config) => config.level.name === game.levelData.name,
     )
     if (currentConfig) {
       const connection = currentConfig.connectedLevels?.find(

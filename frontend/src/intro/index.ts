@@ -1,10 +1,10 @@
-import { getContext } from '../utils/context'
+import { getDrawContext } from '../utils/drawContext'
 import { getKeys } from '../utils/eventListeners'
 import { startGame } from '../utils/game'
 import { loadImage } from '../utils/loadImage'
 
 export const intro = async () => {
-  const context = getContext()
+  const context = getDrawContext()
   if (!context) {
     throw new Error('Failed to get 2D context from canvas')
   }
@@ -21,6 +21,7 @@ const animate = (
   const keys = getKeys()
   if (keys.space.pressed) {
     keys.space.pressed = false
+    keys.spaceEnabled = false
     startGame()
     return
   }
