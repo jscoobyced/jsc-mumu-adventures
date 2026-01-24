@@ -17,6 +17,7 @@ const initializeKeys = (): void => {
     s: { pressed: false },
     d: { pressed: false },
     g: { pressed: false },
+    q: { pressed: false },
     space: { pressed: false },
     spaceEnabled: true,
   }
@@ -51,6 +52,9 @@ export const initializeEventListeners = (): void => {
       case 'g':
         keys.g.pressed = true
         break
+      case 'q':
+        keys.q.pressed = true
+        break
       default:
         break
     }
@@ -73,6 +77,12 @@ export const initializeEventListeners = (): void => {
       case 'd':
       case 'ArrowRight':
         keys.d.pressed = false
+        break
+      case 'g':
+        keys.g.pressed = false
+        break
+      case 'q':
+        keys.q.pressed = false
         break
       default:
         break

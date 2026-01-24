@@ -1,3 +1,4 @@
+import config from '../config.json'
 import { getDrawContext } from '../utils/drawContext'
 import { getKeys } from '../utils/eventListeners'
 import { startGame } from '../utils/game'
@@ -9,9 +10,9 @@ export const intro = async () => {
   if (!context) {
     throw new Error('Failed to get 2D context from canvas')
   }
-  const introImage = await loadImage('/images/intro.png')
-  const titleImage = await loadImage('/images/title-text.png')
-  await loadAndPlayAudio('/mumu-adventures.mp3')
+  const introImage = await loadImage(config.images.tilesets.intro)
+  const titleImage = await loadImage(config.images.tilesets.title)
+  await loadAndPlayAudio(config.audio.backgroundMusic)
   animate(context, introImage, titleImage)
 }
 

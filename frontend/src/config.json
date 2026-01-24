@@ -8,6 +8,7 @@
   "images": {
     "tilesets": {
       "intro": "./images/intro.png",
+      "title": "./images/title-text.png",
       "terrain": "./images/terrain.png",
       "decorations": "./images/decorations.png"
     },
@@ -30,5 +31,8 @@
         "height": 340
       }
     }
+  },
+  "audio": {
+    "backgroundMusic": "./mumu-adventures.mp3"
   }
 }

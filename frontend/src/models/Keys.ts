@@ -4,6 +4,7 @@ export interface Keys {
   s: KeyState
   d: KeyState
   g: KeyState
+  q: KeyState
   space: KeyState
   spaceEnabled: boolean
 }
