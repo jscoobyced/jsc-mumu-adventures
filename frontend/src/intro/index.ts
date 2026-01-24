@@ -2,6 +2,7 @@ import { getDrawContext } from '../utils/drawContext'
 import { getKeys } from '../utils/eventListeners'
 import { startGame } from '../utils/game'
 import { loadImage } from '../utils/loadImage'
+import { loadAndPlayAudio } from '../utils/music'
 
 export const intro = async () => {
   const context = getDrawContext()
@@ -10,6 +11,7 @@ export const intro = async () => {
   }
   const introImage = await loadImage('/images/intro.png')
   const titleImage = await loadImage('/images/title-text.png')
+  await loadAndPlayAudio('/mumu-adventures.mp3')
   animate(context, introImage, titleImage)
 }
 
