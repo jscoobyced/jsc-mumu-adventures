@@ -5,24 +5,15 @@ import { Character } from './Character'
 import { CollisionBlock } from './CollisionBlock'
 
 export class SimpleNpc extends Character {
-  public originalPosition: Vector
-  public health: number
   public elapsedMovementTime: number
+  private originalPosition: Vector
 
-  constructor({
-    position,
-    size,
-    imageSrc,
-    velocity = { x: 0, y: 0 },
-    health = 3,
-  }: CharacterInitializationOptions) {
-    super(position, size, velocity)
+  constructor(initializationOptions: CharacterInitializationOptions) {
+    super(initializationOptions)
 
-    this.originalPosition = { ...position }
-    this.health = health
     this.elapsedMovementTime = 0
-
-    this.loadImage(imageSrc)
+    this.originalPosition = initializationOptions.position
+    this.health = initializationOptions.health
 
     if (characterSprites === undefined) {
       throw new Error('NPC sprites is undefined')

@@ -1,5 +1,10 @@
 import config from '../config.json'
-import { SpriteConfig, Vector } from '../models'
+import {
+  CharacterInitializationOptions,
+  SpriteConfig,
+  Sprites,
+  Vector,
+} from '../models'
 import { LevelDirection } from '../models/LevelData'
 import { CollisionBlock } from './CollisionBlock'
 
@@ -19,25 +24,26 @@ export abstract class Character {
   public currentFrame: number
   public elapsedTime: number
   public currentSprite?: SpriteConfig
+  public characterSprites?: Sprites
   public isInvincible: boolean
   public elapsedInvincibilityTime: number
   public invincibilityInterval?: number
+  public health: number
 
-  constructor(
-    position: Vector,
-    size: number,
-    velocity: Vector = { x: 0, y: 0 },
-  ) {
-    this.position = position
-    this.width = size
-    this.height = size
-    this.velocity = velocity
+  constructor(initializationOptions: CharacterInitializationOptions) {
+    this.position = initializationOptions.position
+    this.width = initializationOptions.size
+    this.height = initializationOptions.size
+    this.velocity = initializationOptions.velocity || { x: 0, y: 0 }
+    this.health = initializationOptions.health || 1
+    this.characterSprites = initializationOptions.sprites
     this.center = {
       x: this.position.x + this.width / 2,
       y: this.position.y + this.height / 2,
     }
 
     this.image = new Image()
+    this.loadImage(initializationOptions.imageSrc)
     this.imageLoaded = false
     this.currentFrame = 0
     this.elapsedTime = 0
@@ -45,7 +51,7 @@ export abstract class Character {
     this.elapsedInvincibilityTime = 0
   }
 
-  protected loadImage(imageSrc: string): void {
+  private loadImage(imageSrc: string): void {
     this.image.onload = (): void => {
       this.imageLoaded = true
     }

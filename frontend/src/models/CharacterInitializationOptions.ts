@@ -5,9 +5,9 @@ export interface CharacterInitializationOptions {
   position: Vector
   size: number
   imageSrc: string
-  velocity?: Vector
-  sprites?: Sprites
-  health?: number
+  velocity: Vector
+  sprites: Sprites
+  health: number
 }
 
 export interface NpcInitializationOptions {

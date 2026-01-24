@@ -13,18 +13,17 @@ export class Player extends Character {
   private objects: string[] = []
 
   constructor(
-    {
-      position,
-      size,
-      imageSrc,
-      velocity = { x: 0, y: 0 },
-    }: CharacterInitializationOptions,
+    initializationOptions: CharacterInitializationOptions,
     initialInventory: string[] = [],
   ) {
-    super(position, size, velocity)
+    super(initializationOptions)
 
     this.invincibilityInterval = 0.8
-    this.loadImage(imageSrc)
+    if (characterSprites === undefined) {
+      throw new Error('NPC sprites is undefined')
+    }
+    this.currentSprite = Object.values(characterSprites)[0]
+
     this.currentSprite = characterSprites.walkDown
     this.objects = [...initialInventory]
   }
