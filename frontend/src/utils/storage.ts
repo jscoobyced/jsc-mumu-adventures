@@ -7,6 +7,7 @@ import {
   generateKey,
   importKey,
 } from './crypto'
+import { getJscData } from './window'
 
 const CURRENT_STATUS = 'MUMU_CURRENT_STATUS'
 const INITIALIZATION_VECTOR = 'MUMU_IV'
@@ -17,9 +18,9 @@ export const initializeCryptoKey = async () => {
   if (!storedKey) {
     const key = await generateKey()
     await saveCryptoKey(key)
-    window.cryptoKey = key
+    getJscData().cryptoKey = key
   } else {
-    window.cryptoKey = storedKey
+    getJscData().cryptoKey = storedKey
   }
 }
 
@@ -50,14 +51,14 @@ const getCryptoKey = async () => {
 }
 
 export const setCurrentStatus = (data: CurrentStatusData): boolean => {
-  window.currentStatusData = data
+  getJscData().currentStatusData = data
   try {
     let iv = getInitializationVector()
     if (!iv) {
       iv = generateIV()
       saveInitializationVector(iv)
     }
-    const key = window.cryptoKey
+    const key = getJscData().cryptoKey
     if (!key) {
       return false
     }
@@ -77,7 +78,11 @@ export const loadCurrentStatus = async (
   defaultCurrentStatus: CurrentStatusData,
 ) => {
   const currentStatus = await getCurrentStatus()
-  window.currentStatusData = currentStatus ?? defaultCurrentStatus
+  if (currentStatus?.version !== defaultCurrentStatus.version) {
+    getJscData().currentStatusData = defaultCurrentStatus
+    return
+  }
+  getJscData().currentStatusData = currentStatus ?? defaultCurrentStatus
 }
 
 const getCurrentStatus = async () => {

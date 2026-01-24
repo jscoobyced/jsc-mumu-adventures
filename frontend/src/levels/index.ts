@@ -6,3 +6,5 @@ export const levelConfig: LevelConfig[] = [
   { level: levelA1, connectedLevels: [{ direction: LevelDirection.RIGHT, level: levelA2 }] },
   { level: levelA2, connectedLevels: [{ direction: LevelDirection.LEFT, level: levelA1 }] },
 ];
+
+export const defaultLevel = levelA1;

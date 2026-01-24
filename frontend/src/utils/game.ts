@@ -7,9 +7,10 @@ import { Player } from '../classes/Player'
 import { SimpleNpc } from '../classes/SimpleNpc'
 import config from '../config.json'
 import { startRendering } from '../level'
-import { levelConfig } from '../levels'
+import { defaultLevel, levelConfig } from '../levels'
 import { Keys } from '../models'
 import {
+  CURRENT_STATUS_VERSION,
   CurrentStatusData,
   defaultStatusData,
 } from '../models/CurrentStatusData'
@@ -17,6 +18,7 @@ import { LevelData } from '../models/LevelData'
 import { getLastTime } from './eventListeners'
 import { jscLog } from './log'
 import { setCurrentStatus } from './storage'
+import { getJscData } from './window'
 
 export interface Game {
   playing: boolean
@@ -30,7 +32,7 @@ export interface Game {
 export const startGame = (restart = false): void => {
   const currentStatusData = restart
     ? defaultStatusData
-    : window.currentStatusData || defaultStatusData
+    : getJscData().currentStatusData || defaultStatusData
   const initialPlayer: Player = new Player(
     {
       position: currentStatusData.playerData.position,
@@ -70,7 +72,7 @@ export const startGame = (restart = false): void => {
   ]
   const initialLevel =
     levelConfig.find((config) => config.level.name === currentStatusData.level)!
-      .level || levelConfig[0].level
+      .level || defaultLevel
 
   const game: Game = {
     playing: true,
@@ -161,6 +163,7 @@ export const handleNpcs = (
     if (getLastTime() - lastSaveTime > 1000) {
       const playerData = game.player.getCurrentPlayerData()
       const currentStatusData: CurrentStatusData = {
+        version: CURRENT_STATUS_VERSION,
         level: game.levelData.name,
         health: game.hearts.filter((heart: Heart) => heart.currentFrame === 4)
           .length,

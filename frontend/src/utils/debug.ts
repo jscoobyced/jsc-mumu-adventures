@@ -1,3 +1,5 @@
+import { getJscData } from './window'
+
 export const isDebugMode = (): boolean => {
-  return window.jscDebug === true
+  return getJscData().debug === true
 }
