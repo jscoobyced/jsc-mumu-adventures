@@ -79,6 +79,9 @@ export const loadCurrentStatus = async (
 ) => {
   const currentStatus = await getCurrentStatus()
   if (currentStatus?.version !== defaultCurrentStatus.version) {
+    console.log(
+      'Current status version mismatch. Loading default current status data.',
+    )
     getJscData().currentStatusData = defaultCurrentStatus
     return
   }

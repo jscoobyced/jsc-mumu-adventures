@@ -3,7 +3,7 @@ import { getDrawContext } from '../utils/drawContext'
 import { getKeys } from '../utils/eventListeners'
 import { startGame } from '../utils/game'
 import { loadImage } from '../utils/loadImage'
-import { loadAndPlayAudio } from '../utils/music'
+import { loadAndPlayAudio, toggleAudio } from '../utils/music'
 
 export const intro = async () => {
   const context = getDrawContext()
@@ -22,6 +22,7 @@ const animate = (
   titleImage: HTMLImageElement,
 ) => {
   const keys = getKeys()
+  toggleAudio(keys)
   if (keys.space.pressed) {
     keys.space.pressed = false
     keys.spaceEnabled = false

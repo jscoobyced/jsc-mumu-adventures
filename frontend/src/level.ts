@@ -10,7 +10,7 @@ import { dpr, getDrawContext } from './utils/drawContext'
 import { getKeys, getLastTime, setLastTime } from './utils/eventListeners'
 import { Game, handleNpcs, startGame } from './utils/game'
 import { loadImage } from './utils/loadImage'
-import { loadAndPlayAudio, stopCurrentAudio } from './utils/music'
+import { toggleAudio } from './utils/music'
 
 const MAP_COLS: number = config.cols
 const MAP_ROWS: number = config.rows
@@ -56,7 +56,6 @@ const prepareLevel = (level: LevelData) => {
 }
 
 let frontRenderedCanvas: HTMLCanvasElement
-let playMusic = true
 
 const renderLayer = (
   tilesData: number[][],
@@ -161,19 +160,7 @@ const animate = (
   }
   game.player.draw(context)
   const keys = getKeys()
-  if (keys.q.pressed) {
-    if (!playMusic) {
-      playMusic = true
-      loadAndPlayAudio(config.audio.backgroundMusic).catch((error) => {
-        console.error('Error playing audio:', error)
-      })
-    } else {
-      playMusic = false
-      stopCurrentAudio()
-    }
-    keys.q.pressed = false
-  }
-
+  toggleAudio(keys)
   if (!game.paused) handleNpcs(game, context, collisionBlocks, deltaTime, keys)
 
   context.drawImage(frontRenderedCanvas, 0, 0)

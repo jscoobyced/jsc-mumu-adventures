@@ -8,6 +8,7 @@ export interface CharacterInitializationOptions {
   velocity: Vector
   sprites: Sprites
   health: number
+  name?: string
 }
 
 export interface NpcInitializationOptions {
@@ -17,10 +18,9 @@ export interface NpcInitializationOptions {
 
 export interface TalkingNpcInitializationOptions {
   npcInitializationOptions: NpcInitializationOptions
-  messages?: string[]
-  isKeyNpc?: boolean
+  messages: string[]
   expectedObject?: string
-  postObjectMessages?: string[]
+  postObjectMessages: string[]
   waitingMessages: string[]
   finalMessages: string[]
   portraitImageSrc?: string

@@ -30,6 +30,7 @@ export abstract class Character {
   public invincibilityInterval?: number
   public health: number
   public imageLoaded: boolean = false
+  private name?: string
 
   constructor(initializationOptions: CharacterInitializationOptions) {
     this.position = initializationOptions.position
@@ -42,6 +43,7 @@ export abstract class Character {
       x: this.position.x + this.width / 2,
       y: this.position.y + this.height / 2,
     }
+    this.name = initializationOptions.name
 
     this.image = new Image()
     loadImage(initializationOptions.imageSrc).then((img) => {
@@ -52,6 +54,10 @@ export abstract class Character {
     this.elapsedTime = 0
     this.isInvincible = false
     this.elapsedInvincibilityTime = 0
+  }
+
+  public getName(): string | undefined {
+    return this.name
   }
 
   public hitReceived(): void {

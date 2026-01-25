@@ -1,3 +1,6 @@
+import config from '../config.json'
+import { Keys } from '../models/Keys'
+
 let currentAudio: HTMLAudioElement | null = null
 
 export const stopCurrentAudio = (): void => {
@@ -26,5 +29,22 @@ export const loadAndPlayAudio = async (
       audio.onerror = (e) =>
         reject(new Error(`Failed to load audio from ${url}: ${e}`))
     })
+  }
+}
+
+let playMusic = true
+
+export const toggleAudio = (keys: Keys): void => {
+  if (keys.q.pressed) {
+    if (!playMusic) {
+      playMusic = true
+      loadAndPlayAudio(config.audio.backgroundMusic).catch((error) => {
+        console.error('Error playing audio:', error)
+      })
+    } else {
+      playMusic = false
+      stopCurrentAudio()
+    }
+    keys.q.pressed = false
   }
 }

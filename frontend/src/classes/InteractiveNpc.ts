@@ -1,74 +1,99 @@
 import { TalkingNpcInitializationOptions } from '../models/CharacterInitializationOptions'
+import { NpcData } from '../models/CurrentStatusData'
+import Interaction from '../models/Interaction'
 import { loadImage } from '../utils/loadImage'
 import ActiveNpc from './ActiveNpc'
 
 export class InteractiveNpc extends ActiveNpc {
   private messages: string[]
-  private isKeyNpc: boolean
   private expectedObject?: string
-  private hasReceivedObject: boolean
   private postObjectMessages: string[]
   private waitingMessages: string[]
   private finalMessages: string[]
   private portraitImage?: HTMLImageElement
+  private currentInteraction: Interaction = Interaction.NONE
 
-  constructor(initializationOptions: TalkingNpcInitializationOptions) {
+  constructor(
+    initializationOptions: TalkingNpcInitializationOptions,
+    initialInteraction: Interaction = Interaction.NONE,
+  ) {
     super(initializationOptions.npcInitializationOptions)
 
-    this.messages = initializationOptions.messages
-      ? [...initializationOptions.messages]
-      : []
-    this.isKeyNpc =
-      initializationOptions.isKeyNpc ||
-      initializationOptions.expectedObject !== undefined
+    this.messages = [...initializationOptions.messages]
     this.expectedObject = initializationOptions.expectedObject?.toLowerCase()
-    this.hasReceivedObject = false
-    this.postObjectMessages = initializationOptions.postObjectMessages
-      ? [...initializationOptions.postObjectMessages]
-      : []
-    this.waitingMessages = initializationOptions.waitingMessages
-    this.finalMessages = initializationOptions.finalMessages
+    this.postObjectMessages = [...initializationOptions.postObjectMessages]
+    this.waitingMessages = [...initializationOptions.waitingMessages]
+    this.finalMessages = [...initializationOptions.finalMessages]
     if (initializationOptions.portraitImageSrc)
       loadImage(initializationOptions.portraitImageSrc).then((img) => {
         this.portraitImage = img
       })
+    this.currentInteraction = initialInteraction
+  }
+
+  public toString = (): string => {
+    return `InteractiveNpc:\n\t${this.getName() || 'unknown'}\n\tInteraction: ${this.currentInteraction}\n\tExpected Object: ${
+      this.expectedObject || 'none'
+    }`
+  }
+
+  public setInteraction = (interaction: Interaction) => {
+    switch (interaction) {
+      case Interaction.WAITING:
+        if (this.currentInteraction === Interaction.NONE) {
+          this.currentInteraction = interaction
+          this.messages = this.waitingMessages.length
+            ? [...this.waitingMessages]
+            : this.messages
+        }
+        break
+      case Interaction.OBJECT:
+        if (this.currentInteraction === Interaction.WAITING) {
+          this.currentInteraction = interaction
+          this.messages = this.postObjectMessages.length
+            ? [...this.postObjectMessages]
+            : this.messages
+        }
+        break
+      case Interaction.DONE:
+        if (this.currentInteraction === Interaction.OBJECT) {
+          this.currentInteraction = interaction
+          this.messages = this.finalMessages.length
+            ? [...this.finalMessages]
+            : this.messages
+        }
+        break
+      case Interaction.NONE:
+      default:
+        // Do nothing
+        break
+    }
   }
 
   public getMessages = (): string[] => {
-    return this.messages
-  }
-
-  public setHasSpoken = () => {
-    this.setInvincible()
-    if (this.hasReceivedObject && this.finalMessages.length > 0) {
-      this.messages = this.finalMessages
-      return
+    const currentMessages = [...this.messages]
+    if (this.currentInteraction === Interaction.OBJECT) {
+      this.setInteraction(Interaction.DONE)
     }
-    if (this.waitingMessages) this.messages = this.waitingMessages
+    if (this.currentInteraction === Interaction.NONE) {
+      this.setInteraction(Interaction.WAITING)
+    }
+    return currentMessages
   }
 
   /**
    * Call this when the Player gives the expected object to the NPC
    */
   public receiveObjectFromPlayer(objectName: string): boolean {
-    if (
-      this.isKeyNpc &&
-      this.expectedObject === objectName &&
-      !this.hasReceivedObject
-    ) {
-      this.hasReceivedObject = true
-      this.messages = [...this.postObjectMessages]
+    if (this.expectedObject === objectName.toLowerCase()) {
+      this.setInteraction(Interaction.OBJECT)
       return true
     }
     return false
   }
 
   public expectingObjectName(): string | false {
-    if (
-      this.isKeyNpc &&
-      !this.hasReceivedObject &&
-      this.expectedObject !== undefined
-    ) {
+    if (this.expectedObject !== undefined) {
       return this.expectedObject
     }
     return false
@@ -76,8 +101,7 @@ export class InteractiveNpc extends ActiveNpc {
 
   public isExpectingSpecificObject(object: string): boolean {
     return (
-      this.isKeyNpc &&
-      !this.hasReceivedObject &&
+      this.currentInteraction === Interaction.WAITING &&
       this.expectedObject !== undefined &&
       this.expectedObject === object
     )
@@ -85,6 +109,13 @@ export class InteractiveNpc extends ActiveNpc {
 
   public getPortraitImageSrc(): HTMLImageElement | undefined {
     return this.portraitImage
+  }
+
+  public getCurrentNpcData(): NpcData {
+    return {
+      npcName: this.getName() || 'unknown',
+      interaction: this.currentInteraction,
+    }
   }
 }
 

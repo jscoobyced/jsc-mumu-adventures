@@ -11,7 +11,9 @@ import level from "./level.json";
 import { characterSprites } from "../../../sprites";
 import { InteractiveNpc } from "../../../classes/InteractiveNpc";
 import { TalkingNpcInitializationOptions } from "../../../models/CharacterInitializationOptions";
+import { getJscData } from "../../../utils/window";
 
+const name = "A-1";
 const layersData: LayersData = {
   l_Terrain: l_Terrain,
   l_Trees: l_Trees,
@@ -42,6 +44,14 @@ const tilesets: Tilesets = {
 };
 
 const npcs: InteractiveNpc[] = [];
+const savedLevelData = getJscData().currentStatusData?.levelsData;
+const savedNpcs: any[] = [];
+if (savedLevelData) {
+  const savedLevel = savedLevelData.find((levelData) => levelData.levelName === name);
+  if (savedLevel) {
+    savedNpcs.push(...savedLevel.npcData);
+  }
+}
 
 for (const npcData of level.npcs) {
   if (npcData.type === "TalkingNpc") {
@@ -54,6 +64,7 @@ for (const npcData of level.npcs) {
           imageSrc: npcData.imageSrc,
           sprites: characterSprites,
           health: npcData.health,
+          name: npcData.name,
         },
         attacking: false,
       },
@@ -64,7 +75,10 @@ for (const npcData of level.npcs) {
       finalMessages: npcData.finalMessages,
       portraitImageSrc: npcData.portraitImageSrc,
     };
-    npcs.push(new InteractiveNpc(initializationOptions));
+    let savedNpc = savedNpcs.find((npc) => npc.name === npcData.name);
+
+    const newNpc = new InteractiveNpc(initializationOptions, savedNpc?.interaction);
+    npcs.push(newNpc);
   }
 }
 

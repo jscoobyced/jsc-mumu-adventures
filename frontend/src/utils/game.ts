@@ -74,9 +74,13 @@ export const startGame = (restart = false): void => {
       currentStatusData.health > 2 ? 4 : 0,
     ),
   ]
-  const initialLevel =
-    levelConfig.find((config) => config.level.name === currentStatusData.level)!
-      .level || defaultLevel
+
+  const initialLevel: LevelData =
+    currentStatusData.version !== CURRENT_STATUS_VERSION
+      ? defaultLevel
+      : levelConfig.find(
+          (config) => config.level.name === currentStatusData.currentLevel,
+        )!.level || defaultLevel
 
   const game: Game = {
     playing: true,
@@ -133,7 +137,7 @@ export const handleNpcs = (
           const npcMessages = interactiveNpc.getMessages()
           if (npcMessages?.length > 0) {
             game.paused = true
-            interactiveNpc.setHasSpoken()
+            interactiveNpc.setInvincible()
             keys.spaceEnabled = true
             game.banner.show(npcMessages, interactiveNpc.getPortraitImageSrc())
             continue
@@ -166,9 +170,25 @@ export const handleNpcs = (
     // Save current status asynchronously every 5 seconds
     if (getLastTime() - lastSaveTime > 1000) {
       const playerData = game.player.getCurrentPlayerData()
+      const allLevelData = getJscData().currentStatusData?.levelsData || []
+      let currentLevelData = allLevelData.find(
+        (levelData) => levelData.levelName === game.levelData.name,
+      )
+      if (currentLevelData) {
+        currentLevelData.npcData = game.levelData.npcs.map((npc) =>
+          npc.getCurrentNpcData(),
+        )
+      } else {
+        currentLevelData = {
+          levelName: game.levelData.name,
+          npcData: game.levelData.npcs.map((npc) => npc.getCurrentNpcData()),
+        }
+        allLevelData.push(currentLevelData)
+      }
       const currentStatusData: CurrentStatusData = {
         version: CURRENT_STATUS_VERSION,
-        level: game.levelData.name,
+        levelsData: allLevelData,
+        currentLevel: game.levelData.name,
         health: game.hearts.filter((heart: Heart) => heart.currentFrame === 4)
           .length,
         playerData: playerData,

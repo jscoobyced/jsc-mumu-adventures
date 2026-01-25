@@ -1,5 +1,7 @@
 import { Vector } from '../models'
 import { CharacterInitializationOptions } from '../models/CharacterInitializationOptions'
+import { NpcData } from '../models/CurrentStatusData'
+import Interaction from '../models/Interaction'
 import { characterSprites } from '../sprites'
 import { Character } from './Character'
 import { CollisionBlock } from './CollisionBlock'
@@ -89,6 +91,13 @@ export class SimpleNpc extends Character {
 
   protected onVerticalCollision(): void {
     this.velocity.y = -this.velocity.y
+  }
+
+  public getCurrentNpcData(): NpcData {
+    return {
+      npcName: this.getName() || 'unknown',
+      interaction: Interaction.NONE,
+    }
   }
 }
 
