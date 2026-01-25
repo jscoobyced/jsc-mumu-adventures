@@ -8,12 +8,8 @@ import { LevelData } from "../../../models/LevelData";
 import { Tilesets } from "../../../models/TileSet";
 import config from "../../../config.json";
 import level from "./level.json";
-import { characterSprites } from "../../../sprites";
-import { InteractiveNpc } from "../../../classes/InteractiveNpc";
-import { TalkingNpcInitializationOptions } from "../../../models/CharacterInitializationOptions";
-import { getJscData } from "../../../utils/window";
+import SimpleNpc from "../../../classes/SimpleNpc";
 
-const name = "A-1";
 const layersData: LayersData = {
   l_Terrain: l_Terrain,
   l_Trees: l_Trees,
@@ -43,45 +39,7 @@ const tilesets: Tilesets = {
   },
 };
 
-const npcs: InteractiveNpc[] = [];
-const savedLevelData = getJscData().currentStatusData?.levelsData;
-const savedNpcs: any[] = [];
-if (savedLevelData) {
-  const savedLevel = savedLevelData.find((levelData) => levelData.levelName === name);
-  if (savedLevel) {
-    savedNpcs.push(...savedLevel.npcData);
-  }
-}
-
-for (const npcData of level.npcs) {
-  if (npcData.type === "TalkingNpc") {
-    const initializationOptions: TalkingNpcInitializationOptions = {
-      npcInitializationOptions: {
-        characterInitializationOptions: {
-          position: { x: npcData.position.x, y: npcData.position.y },
-          size: npcData.size,
-          velocity: { x: 0, y: 0 },
-          imageSrc: npcData.imageSrc,
-          sprites: characterSprites,
-          health: npcData.health,
-          name: npcData.name,
-        },
-        attacking: false,
-      },
-      messages: npcData.messages,
-      expectedObject: npcData.expectedObject,
-      postObjectMessages: npcData.postObjectMessages,
-      waitingMessages: npcData.waitingMessages,
-      finalMessages: npcData.finalMessages,
-      portraitImageSrc: npcData.portraitImageSrc,
-    };
-    let savedNpc = savedNpcs.find((npc) => npc.name === npcData.name);
-
-    const newNpc = new InteractiveNpc(initializationOptions, savedNpc?.interaction);
-    npcs.push(newNpc);
-  }
-}
-
+const npcs = [] as SimpleNpc[];
 export const levelData: LevelData = {
   name: "A-1",
   layersData,
@@ -89,4 +47,5 @@ export const levelData: LevelData = {
   tilesets,
   l_Collisions,
   npcs,
+  npcConfiguration: level.npcs,
 };

@@ -65,4 +65,5 @@ export const levelData: LevelData = {
   tilesets,
   l_Collisions,
   npcs: npcs,
+  npcConfiguration: [],
 };

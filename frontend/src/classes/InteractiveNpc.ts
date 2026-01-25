@@ -28,7 +28,7 @@ export class InteractiveNpc extends ActiveNpc {
       loadImage(initializationOptions.portraitImageSrc).then((img) => {
         this.portraitImage = img
       })
-    this.currentInteraction = initialInteraction
+    this.setInteraction(initialInteraction)
   }
 
   public toString = (): string => {
@@ -40,28 +40,22 @@ export class InteractiveNpc extends ActiveNpc {
   public setInteraction = (interaction: Interaction) => {
     switch (interaction) {
       case Interaction.WAITING:
-        if (this.currentInteraction === Interaction.NONE) {
-          this.currentInteraction = interaction
-          this.messages = this.waitingMessages.length
-            ? [...this.waitingMessages]
-            : this.messages
-        }
+        this.currentInteraction = interaction
+        this.messages = this.waitingMessages.length
+          ? [...this.waitingMessages]
+          : this.messages
         break
       case Interaction.OBJECT:
-        if (this.currentInteraction === Interaction.WAITING) {
-          this.currentInteraction = interaction
-          this.messages = this.postObjectMessages.length
-            ? [...this.postObjectMessages]
-            : this.messages
-        }
+        this.currentInteraction = interaction
+        this.messages = this.postObjectMessages.length
+          ? [...this.postObjectMessages]
+          : this.messages
         break
       case Interaction.DONE:
-        if (this.currentInteraction === Interaction.OBJECT) {
-          this.currentInteraction = interaction
-          this.messages = this.finalMessages.length
-            ? [...this.finalMessages]
-            : this.messages
-        }
+        this.currentInteraction = interaction
+        this.messages = this.finalMessages.length
+          ? [...this.finalMessages]
+          : this.messages
         break
       case Interaction.NONE:
       default:
@@ -72,7 +66,10 @@ export class InteractiveNpc extends ActiveNpc {
 
   public getMessages = (): string[] => {
     const currentMessages = [...this.messages]
-    if (this.currentInteraction === Interaction.OBJECT) {
+    if (
+      this.currentInteraction === Interaction.OBJECT &&
+      this.currentInteraction === Interaction.OBJECT
+    ) {
       this.setInteraction(Interaction.DONE)
     }
     if (this.currentInteraction === Interaction.NONE) {
@@ -85,7 +82,10 @@ export class InteractiveNpc extends ActiveNpc {
    * Call this when the Player gives the expected object to the NPC
    */
   public receiveObjectFromPlayer(objectName: string): boolean {
-    if (this.expectedObject === objectName.toLowerCase()) {
+    if (
+      this.expectedObject === objectName.toLowerCase() &&
+      this.currentInteraction === Interaction.WAITING
+    ) {
       this.setInteraction(Interaction.OBJECT)
       return true
     }
