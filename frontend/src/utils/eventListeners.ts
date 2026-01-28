@@ -1,4 +1,5 @@
 import { Keys } from '../models/Keys'
+import { startBackgroundAudio, toggleAudio } from './music'
 
 // Declare global variables (these should be defined elsewhere in your project)
 let keys!: Keys
@@ -54,10 +55,14 @@ export const initializeEventListeners = (): void => {
         break
       case 'q':
         keys.q.pressed = true
+        toggleAudio(keys)
         break
       default:
         break
     }
+    startBackgroundAudio().catch((error) => {
+      console.error('Error starting background audio:', error)
+    })
   })
 
   window.addEventListener('keyup', (event: KeyboardEvent): void => {

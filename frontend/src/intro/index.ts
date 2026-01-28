@@ -3,7 +3,6 @@ import { getDrawContext } from '../utils/drawContext'
 import { getKeys } from '../utils/eventListeners'
 import { startGame } from '../utils/game'
 import { loadImage } from '../utils/loadImage'
-import { loadAndPlayAudio, toggleAudio } from '../utils/music'
 
 export const intro = async () => {
   const context = getDrawContext()
@@ -12,7 +11,6 @@ export const intro = async () => {
   }
   const introImage = await loadImage(config.images.tilesets.intro)
   const titleImage = await loadImage(config.images.tilesets.title)
-  await loadAndPlayAudio(config.audio.backgroundMusic)
   animate(context, introImage, titleImage)
 }
 
@@ -22,7 +20,6 @@ const animate = (
   titleImage: HTMLImageElement,
 ) => {
   const keys = getKeys()
-  toggleAudio(keys)
   if (keys.space.pressed) {
     keys.space.pressed = false
     keys.spaceEnabled = false

@@ -1,6 +1,6 @@
+import { intro } from './intro'
 import { defaultStatusData } from './models/CurrentStatusData'
 import { initializeEventListeners } from './utils/eventListeners'
-import { startGame } from './utils/game'
 import { initializeCryptoKey, loadCurrentStatus } from './utils/storage'
 
 initializeEventListeners()
@@ -12,6 +12,5 @@ initializeEventListeners()
 const myFont = new FontFace('MumuFont', 'url(fonts/mumu.ttf)')
 myFont.load().then(() => {
   document.fonts.add(myFont)
-  // intro()
-  startGame()
+  intro()
 })

@@ -1,48 +1,51 @@
 import config from '../config.json'
 import { Keys } from '../models/Keys'
 
-let currentAudio: HTMLAudioElement | null = null
+let backgroundAudio: HTMLAudioElement | null = null
+let backgroundAudioStarted: boolean = false
 
 export const stopCurrentAudio = (): void => {
-  if (currentAudio) {
-    currentAudio.pause()
+  if (backgroundAudio) {
+    backgroundAudio.pause()
   }
 }
 
-export const loadAndPlayAudio = async (
-  url: string,
-): Promise<HTMLAudioElement> => {
-  if (currentAudio) {
-    currentAudio.play()
-    return Promise.resolve(currentAudio)
-  } else {
-    return new Promise((resolve, reject) => {
-      const audio = new Audio()
-      audio.src = url
-      audio.autoplay = true
-      audio.loop = true
-      audio.volume = 0.5
-      audio.oncanplaythrough = () => {
-        currentAudio = audio
-        resolve(audio)
-      }
-      audio.onerror = (e) =>
-        reject(new Error(`Failed to load audio from ${url}: ${e}`))
-    })
-  }
+export const hasBackgroundAudioStarted = (): boolean => {
+  return backgroundAudioStarted
 }
 
-let playMusic = true
+export const startBackgroundAudio = async (): Promise<void> => {
+  if (backgroundAudioStarted) {
+    return
+  }
+  if (!backgroundAudio) {
+    backgroundAudio = await loadAudio(config.audio.backgroundMusic)
+  }
+  await backgroundAudio.play()
+  backgroundAudioStarted = true
+}
+
+export const loadAudio = async (url: string): Promise<HTMLAudioElement> => {
+  return new Promise((resolve, reject) => {
+    const audio = new Audio()
+    audio.src = url
+    audio.loop = true
+    audio.volume = 0.5
+    audio.oncanplaythrough = () => {
+      resolve(audio)
+    }
+    audio.onerror = (e) =>
+      reject(new Error(`Failed to load audio from ${url}: ${e}`))
+  })
+}
 
 export const toggleAudio = (keys: Keys): void => {
   if (keys.q.pressed) {
-    if (!playMusic) {
-      playMusic = true
-      loadAndPlayAudio(config.audio.backgroundMusic).catch((error) => {
-        console.error('Error playing audio:', error)
-      })
+    if (backgroundAudio && backgroundAudio.paused) {
+      ;(async () => {
+        backgroundAudio.play()
+      })()
     } else {
-      playMusic = false
       stopCurrentAudio()
     }
     keys.q.pressed = false
