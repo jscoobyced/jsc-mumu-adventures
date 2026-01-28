@@ -8,7 +8,7 @@ RUN apk add --no-cache git libc6-compat build-base python3
 
 # Install corepack and set yarn to stable version
 RUN corepack enable
-RUN yarn set version stable
+RUN yarn set version classic
 
 WORKDIR /app
 
