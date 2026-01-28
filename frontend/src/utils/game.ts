@@ -18,7 +18,6 @@ import { LevelData } from '../models/LevelData'
 import { characterSprites } from '../sprites'
 import { getLastTime } from './eventListeners'
 import { jscLog } from './log'
-import { initializeNpcs } from './npc'
 import { setCurrentStatus } from './storage'
 import { getJscData } from './window'
 
@@ -82,8 +81,6 @@ export const startGame = (restart = false): void => {
       : levelConfig.find(
           (config) => config.level.name === currentStatusData.currentLevel,
         )!.level || defaultLevel
-  const npcs = initializeNpcs(initialLevel.name, initialLevel.npcConfiguration)
-  initialLevel.npcs = npcs
 
   const game: Game = {
     playing: true,

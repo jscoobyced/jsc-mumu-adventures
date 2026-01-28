@@ -205,11 +205,6 @@ const animate = (
           game.player.position.y = 0 + BUFFER
         }
         game.levelData = connection.level
-        const npcs = initializeNpcs(
-          connection.level.name,
-          connection.level.npcConfiguration,
-        )
-        connection.level.npcs = npcs
         startRendering(game)
         return
       }
@@ -229,6 +224,11 @@ const debugCollisions = (c: CanvasRenderingContext2D): void => {
 
 export const startRendering = async (game: Game): Promise<void> => {
   prepareLevel(game.levelData)
+  const npcs = initializeNpcs(
+    game.levelData.name,
+    game.levelData.npcConfiguration,
+  )
+  game.levelData.npcs = npcs
   try {
     const backgroundCanvas: HTMLCanvasElement = await renderStaticLayers(
       game.levelData.layersData,

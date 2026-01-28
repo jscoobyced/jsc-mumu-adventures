@@ -55,7 +55,7 @@ export const initializeNpcs = (name: string, npcs: NpcConfiguration[]) => {
         characterInitializationOptions:
           initializationOptions.npcInitializationOptions
             .characterInitializationOptions,
-        attacking: initializationOptions.npcInitializationOptions.attacking,
+        attacking: true,
       }
       const newNpc = new ActiveNpc(initOption)
       newNpcs.push(newNpc)
