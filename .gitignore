@@ -4,3 +4,5 @@ dist/
 coverage/
 .vscode/
 tsconfig.tsbuildinfo
+.yarn
+.yarnrc.yml

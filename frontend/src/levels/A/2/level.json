@@ -1,0 +1,18 @@
+{
+  "npcs": [
+    {
+      "type": "ActiveNpc",
+      "name": "Bob",
+      "position": { "x": 380, "y": 480 },
+      "size": 15,
+      "imageSrc": "./images/sprites/blond-purple-dress.png",
+      "health": 1,
+      "messages": [],
+      "expectedObject": "",
+      "postObjectMessages": [],
+      "waitingMessages": [],
+      "finalMessages": [],
+      "portraitImageSrc": "./images/portraits/blond-purple-dress.png"
+    }
+  ]
+}

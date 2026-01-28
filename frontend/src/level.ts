@@ -11,6 +11,7 @@ import { getKeys, getLastTime, setLastTime } from './utils/eventListeners'
 import { Game, handleNpcs, startGame } from './utils/game'
 import { loadImage } from './utils/loadImage'
 import { toggleAudio } from './utils/music'
+import { initializeNpcs } from './utils/npc'
 
 const MAP_COLS: number = config.cols
 const MAP_ROWS: number = config.rows
@@ -204,6 +205,11 @@ const animate = (
           game.player.position.y = 0 + BUFFER
         }
         game.levelData = connection.level
+        const npcs = initializeNpcs(
+          connection.level.name,
+          connection.level.npcConfiguration,
+        )
+        connection.level.npcs = npcs
         startRendering(game)
         return
       }
