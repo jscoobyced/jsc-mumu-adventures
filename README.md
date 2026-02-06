@@ -1,6 +1,7 @@
 # JSC's Mumu's Adventures 🕹️
 
 [![Build](https://github.com/jscoobyced/jsc-mumu-adventures/actions/workflows/build.yml/badge.svg)](https://github.com/jscoobyced/jsc-mumu-adventures/actions/workflows/build.yml)
+[![codecov](https://codecov.io/gh/jscoobyced/jsc-mumu-adventures/graph/badge.svg?token=6SLX69ZBSA)](https://codecov.io/gh/jscoobyced/jsc-mumu-adventures)
 
 ![Mumu's Adventures](/docs/mumu-adventures.png)
 

@@ -36,15 +36,19 @@ export const createMockContext = () => {
     measureText: vi.fn(() => ({ width: 100 })),
     set fillStyle(value: string) {
       // Setter for fillStyle
+      void value
     },
     set font(value: string) {
       // Setter for font
+      void value
     },
     set textAlign(value: string) {
       // Setter for textAlign
+      void value
     },
     set globalAlpha(value: number) {
       // Setter for globalAlpha
+      void value
     },
   } as unknown as CanvasRenderingContext2D
 }
