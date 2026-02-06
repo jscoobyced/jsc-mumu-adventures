@@ -43,7 +43,7 @@ export const initializeNpcs = (name: string, npcs: NpcConfiguration[]) => {
       finalMessages: npcData.finalMessages,
       portraitImageSrc: npcData.portraitImageSrc,
     }
-    let savedNpc = savedNpcs.find((npc) => npc.npcName === npcData.name)
+    const savedNpc = savedNpcs.find((npc) => npc.npcName === npcData.name)
     if (npcData.type === 'InteractiveNpc') {
       const newNpc = new InteractiveNpc(
         initializationOptions,
