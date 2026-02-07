@@ -1,0 +1,78 @@
+import { describe, expect, it, beforeEach } from 'vitest'
+import { getJscData } from './window'
+import { ApplicationData } from '../models/ApplicationData'
+
+describe('window', () => {
+  beforeEach(() => {
+    // Clean up window.jsc before each test
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    delete (window as any).jsc
+  })
+
+  describe('getJscData', () => {
+    it('should return ApplicationData from window.jsc', () => {
+      const mockData: ApplicationData = {
+        version: '1.0.0',
+        debug: false,
+        currentStatusData: undefined,
+        cryptoKey: undefined,
+      }
+
+      window.jsc = mockData
+
+      expect(getJscData()).toBe(mockData)
+    })
+
+    it('should return same reference on multiple calls', () => {
+      const mockData: ApplicationData = {
+        version: '1.0.0',
+        debug: true,
+        currentStatusData: undefined,
+        cryptoKey: undefined,
+      }
+
+      window.jsc = mockData
+
+      const firstCall = getJscData()
+      const secondCall = getJscData()
+
+      expect(firstCall).toBe(secondCall)
+      expect(firstCall).toBe(mockData)
+    })
+
+    it('should allow reading debug flag', () => {
+      window.jsc = {
+        version: '1.0.0',
+        debug: true,
+        currentStatusData: undefined,
+        cryptoKey: undefined,
+      }
+
+      expect(getJscData().debug).toBe(true)
+    })
+
+    it('should allow reading version', () => {
+      window.jsc = {
+        version: '2.5.3',
+        debug: false,
+        currentStatusData: undefined,
+        cryptoKey: undefined,
+      }
+
+      expect(getJscData().version).toBe('2.5.3')
+    })
+
+    it('should return undefined for uninitialized properties', () => {
+      window.jsc = {
+        version: '1.0.0',
+        debug: false,
+        currentStatusData: undefined,
+        cryptoKey: undefined,
+      }
+
+      const data = getJscData()
+      expect(data.currentStatusData).toBeUndefined()
+      expect(data.cryptoKey).toBeUndefined()
+    })
+  })
+})
