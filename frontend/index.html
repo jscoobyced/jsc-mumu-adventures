@@ -14,7 +14,7 @@
     <meta property="og:image:width" content="%VITE_APP_IMAGE_WIDTH%" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=yes"
     />
     <link rel="stylesheet" href="styles.css" />
     <title>%VITE_APP_NAME%</title>
@@ -26,14 +26,6 @@
           appVersion: '%VITE_APP_VERSION%',
         },
       }
-      function resizeCanvas() {
-        const canvas = document.getElementById('mumu-game-canvas')
-        canvas.width = window.innerWidth
-        canvas.height = window.innerHeight
-      }
-
-      window.addEventListener('load', resizeCanvas)
-      window.addEventListener('resize', resizeCanvas)
     </script>
     <canvas id="mumu-game-canvas"></canvas>
     <script type="module" src="src/index.ts"></script>

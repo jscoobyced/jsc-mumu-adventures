@@ -223,6 +223,11 @@ const debugCollisions = (c: CanvasRenderingContext2D): void => {
 }
 
 export const startRendering = async (game: Game): Promise<void> => {
+  // Purge canvas before rendering
+  const context = getDrawContext()
+  if (context) {
+    context.clearRect(0, 0, context.canvas.width, context.canvas.height)
+  }
   prepareLevel(game.levelData)
   const npcs = initializeNpcs(
     game.levelData.name,

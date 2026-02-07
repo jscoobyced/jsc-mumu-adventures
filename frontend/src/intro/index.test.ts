@@ -57,10 +57,17 @@ describe('intro', () => {
     vi.clearAllMocks()
     animationFrameId = 0
 
+    // Mock window.jsc for debug mode
+    window.jsc = {
+      appVersion: 'test',
+      debug: false,
+    }
+
     mockContext = {
       canvas: {
         width: 1024,
         height: 576,
+        setAttribute: vi.fn(),
       },
       drawImage: vi.fn(),
     } as unknown as CanvasRenderingContext2D
@@ -167,7 +174,8 @@ describe('intro', () => {
         canvas: {
           width: 1024,
           height: 576,
-        },
+        setAttribute: vi.fn(),
+          },
         drawImage: vi.fn(),
       } as unknown as CanvasRenderingContext2D
 
