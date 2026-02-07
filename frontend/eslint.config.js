@@ -3,7 +3,7 @@ import { defineConfig, globalIgnores } from 'eslint/config'
 import tseslint from 'typescript-eslint'
 
 export default defineConfig([
-  globalIgnores(['dist', 'src/utils/generate-map-data.ts']),
+  globalIgnores(['dist', 'coverage', 'src/utils/generate-map-data.ts']),
   {
     files: ['**/*.ts', '**/*.test.ts'],
     extends: [js.configs.recommended, tseslint.configs.recommended],
