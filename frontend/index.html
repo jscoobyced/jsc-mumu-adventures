@@ -26,8 +26,16 @@
           appVersion: '%VITE_APP_VERSION%',
         },
       }
+      function resizeCanvas() {
+        const canvas = document.getElementById('mumu-game-canvas')
+        canvas.width = window.innerWidth
+        canvas.height = window.innerHeight
+      }
+
+      window.addEventListener('load', resizeCanvas)
+      window.addEventListener('resize', resizeCanvas)
     </script>
-    <canvas></canvas>
+    <canvas id="mumu-game-canvas"></canvas>
     <script type="module" src="src/index.ts"></script>
   </body>
 </html>
