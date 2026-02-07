@@ -8,6 +8,7 @@ import { Player } from '../classes/Player'
 import { Heart } from '../classes/Heart'
 import { InteractiveNpc } from '../classes/InteractiveNpc'
 import ActiveNpc from '../classes/ActiveNpc'
+import SimpleNpc from '../classes/SimpleNpc'
 import { CollisionBlock } from '../classes/CollisionBlock'
 import { Keys } from '../models/Keys'
 
@@ -99,11 +100,12 @@ describe('game', () => {
       } as never)
 
       const { startRendering } = await import('../level')
+      const mockStartRendering = startRendering as ReturnType<typeof vi.fn>
 
       startGame(true)
 
-      expect(startRendering).toHaveBeenCalled()
-      const game = startRendering.mock.calls[0][0]
+      expect(mockStartRendering).toHaveBeenCalled()
+      const game = mockStartRendering.mock.calls[0][0]
       expect(game.playing).toBe(true)
       expect(game.paused).toBe(false)
     })
@@ -129,7 +131,7 @@ describe('game', () => {
       startGame(false)
 
       expect(startRendering).toHaveBeenCalled()
-      const game = startRendering.mock.calls[0][0]
+      const game = (startRendering as ReturnType<typeof vi.fn>).mock.calls[0][0]
       expect(game.player.position.x).toBe(100)
       expect(game.player.position.y).toBe(200)
     })
@@ -151,7 +153,7 @@ describe('game', () => {
 
       startGame(false)
 
-      const game = startRendering.mock.calls[0][0]
+      const game = (startRendering as ReturnType<typeof vi.fn>).mock.calls[0][0]
       expect(game.player.position.x).toBe(150)
       expect(game.player.position.y).toBe(250)
     })
@@ -170,7 +172,7 @@ describe('game', () => {
 
       startGame(false)
 
-      const game = startRendering.mock.calls[0][0]
+      const game = (startRendering as ReturnType<typeof vi.fn>).mock.calls[0][0]
       expect(game.hearts).toHaveLength(3)
       expect(game.hearts[0].currentFrame).toBe(4) // Filled
       expect(game.hearts[1].currentFrame).toBe(4) // Filled
@@ -191,7 +193,7 @@ describe('game', () => {
 
       startGame(false)
 
-      const game = startRendering.mock.calls[0][0]
+      const game = (startRendering as ReturnType<typeof vi.fn>).mock.calls[0][0]
       expect(game.hearts[0].currentFrame).toBe(0)
       expect(game.hearts[1].currentFrame).toBe(0)
       expect(game.hearts[2].currentFrame).toBe(0)
@@ -206,7 +208,7 @@ describe('game', () => {
 
       startGame(false)
 
-      const game = startRendering.mock.calls[0][0]
+      const game = (startRendering as ReturnType<typeof vi.fn>).mock.calls[0][0]
       expect(game.banner).toBeDefined()
     })
 
@@ -219,7 +221,7 @@ describe('game', () => {
 
       startGame(false)
 
-      const game = startRendering.mock.calls[0][0]
+      const game = (startRendering as ReturnType<typeof vi.fn>).mock.calls[0][0]
       expect(game.playing).toBe(true)
     })
 
@@ -232,7 +234,7 @@ describe('game', () => {
 
       startGame(false)
 
-      const game = startRendering.mock.calls[0][0]
+      const game = (startRendering as ReturnType<typeof vi.fn>).mock.calls[0][0]
       expect(game.paused).toBe(false)
     })
 
@@ -250,7 +252,7 @@ describe('game', () => {
 
       startGame(false)
 
-      const game = startRendering.mock.calls[0][0]
+      const game = (startRendering as ReturnType<typeof vi.fn>).mock.calls[0][0]
       expect(game.levelData.name).toBe('A-1')
     })
   })
@@ -335,7 +337,7 @@ describe('game', () => {
         width: 15,
         height: 15,
         isInvincible: false,
-      } as never
+      } as unknown as SimpleNpc
 
       mockGame.levelData.npcs.push(mockNpc)
       mockGame.paused = false
@@ -353,7 +355,7 @@ describe('game', () => {
         width: 15,
         height: 15,
         isInvincible: false,
-      } as never
+      } as unknown as SimpleNpc
 
       mockGame.levelData.npcs.push(mockNpc)
       mockGame.paused = true
@@ -371,7 +373,7 @@ describe('game', () => {
         width: 15,
         height: 15,
         isInvincible: false,
-      } as never
+      } as unknown as SimpleNpc
 
       mockGame.levelData.npcs.push(mockNpc)
 
@@ -427,7 +429,7 @@ describe('game', () => {
       mockGame.levelData.npcs.push(mockInteractiveNpc as never)
       mockGame.player.position = { x: 100, y: 100 }
       vi.spyOn(mockGame.player, 'hasObject').mockReturnValue(true)
-      vi.spyOn(mockGame.player, 'getObject').mockReturnValue({ name: 'key' })
+      vi.spyOn(mockGame.player, 'getObject').mockReturnValue('key')
       const removeObjectSpy = vi
         .spyOn(mockGame.player, 'removeObject')
         .mockImplementation(() => {})
@@ -585,7 +587,7 @@ describe('game', () => {
           npcName: 'test',
           interaction: 0,
         })),
-      } as never
+      } as unknown as SimpleNpc
 
       mockGame.levelData.npcs.push(mockNpc)
 

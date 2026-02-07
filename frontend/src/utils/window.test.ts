@@ -1,6 +1,6 @@
-import { describe, expect, it, beforeEach } from 'vitest'
-import { getJscData } from './window'
+import { beforeEach, describe, expect, it } from 'vitest'
 import { ApplicationData } from '../models/ApplicationData'
+import { getJscData } from './window'
 
 describe('window', () => {
   beforeEach(() => {
@@ -12,7 +12,7 @@ describe('window', () => {
   describe('getJscData', () => {
     it('should return ApplicationData from window.jsc', () => {
       const mockData: ApplicationData = {
-        version: '1.0.0',
+        appVersion: '1.0.0',
         debug: false,
         currentStatusData: undefined,
         cryptoKey: undefined,
@@ -25,7 +25,7 @@ describe('window', () => {
 
     it('should return same reference on multiple calls', () => {
       const mockData: ApplicationData = {
-        version: '1.0.0',
+        appVersion: '1.0.0',
         debug: true,
         currentStatusData: undefined,
         cryptoKey: undefined,
@@ -42,7 +42,7 @@ describe('window', () => {
 
     it('should allow reading debug flag', () => {
       window.jsc = {
-        version: '1.0.0',
+        appVersion: '1.0.0',
         debug: true,
         currentStatusData: undefined,
         cryptoKey: undefined,
@@ -53,18 +53,18 @@ describe('window', () => {
 
     it('should allow reading version', () => {
       window.jsc = {
-        version: '2.5.3',
+        appVersion: '2.5.3',
         debug: false,
         currentStatusData: undefined,
         cryptoKey: undefined,
       }
 
-      expect(getJscData().version).toBe('2.5.3')
+      expect(getJscData().appVersion).toBe('2.5.3')
     })
 
     it('should return undefined for uninitialized properties', () => {
       window.jsc = {
-        version: '1.0.0',
+        appVersion: '1.0.0',
         debug: false,
         currentStatusData: undefined,
         cryptoKey: undefined,

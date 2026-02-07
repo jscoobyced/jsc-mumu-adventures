@@ -36,7 +36,7 @@ describe('music', () => {
           }
         }, 0)
       }
-    } as typeof Audio
+    } as unknown as typeof Audio
   })
 
   describe('loadAudio', () => {

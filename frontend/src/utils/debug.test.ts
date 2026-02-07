@@ -11,7 +11,7 @@ describe('debug', () => {
     it('should return true when debug is true', () => {
       vi.spyOn(window, 'getJscData').mockReturnValue({
         debug: true,
-        version: '1.0.0',
+        appVersion: '1.0.0',
         currentStatusData: undefined,
         cryptoKey: undefined,
       })
@@ -22,7 +22,7 @@ describe('debug', () => {
     it('should return false when debug is false', () => {
       vi.spyOn(window, 'getJscData').mockReturnValue({
         debug: false,
-        version: '1.0.0',
+        appVersion: '1.0.0',
         currentStatusData: undefined,
         cryptoKey: undefined,
       })
@@ -32,7 +32,7 @@ describe('debug', () => {
 
     it('should return false when debug is undefined', () => {
       vi.spyOn(window, 'getJscData').mockReturnValue({
-        version: '1.0.0',
+        appVersion: '1.0.0',
         currentStatusData: undefined,
         cryptoKey: undefined,
       } as never)
@@ -43,7 +43,7 @@ describe('debug', () => {
     it('should return false when debug is not strictly true', () => {
       vi.spyOn(window, 'getJscData').mockReturnValue({
         debug: 'true',
-        version: '1.0.0',
+        appVersion: '1.0.0',
         currentStatusData: undefined,
         cryptoKey: undefined,
       } as never)
