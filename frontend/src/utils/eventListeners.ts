@@ -144,15 +144,19 @@ export const initializeEventListeners = (): void => {
   })
 
   // Clear keys pressed when user stop touching the screen
-  window.addEventListener('touchend', (event: TouchEvent): void => {
-    event.preventDefault()
-    keys.w.pressed = false
-    keys.a.pressed = false
-    keys.s.pressed = false
-    keys.d.pressed = false
-    keys.g.pressed = false
-    keys.q.pressed = false
-  })
+  window.addEventListener(
+    'touchend',
+    (event: TouchEvent): void => {
+      event.preventDefault()
+      keys.w.pressed = false
+      keys.a.pressed = false
+      keys.s.pressed = false
+      keys.d.pressed = false
+      keys.g.pressed = false
+      keys.q.pressed = false
+    },
+    { passive: false },
+  )
 
   if (isTouchSupported) {
     const context = getDrawContext()
