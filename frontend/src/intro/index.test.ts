@@ -18,7 +18,6 @@ vi.mock('../config.json', () => ({
 
 vi.mock('../utils/drawContext', () => ({
   getDrawContext: vi.fn(),
-  dpr: 1,
 }))
 
 vi.mock('../utils/eventListeners', () => ({
@@ -40,11 +39,11 @@ vi.mock('../level', () => ({
   startRendering: vi.fn(),
 }))
 
-import { intro } from './index'
 import * as drawContext from '../utils/drawContext'
 import * as eventListeners from '../utils/eventListeners'
 import * as game from '../utils/game'
 import * as loadImage from '../utils/loadImage'
+import { intro } from './index'
 
 describe('intro', () => {
   let mockContext: CanvasRenderingContext2D
@@ -174,8 +173,8 @@ describe('intro', () => {
         canvas: {
           width: 1024,
           height: 576,
-        setAttribute: vi.fn(),
-          },
+          setAttribute: vi.fn(),
+        },
         drawImage: vi.fn(),
       } as unknown as CanvasRenderingContext2D
 

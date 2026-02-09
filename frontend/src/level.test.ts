@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import type { Game } from './utils/game'
-import { LevelData, LevelDirection } from './models/LevelData'
-import { Player } from './classes/Player'
 import { Heart } from './classes/Heart'
+import { Player } from './classes/Player'
+import { LevelData, LevelDirection } from './models/LevelData'
+import type { Game } from './utils/game'
 
 vi.mock('./config.json', () => ({
   default: {
@@ -164,7 +164,6 @@ const mockMainContext = {
 }
 
 vi.mock('./utils/drawContext', () => ({
-  dpr: 1,
   getDrawContext: vi.fn(() => mockMainContext),
 }))
 

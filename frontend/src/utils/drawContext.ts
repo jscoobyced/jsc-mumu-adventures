@@ -1,11 +1,10 @@
 import config from '../config.json'
-
-export const dpr: number = Math.max(1, window.devicePixelRatio)
+import { getDevicePixelRatio } from './device'
 
 export const getDrawContext = (): CanvasRenderingContext2D | null => {
   const canvas = document.querySelector('canvas') as HTMLCanvasElement
   const context = canvas.getContext('2d')
-  canvas.width = config.canvasWidth * dpr
-  canvas.height = config.canvasHeight * dpr
+  canvas.width = config.canvasWidth * getDevicePixelRatio()
+  canvas.height = config.canvasHeight * getDevicePixelRatio()
   return context
 }

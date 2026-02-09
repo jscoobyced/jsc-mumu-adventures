@@ -6,7 +6,8 @@ import { LayersData } from './models/Layer'
 import { LevelData, LevelDirection } from './models/LevelData'
 import { TilesetInfo, Tilesets } from './models/TileSet'
 import { isDebugMode } from './utils/debug'
-import { dpr, getDrawContext } from './utils/drawContext'
+import { getDevicePixelRatio } from './utils/device'
+import { getDrawContext } from './utils/drawContext'
 import { getKeys, getLastTime, setLastTime } from './utils/eventListeners'
 import { Game, handleNpcs, startGame } from './utils/game'
 import { loadImage } from './utils/loadImage'
@@ -18,7 +19,7 @@ const MAP_ROWS: number = config.rows
 
 const MAP_WIDTH: number = config.tileSize * MAP_COLS
 const MAP_HEIGHT: number = config.tileSize * MAP_ROWS
-const MAP_SCALE: number = dpr + config.mapScale
+const MAP_SCALE: number = getDevicePixelRatio() + config.mapScale
 
 const BUFFER = 0.0001
 

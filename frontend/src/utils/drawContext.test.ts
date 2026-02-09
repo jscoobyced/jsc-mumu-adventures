@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { dpr, getDrawContext } from './drawContext'
+import { getDevicePixelRatio } from './device'
+import { getDrawContext } from './drawContext'
 
 vi.mock('../config.json', () => ({
   default: {
@@ -31,16 +32,6 @@ describe('drawContext', () => {
     document.querySelector = vi.fn(() => mockCanvas)
   })
 
-  describe('dpr', () => {
-    it('should use device pixel ratio when greater than 1', () => {
-      expect(dpr).toBeGreaterThanOrEqual(1)
-    })
-
-    it('should be at least 1', () => {
-      expect(dpr).toBeGreaterThanOrEqual(1)
-    })
-  })
-
   describe('getDrawContext', () => {
     it('should query for canvas element', () => {
       getDrawContext()
@@ -57,13 +48,13 @@ describe('drawContext', () => {
     it('should set canvas width based on config and dpr', () => {
       getDrawContext()
 
-      expect(mockCanvas.width).toBe(1024 * dpr)
+      expect(mockCanvas.width).toBe(1024 * getDevicePixelRatio())
     })
 
     it('should set canvas height based on config and dpr', () => {
       getDrawContext()
 
-      expect(mockCanvas.height).toBe(576 * dpr)
+      expect(mockCanvas.height).toBe(576 * getDevicePixelRatio())
     })
 
     it('should return canvas context', () => {

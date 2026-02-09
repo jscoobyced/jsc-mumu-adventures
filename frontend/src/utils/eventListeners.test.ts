@@ -22,14 +22,12 @@ vi.mock('./music', () => ({
 
 vi.mock('./drawContext', () => ({
   getDrawContext: vi.fn(() => mockContext),
-  dpr: 1,
 }))
 
 describe('eventListeners', () => {
   let keydownListeners: ((event: KeyboardEvent) => void)[] = []
   let keyupListeners: ((event: KeyboardEvent) => void)[] = []
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let touchendListeners: { handler: (event: any) => void; options?: any }[] = []
+  let touchendListeners: { handler: EventListener; options?: AddEventListenerOptions | boolean }[] = []
   let resizeListeners: (() => void)[] = []
   let visibilityListeners: (() => void)[] = []
 
@@ -42,18 +40,19 @@ describe('eventListeners', () => {
     visibilityListeners = []
 
     // Mock window.addEventListener
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    window.addEventListener = vi.fn((event: string, handler: any, options?: any) => {
-      if (event === 'keydown') {
-        keydownListeners.push(handler)
-      } else if (event === 'keyup') {
-        keyupListeners.push(handler)
-      } else if (event === 'touchend') {
-        touchendListeners.push({ handler, options })
-      } else if (event === 'resize') {
-        resizeListeners.push(handler)
-      }
-    })
+    window.addEventListener = vi.fn(
+      (event: string, handler: EventListenerOrEventListenerObject, options?: AddEventListenerOptions | boolean) => {
+        if (event === 'keydown') {
+          keydownListeners.push(handler as (event: KeyboardEvent) => void)
+        } else if (event === 'keyup') {
+          keyupListeners.push(handler as (event: KeyboardEvent) => void)
+        } else if (event === 'touchend') {
+          touchendListeners.push({ handler: handler as EventListener, options })
+        } else if (event === 'resize') {
+          resizeListeners.push(handler as () => void)
+        }
+      },
+    )
 
     window.removeEventListener = vi.fn()
 
@@ -281,7 +280,9 @@ describe('eventListeners', () => {
         const { startBackgroundAudio } = await import('./music')
         const error = new Error('audio failed')
         vi.mocked(startBackgroundAudio).mockRejectedValueOnce(error)
-        const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+        const consoleSpy = vi
+          .spyOn(console, 'error')
+          .mockImplementation(() => {})
 
         const event = new KeyboardEvent('keydown', { key: 'w' })
         keydownListeners[0](event)

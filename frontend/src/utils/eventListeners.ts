@@ -1,7 +1,8 @@
 import { Keys } from '../models/Keys'
-import { isTouchSupported } from './device'
-import { dpr, getDrawContext } from './drawContext'
+import { getDevicePixelRatio, getScreenSize, isTouchSupported } from './device'
+import { getDrawContext } from './drawContext'
 import { startBackgroundAudio, toggleAudio } from './music'
+import { getCanvasQuadrant } from './quadrant'
 
 // Declare global variables (these should be defined elsewhere in your project)
 let keys!: Keys
@@ -96,25 +97,69 @@ export const initializeEventListeners = (): void => {
     }
   })
 
-  window.addEventListener(
-    'touchend',
-    (event: TouchEvent): void => {
-      event.preventDefault()
-      keys.w.pressed = false
-      keys.a.pressed = false
-      keys.s.pressed = false
-      keys.d.pressed = false
-      keys.g.pressed = false
-    },
-    { passive: false },
-  )
+  window.addEventListener('touchstart', (event: TouchEvent): void => {
+    event.preventDefault()
+    const x = event.changedTouches[0].clientX
+    const y = event.changedTouches[0].clientY
+    const quadrant = getCanvasQuadrant(getScreenSize(), {
+      x,
+      y,
+    })
+
+    switch (quadrant) {
+      case 1:
+        keys.w.pressed = true
+        keys.a.pressed = true
+        break
+      case 2:
+        keys.w.pressed = true
+        break
+      case 3:
+        keys.w.pressed = true
+        keys.d.pressed = true
+        break
+      case 4:
+        keys.a.pressed = true
+        break
+      case 5:
+        keys.g.pressed = true
+        break
+      case 6:
+        keys.d.pressed = true
+        break
+      case 7:
+        keys.s.pressed = true
+        keys.a.pressed = true
+        break
+      case 8:
+        keys.s.pressed = true
+        break
+      case 9:
+        keys.s.pressed = true
+        keys.d.pressed = true
+        break
+      default:
+        break
+    }
+  })
+
+  // Clear keys pressed when user stop touching the screen
+  window.addEventListener('touchend', (event: TouchEvent): void => {
+    event.preventDefault()
+    keys.w.pressed = false
+    keys.a.pressed = false
+    keys.s.pressed = false
+    keys.d.pressed = false
+    keys.g.pressed = false
+    keys.q.pressed = false
+  })
 
   if (isTouchSupported) {
     const context = getDrawContext()
     if (context) {
       context.canvas.setAttribute('style', 'width: 100%; height: 100%;')
-      context.canvas.width = window.innerWidth * dpr
-      context.canvas.height = window.innerHeight * dpr
+      context.canvas.width = window.innerWidth * getDevicePixelRatio()
+      context.canvas.height = window.innerHeight * getDevicePixelRatio()
       // Mobile resize support
       window.addEventListener('resize', () => handleResize(context))
     }
@@ -143,8 +188,8 @@ const handleTap = async () => {
 
 const handleResize = (context: CanvasRenderingContext2D | null) => {
   if (context) {
-    context.canvas.width = window.innerWidth * dpr
-    context.canvas.height = window.innerHeight * dpr
+    context.canvas.width = window.innerWidth * getDevicePixelRatio()
+    context.canvas.height = window.innerHeight * getDevicePixelRatio()
     context.canvas.setAttribute('style', 'width: 100%; height: 100%;')
   }
 }

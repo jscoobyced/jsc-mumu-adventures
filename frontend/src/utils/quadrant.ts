@@ -10,12 +10,9 @@ import type { Vector } from '../models/Vector'
  * Top-left is 1, center is 5, bottom-right is 9.
  * Coordinates outside the canvas are clamped to the nearest edge.
  */
-export const getCanvasQuadrant = (
-  canvas: HTMLCanvasElement,
-  point: Vector,
-): number => {
-  const width = canvas.width || 0
-  const height = canvas.height || 0
+export const getCanvasQuadrant = (size: Vector, point: Vector): number => {
+  const width = size.x || 0
+  const height = size.y || 0
 
   if (width <= 0 || height <= 0) {
     // If canvas has no size, default to center
