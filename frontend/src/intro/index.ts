@@ -3,8 +3,6 @@ import { getDrawContext } from '../utils/drawContext'
 import { getKeys } from '../utils/eventListeners'
 import { startGame } from '../utils/game'
 import { loadImage } from '../utils/loadImage'
-import { jscLog } from '../utils/log'
-import { setupMobileEventHandlers } from './mobile-setup'
 
 export const intro = async () => {
   const context = getDrawContext()
@@ -13,7 +11,6 @@ export const intro = async () => {
   }
   const introImage = await loadImage(config.images.tilesets.intro)
   const titleImage = await loadImage(config.images.tilesets.title)
-  setupMobileEventHandlers(context)
   animate(context, introImage, titleImage)
 }
 
@@ -22,7 +19,6 @@ const animate = (
   introImage: HTMLImageElement,
   titleImage: HTMLImageElement,
 ) => {
-  jscLog('Intro animation frame')
   const keys = getKeys()
   if (keys.space.pressed) {
     keys.space.pressed = false

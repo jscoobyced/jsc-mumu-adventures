@@ -16,6 +16,7 @@ import {
 } from '../models/CurrentStatusData'
 import { LevelData } from '../models/LevelData'
 import { characterSprites } from '../sprites'
+import { isMobile } from './device'
 import { getLastTime } from './eventListeners'
 import { jscLog } from './log'
 import { setCurrentStatus } from './storage'
@@ -88,7 +89,7 @@ export const startGame = (restart = false): void => {
     levelData: initialLevel,
     player: initialPlayer,
     hearts: initialHearts,
-    banner: new Banner({ x: 10, y: 10 }),
+    banner: new Banner({ x: 10, y: 10 }, isMobile),
   }
   startRendering(game)
 }

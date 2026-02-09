@@ -38,6 +38,7 @@ describe('Banner', () => {
     font: '',
     textAlign: '',
     fillStyle: '',
+    canvas: { width: 1024, height: 768 },
   })
 
   it('should create banner with correct dimensions', () => {
@@ -45,10 +46,11 @@ describe('Banner', () => {
 
     expect(banner.x).toBe(10)
     expect(banner.y).toBe(10)
-    // Width: (1024 - 2*10) / 1024 * 1024 = 1004
-    expect(banner.width).toBe(1004)
-    // Height: 340 * ratio (approximately)
-    expect(banner.height).toBeCloseTo(333, 0)
+    // ratio = (1022 + 10) / 1024 = 1.0078125
+    // width = 1024 * ratio = 1032
+    expect(banner.width).toBe(1032)
+    // height = 340 * ratio ≈ 342.66
+    expect(banner.height).toBeCloseTo(342.66, 0)
     expect(banner.loaded).toBe(false)
   })
 

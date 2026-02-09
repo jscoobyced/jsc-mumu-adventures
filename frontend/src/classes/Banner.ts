@@ -4,29 +4,33 @@ import { Keys, Vector } from '../models'
 export class Banner {
   public x: number
   public y: number
-  public width: number
-  public height: number
+  public width = 0
+  public height = 0
   public loaded: boolean
   public image: HTMLImageElement
   private texts: string[] = []
   private currentIndex: number = 0
   private portraitImage?: HTMLImageElement
   private textIndent = 0
+  private fontSize = 24
+  private lineHeight = 30
+  private isMobile: boolean = false
 
-  constructor({ x, y }: Vector) {
-    const ratio = (config.canvasWidth - 2 * x) / config.images.ui.banner.width
-    const width = config.images.ui.banner.width * ratio
-    const height = config.images.ui.banner.height * ratio
+  constructor({ x, y }: Vector, isMobile: boolean = false) {
     this.x = x
     this.y = y
-    this.width = width
-    this.height = height
+    this.isMobile = isMobile
+    this.updateSize(config.canvasWidth - 2)
     this.loaded = false
     this.image = new Image()
     this.image.onload = (): void => {
       this.loaded = true
     }
     this.image.src = config.images.ui.banner.path
+    if (isMobile) {
+      this.fontSize = 46
+      this.lineHeight = 50
+    }
   }
 
   public show(texts: string[], portrait?: HTMLImageElement): void {
@@ -54,9 +58,10 @@ export class Banner {
     this.textIndent = this.portraitImage ? this.portraitImage.width + 20 : 0
 
     if (this.currentIndex < this.texts.length) {
+      this.updateSize(c.canvas.width - 2)
       c.drawImage(this.image, this.x, this.y, this.width, this.height)
       c.save()
-      c.font = '24px MumuFont'
+      c.font = `${this.fontSize}px MumuFont`
       c.textAlign = 'center'
       c.fillStyle = 'brown'
       this.wrapText(
@@ -65,18 +70,20 @@ export class Banner {
         this.x + (this.width - this.textIndent) / 2 + this.textIndent,
         this.y + this.height / 2 - 20,
         this.width - this.textIndent - 40,
-        30,
+        this.lineHeight,
       )
       c.restore()
     }
     if (this.portraitImage) {
-      const portraitSize = this.portraitImage.height
+      const portraitHeight =
+        this.portraitImage.height * (this.isMobile ? 1.5 : 1)
+      const portraitWidth = this.portraitImage.width * (this.isMobile ? 1.5 : 1)
       c.drawImage(
         this.portraitImage,
         this.x + 20,
         this.y + 20,
-        portraitSize,
-        portraitSize,
+        portraitWidth,
+        portraitHeight,
       )
     }
 
@@ -106,5 +113,11 @@ export class Banner {
       }
     }
     context.fillText(line, x, y)
+  }
+
+  private updateSize = (initialWidth: number): void => {
+    const ratio = (initialWidth + this.x) / config.images.ui.banner.width
+    this.width = config.images.ui.banner.width * ratio
+    this.height = config.images.ui.banner.height * ratio
   }
 }

@@ -6,30 +6,56 @@ import {
   setLastTime,
 } from './eventListeners'
 
+const mockContext = {
+  canvas: {
+    setAttribute: vi.fn(),
+    width: 0,
+    height: 0,
+    requestFullscreen: vi.fn().mockResolvedValue(undefined),
+  },
+} as unknown as CanvasRenderingContext2D
+
 vi.mock('./music', () => ({
   startBackgroundAudio: vi.fn().mockResolvedValue(undefined),
   toggleAudio: vi.fn(),
 }))
 
+vi.mock('./drawContext', () => ({
+  getDrawContext: vi.fn(() => mockContext),
+  dpr: 1,
+}))
+
 describe('eventListeners', () => {
   let keydownListeners: ((event: KeyboardEvent) => void)[] = []
   let keyupListeners: ((event: KeyboardEvent) => void)[] = []
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let touchendListeners: { handler: (event: any) => void; options?: any }[] = []
+  let resizeListeners: (() => void)[] = []
   let visibilityListeners: (() => void)[] = []
 
   beforeEach(() => {
     vi.clearAllMocks()
     keydownListeners = []
     keyupListeners = []
+    touchendListeners = []
+    resizeListeners = []
     visibilityListeners = []
 
     // Mock window.addEventListener
-    window.addEventListener = vi.fn((event: string, handler) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    window.addEventListener = vi.fn((event: string, handler: any, options?: any) => {
       if (event === 'keydown') {
-        keydownListeners.push(handler as (event: KeyboardEvent) => void)
+        keydownListeners.push(handler)
       } else if (event === 'keyup') {
-        keyupListeners.push(handler as (event: KeyboardEvent) => void)
+        keyupListeners.push(handler)
+      } else if (event === 'touchend') {
+        touchendListeners.push({ handler, options })
+      } else if (event === 'resize') {
+        resizeListeners.push(handler)
       }
     })
+
+    window.removeEventListener = vi.fn()
 
     // Mock document.addEventListener
     document.addEventListener = vi.fn((event: string, handler) => {
@@ -37,6 +63,9 @@ describe('eventListeners', () => {
         visibilityListeners.push(handler as () => void)
       }
     })
+
+    // Mock document.querySelector to return a canvas-like element
+    document.querySelector = vi.fn(() => mockContext.canvas)
 
     // Mock document.hidden
     Object.defineProperty(document, 'hidden', {
@@ -46,6 +75,12 @@ describe('eventListeners', () => {
 
     // Mock performance.now
     vi.spyOn(performance, 'now').mockReturnValue(1000)
+
+    // Enable touch support by default
+    Object.defineProperty(window, 'ontouchstart', {
+      configurable: true,
+      value: null,
+    })
   })
 
   describe('getKeys', () => {
@@ -219,7 +254,7 @@ describe('eventListeners', () => {
         const keys = getKeys()
         keys.spaceEnabled = false
         keys.space.pressed = false
-        
+
         const event = new KeyboardEvent('keydown', { key: ' ' })
         keydownListeners[0](event)
 
@@ -240,6 +275,24 @@ describe('eventListeners', () => {
         keydownListeners[0](event)
 
         expect(startBackgroundAudio).toHaveBeenCalled()
+      })
+
+      it('should log error when startBackgroundAudio rejects', async () => {
+        const { startBackgroundAudio } = await import('./music')
+        const error = new Error('audio failed')
+        vi.mocked(startBackgroundAudio).mockRejectedValueOnce(error)
+        const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+
+        const event = new KeyboardEvent('keydown', { key: 'w' })
+        keydownListeners[0](event)
+
+        // Wait for the promise rejection to be handled
+        await vi.waitFor(() => {
+          expect(consoleSpy).toHaveBeenCalledWith(
+            'Error starting background audio:',
+            error,
+          )
+        })
       })
 
       it('should handle unknown keys without error', () => {
@@ -369,6 +422,118 @@ describe('eventListeners', () => {
         visibilityListeners[0]()
 
         expect(getLastTime()).toBe(originalTime)
+      })
+    })
+
+    describe('touchend events', () => {
+      beforeEach(() => {
+        initializeEventListeners()
+      })
+
+      it('should register touchend listener with passive false', () => {
+        // First touchend is the key-reset handler (passive: false)
+        expect(touchendListeners.length).toBeGreaterThanOrEqual(1)
+        expect(touchendListeners[0].options).toEqual({ passive: false })
+      })
+
+      it('should reset all movement keys on touchend', () => {
+        const keys = getKeys()
+        keys.w.pressed = true
+        keys.a.pressed = true
+        keys.s.pressed = true
+        keys.d.pressed = true
+        keys.g.pressed = true
+
+        const event = { preventDefault: vi.fn() }
+        touchendListeners[0].handler(event)
+
+        expect(keys.w.pressed).toBe(false)
+        expect(keys.a.pressed).toBe(false)
+        expect(keys.s.pressed).toBe(false)
+        expect(keys.d.pressed).toBe(false)
+        expect(keys.g.pressed).toBe(false)
+        expect(event.preventDefault).toHaveBeenCalled()
+      })
+    })
+
+    describe('touch support', () => {
+      it('should set canvas style and dimensions when touch supported', () => {
+        initializeEventListeners()
+
+        expect(mockContext.canvas.setAttribute).toHaveBeenCalledWith(
+          'style',
+          'width: 100%; height: 100%;',
+        )
+      })
+
+      it('should register resize listener when touch supported', () => {
+        initializeEventListeners()
+
+        expect(resizeListeners.length).toBeGreaterThanOrEqual(1)
+      })
+
+      it('should register handleTap touchend listener when touch supported', () => {
+        initializeEventListeners()
+
+        // Second touchend is the handleTap listener
+        expect(touchendListeners.length).toBeGreaterThanOrEqual(2)
+      })
+
+      it('should not set up canvas handlers when getDrawContext returns null', async () => {
+        const { getDrawContext } = await import('./drawContext')
+        vi.mocked(getDrawContext).mockReturnValueOnce(null)
+
+        initializeEventListeners()
+
+        expect(resizeListeners.length).toBe(0)
+      })
+    })
+
+    describe('handleTap', () => {
+      beforeEach(() => {
+        initializeEventListeners()
+      })
+
+      it('should request fullscreen, start audio and set space pressed', async () => {
+        const { startBackgroundAudio } = await import('./music')
+
+        // handleTap is the second touchend listener
+        const handleTap = touchendListeners[1].handler
+        await handleTap()
+
+        expect(mockContext.canvas.requestFullscreen).toHaveBeenCalled()
+        expect(startBackgroundAudio).toHaveBeenCalled()
+        expect(getKeys().space.pressed).toBe(true)
+        expect(window.removeEventListener).toHaveBeenCalledWith(
+          'touchend',
+          handleTap,
+        )
+      })
+    })
+
+    describe('handleResize', () => {
+      beforeEach(() => {
+        initializeEventListeners()
+      })
+
+      it('should update canvas dimensions on resize', () => {
+        Object.defineProperty(window, 'innerWidth', {
+          configurable: true,
+          value: 800,
+        })
+        Object.defineProperty(window, 'innerHeight', {
+          configurable: true,
+          value: 600,
+        })
+
+        resizeListeners[0]()
+
+        expect(mockContext.canvas.width).toBe(800)
+        expect(mockContext.canvas.height).toBe(600)
+        expect(mockContext.canvas.setAttribute).toHaveBeenCalledWith(
+          'style',
+          'width: 100%; height: 100%;',
+        )
       })
     })
   })
