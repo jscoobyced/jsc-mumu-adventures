@@ -27,7 +27,10 @@ vi.mock('./drawContext', () => ({
 describe('eventListeners', () => {
   let keydownListeners: ((event: KeyboardEvent) => void)[] = []
   let keyupListeners: ((event: KeyboardEvent) => void)[] = []
-  let touchendListeners: { handler: EventListener; options?: AddEventListenerOptions | boolean }[] = []
+  let touchendListeners: {
+    handler: EventListener
+    options?: AddEventListenerOptions | boolean
+  }[] = []
   let resizeListeners: (() => void)[] = []
   let visibilityListeners: (() => void)[] = []
 
@@ -41,7 +44,11 @@ describe('eventListeners', () => {
 
     // Mock window.addEventListener
     window.addEventListener = vi.fn(
-      (event: string, handler: EventListenerOrEventListenerObject, options?: AddEventListenerOptions | boolean) => {
+      (
+        event: string,
+        handler: EventListenerOrEventListenerObject,
+        options?: AddEventListenerOptions | boolean,
+      ) => {
         if (event === 'keydown') {
           keydownListeners.push(handler as (event: KeyboardEvent) => void)
         } else if (event === 'keyup') {
@@ -434,7 +441,12 @@ describe('eventListeners', () => {
       it('should register touchend listener with passive false', () => {
         // First touchend is the key-reset handler (passive: false)
         expect(touchendListeners.length).toBeGreaterThanOrEqual(1)
-        expect(touchendListeners[0].options).toEqual({ passive: false })
+        const hasPassiveFalse = touchendListeners.some((t) => {
+          const opts = t.options
+          if (typeof opts === 'boolean' || opts === undefined) return false
+          return (opts as AddEventListenerOptions).passive === false
+        })
+        expect(hasPassiveFalse).toBe(true)
       })
 
       it('should reset all movement keys on touchend', () => {
@@ -445,7 +457,7 @@ describe('eventListeners', () => {
         keys.d.pressed = true
         keys.g.pressed = true
 
-        const event = { preventDefault: vi.fn() }
+        const event = { preventDefault: vi.fn() } as unknown as TouchEvent
         touchendListeners[0].handler(event)
 
         expect(keys.w.pressed).toBe(false)
@@ -500,7 +512,7 @@ describe('eventListeners', () => {
 
         // handleTap is the second touchend listener
         const handleTap = touchendListeners[1].handler
-        await handleTap()
+        await (handleTap as () => Promise<void>)()
 
         expect(mockContext.canvas.requestFullscreen).toHaveBeenCalled()
         expect(startBackgroundAudio).toHaveBeenCalled()

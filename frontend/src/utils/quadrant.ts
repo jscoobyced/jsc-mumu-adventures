@@ -1,18 +1,18 @@
 import type { Vector } from '../models/Vector'
 
 /**
- * Returns a quadrant number (1-9) for a point on a canvas split into a 3x3 grid.
+ * Returns a quadrant number (1-9) for a point on a rectangle split into a 3x3 grid.
  * Quadrant numbering (row-major):
  * 1 2 3
  * 4 5 6
  * 7 8 9
  *
  * Top-left is 1, center is 5, bottom-right is 9.
- * Coordinates outside the canvas are clamped to the nearest edge.
+ * Coordinates outside the rectangle are clamped to the nearest edge.
  */
-export const getCanvasQuadrant = (size: Vector, point: Vector): number => {
-  const width = size.x || 0
-  const height = size.y || 0
+export const getCanvasQuadrant = (rectangle: Vector, point: Vector): number => {
+  const width = rectangle.x || 0
+  const height = rectangle.y || 0
 
   if (width <= 0 || height <= 0) {
     // If canvas has no size, default to center
