@@ -84,17 +84,17 @@ describe('GamePad', () => {
       pad.draw(context)
 
       expect(context.beginPath).toHaveBeenCalledOnce()
-      // centerX = 200/2 + 50 = 150, centerY = 768 - 200/2 - 50 = 618, radius = 100
-      expect(context.arc).toHaveBeenCalledWith(150, 618, 100, 0, 2 * Math.PI)
+      // centerX = 200/2 + 20 = 120, centerY = 768 - 200/2 - 20 = 648, radius = 100
+      expect(context.arc).toHaveBeenCalledWith(120, 648, 100, 0, 2 * Math.PI)
       expect(context.stroke).toHaveBeenCalledOnce()
     })
   })
 
   describe('getSegmentNumber', () => {
     const WIDTH = 200
-    // center of gamepad: x = 200/2 + 50 = 150, y = 768 - 200/2 - 50 = 618
-    const CENTER_X = 150
-    const CENTER_Y = 618
+    // center of gamepad: x = 200/2 + 20 = 120, y = 768 - 200/2 - 20 = 648
+    const CENTER_X = 120
+    const CENTER_Y = 648
 
     it('should return 0 for coordinates outside the circle', () => {
       const result = getSegmentNumber(0, 0, WIDTH)
@@ -103,49 +103,49 @@ describe('GamePad', () => {
     })
 
     it('should return 6 (Right) for coordinates to the right of center', () => {
-      const result = getSegmentNumber(CENTER_X + 50, CENTER_Y, WIDTH)
+      const result = getSegmentNumber(CENTER_X + 20, CENTER_Y, WIDTH)
 
       expect(result).toBe(6)
     })
 
     it('should return 4 (Left) for coordinates to the left of center', () => {
-      const result = getSegmentNumber(CENTER_X - 50, CENTER_Y, WIDTH)
+      const result = getSegmentNumber(CENTER_X - 20, CENTER_Y, WIDTH)
 
       expect(result).toBe(4)
     })
 
     it('should return 8 (Up) for coordinates above center', () => {
-      const result = getSegmentNumber(CENTER_X, CENTER_Y - 50, WIDTH)
+      const result = getSegmentNumber(CENTER_X, CENTER_Y - 20, WIDTH)
 
       expect(result).toBe(8)
     })
 
     it('should return 2 (Down) for coordinates below center', () => {
-      const result = getSegmentNumber(CENTER_X, CENTER_Y + 50, WIDTH)
+      const result = getSegmentNumber(CENTER_X, CENTER_Y + 20, WIDTH)
 
       expect(result).toBe(2)
     })
 
     it('should return 9 (Up-Right) for diagonal up-right', () => {
-      const result = getSegmentNumber(CENTER_X + 40, CENTER_Y - 40, WIDTH)
+      const result = getSegmentNumber(CENTER_X + 20, CENTER_Y - 20, WIDTH)
 
       expect(result).toBe(9)
     })
 
     it('should return 7 (Up-Left) for diagonal up-left', () => {
-      const result = getSegmentNumber(CENTER_X - 40, CENTER_Y - 40, WIDTH)
+      const result = getSegmentNumber(CENTER_X - 20, CENTER_Y - 20, WIDTH)
 
       expect(result).toBe(7)
     })
 
     it('should return 3 (Down-Right) for diagonal down-right', () => {
-      const result = getSegmentNumber(CENTER_X + 40, CENTER_Y + 40, WIDTH)
+      const result = getSegmentNumber(CENTER_X + 20, CENTER_Y + 20, WIDTH)
 
       expect(result).toBe(3)
     })
 
     it('should return 1 (Down-Left) for diagonal down-left', () => {
-      const result = getSegmentNumber(CENTER_X - 40, CENTER_Y + 40, WIDTH)
+      const result = getSegmentNumber(CENTER_X - 20, CENTER_Y + 20, WIDTH)
 
       expect(result).toBe(1)
     })

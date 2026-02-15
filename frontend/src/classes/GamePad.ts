@@ -1,7 +1,7 @@
 import { getScreenSize, isMobile } from '../utils/device'
 import { getDrawContext } from '../utils/drawContext'
 
-const SPACING = 50
+const SPACING = 20
 
 export class GamePad {
   public width: number

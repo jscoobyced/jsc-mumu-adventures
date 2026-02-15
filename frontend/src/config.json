@@ -5,7 +5,7 @@
   "cols": 50,
   "rows": 50,
   "mapScale": 0.5,
-  "gamepadSize": 500,
+  "gamepadSize": 200,
   "images": {
     "tilesets": {
       "intro": "./images/intro.png",

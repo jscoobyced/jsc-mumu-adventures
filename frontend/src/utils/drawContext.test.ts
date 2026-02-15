@@ -34,31 +34,31 @@ describe('drawContext', () => {
 
   describe('getDrawContext', () => {
     it('should query for canvas element', () => {
-      getDrawContext()
+      getDrawContext(false)
 
       expect(document.querySelector).toHaveBeenCalledWith('canvas')
     })
 
     it('should get 2d context from canvas', () => {
-      getDrawContext()
+      getDrawContext(false)
 
       expect(mockCanvas.getContext).toHaveBeenCalledWith('2d')
     })
 
     it('should set canvas width based on config and dpr', () => {
-      getDrawContext()
+      getDrawContext(false)
 
       expect(mockCanvas.width).toBe(1024 * getDevicePixelRatio())
     })
 
     it('should set canvas height based on config and dpr', () => {
-      getDrawContext()
+      getDrawContext(false)
 
       expect(mockCanvas.height).toBe(576 * getDevicePixelRatio())
     })
 
     it('should return canvas context', () => {
-      const result = getDrawContext()
+      const result = getDrawContext(false)
 
       expect(result).toBe(mockContext)
     })
@@ -66,7 +66,7 @@ describe('drawContext', () => {
     it('should return null if getContext returns null', () => {
       mockCanvas.getContext = vi.fn(() => null)
 
-      const result = getDrawContext()
+      const result = getDrawContext(false)
 
       expect(result).toBeNull()
     })
@@ -74,7 +74,7 @@ describe('drawContext', () => {
     it('should handle canvas element not found', () => {
       document.querySelector = vi.fn(() => null)
 
-      expect(() => getDrawContext()).toThrow()
+      expect(() => getDrawContext(false)).toThrow()
     })
   })
 })
