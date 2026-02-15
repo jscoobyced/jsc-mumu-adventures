@@ -1,6 +1,7 @@
 import ActiveNpc from '../classes/ActiveNpc'
 import { Banner } from '../classes/Banner'
 import { CollisionBlock } from '../classes/CollisionBlock'
+import { GamePad } from '../classes/GamePad'
 import { Heart } from '../classes/Heart'
 import { InteractiveNpc } from '../classes/InteractiveNpc'
 import { Player } from '../classes/Player'
@@ -29,6 +30,7 @@ export interface Game {
   player: Player
   hearts: Heart[]
   banner: Banner
+  gamePad?: GamePad
 }
 
 export const startGame = (restart = false): void => {
@@ -90,6 +92,7 @@ export const startGame = (restart = false): void => {
     player: initialPlayer,
     hearts: initialHearts,
     banner: new Banner({ x: 10, y: 10 }, isMobile),
+    gamePad: isMobile ? new GamePad(config.gamepadSize) : undefined,
   }
   startRendering(game)
 }

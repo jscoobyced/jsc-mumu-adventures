@@ -1,11 +1,12 @@
 import config from '../config.json'
+import { isMobile } from '../utils/device'
 import { getDrawContext } from '../utils/drawContext'
 import { getKeys } from '../utils/eventListeners'
 import { startGame } from '../utils/game'
 import { loadImage } from '../utils/loadImage'
 
 export const intro = async () => {
-  const context = getDrawContext()
+  const context = getDrawContext(isMobile)
   if (!context) {
     throw new Error('Failed to get 2D context from canvas')
   }

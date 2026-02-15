@@ -4,7 +4,7 @@ import { Vector } from '../models/Vector'
 export const isTouchSupported =
   'ontouchstart' in window || navigator.maxTouchPoints > 0
 
-export const isMobile = isTouchSupported && window.innerWidth <= 840
+export const isMobile = isTouchSupported && window.innerWidth <= 920
 
 export const getScreenSize = (): Vector => {
   return {

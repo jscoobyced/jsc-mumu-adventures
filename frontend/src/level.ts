@@ -6,7 +6,7 @@ import { LayersData } from './models/Layer'
 import { LevelData, LevelDirection } from './models/LevelData'
 import { TilesetInfo, Tilesets } from './models/TileSet'
 import { isDebugMode } from './utils/debug'
-import { getDevicePixelRatio } from './utils/device'
+import { getDevicePixelRatio, isMobile } from './utils/device'
 import { getDrawContext } from './utils/drawContext'
 import { getKeys, getLastTime, setLastTime } from './utils/eventListeners'
 import { Game, handleNpcs, startGame } from './utils/game'
@@ -23,7 +23,7 @@ const MAP_SCALE: number = getDevicePixelRatio() + config.mapScale
 
 const BUFFER = 0.0001
 
-const context = getDrawContext()
+const context = getDrawContext(isMobile)
 
 if (!context) {
   throw new Error('Failed to get 2D context from canvas')
@@ -175,6 +175,11 @@ const animate = (
   })
   context.restore()
 
+  // Draw GamePad if it exists
+  if (game.gamePad) {
+    game.gamePad.draw(context)
+  }
+
   const bannerClosed = game.banner.draw(context, keys)
   if (game.paused && bannerClosed) {
     game.paused = false
@@ -225,7 +230,7 @@ const debugCollisions = (c: CanvasRenderingContext2D): void => {
 
 export const startRendering = async (game: Game): Promise<void> => {
   // Purge canvas before rendering
-  const context = getDrawContext()
+  const context = getDrawContext(isMobile)
   if (context) {
     context.clearRect(0, 0, context.canvas.width, context.canvas.height)
   }

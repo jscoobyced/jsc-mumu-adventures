@@ -1,8 +1,9 @@
+import { getSegmentNumber } from '../classes/GamePad'
+import config from '../config.json'
 import { Keys } from '../models/Keys'
-import { getDevicePixelRatio, getScreenSize, isTouchSupported } from './device'
+import { getDevicePixelRatio, isMobile, isTouchSupported } from './device'
 import { getDrawContext } from './drawContext'
 import { startBackgroundAudio, toggleAudio } from './music'
-import { getCanvasQuadrant } from './quadrant'
 
 // Declare global variables (these should be defined elsewhere in your project)
 let keys!: Keys
@@ -101,20 +102,17 @@ export const initializeEventListeners = (): void => {
     event.preventDefault()
     const x = event.changedTouches[0].clientX
     const y = event.changedTouches[0].clientY
-    const quadrant = getCanvasQuadrant(getScreenSize(), {
-      x,
-      y,
-    })
+    const quadrant = getSegmentNumber(x, y, config.gamepadSize)
 
     switch (quadrant) {
-      case 1:
+      case 7:
         keys.w.pressed = true
         keys.a.pressed = true
         break
-      case 2:
+      case 8:
         keys.w.pressed = true
         break
-      case 3:
+      case 9:
         keys.w.pressed = true
         keys.d.pressed = true
         break
@@ -127,14 +125,14 @@ export const initializeEventListeners = (): void => {
       case 6:
         keys.d.pressed = true
         break
-      case 7:
+      case 1:
         keys.s.pressed = true
         keys.a.pressed = true
         break
-      case 8:
+      case 2:
         keys.s.pressed = true
         break
-      case 9:
+      case 3:
         keys.s.pressed = true
         keys.d.pressed = true
         break
@@ -159,7 +157,7 @@ export const initializeEventListeners = (): void => {
   )
 
   if (isTouchSupported) {
-    const context = getDrawContext()
+    const context = getDrawContext(isMobile)
     if (context) {
       context.canvas.setAttribute('style', 'width: 100%; height: 100%;')
       context.canvas.width = window.innerWidth * getDevicePixelRatio()
