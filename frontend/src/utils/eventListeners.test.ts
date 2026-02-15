@@ -15,6 +15,11 @@ const mockContext = {
   },
 } as unknown as CanvasRenderingContext2D
 
+const mockGetSegmentNumber = vi.fn().mockReturnValue(0)
+vi.mock('../classes/GamePad', () => ({
+  getSegmentNumber: (...args: unknown[]) => mockGetSegmentNumber(...args),
+}))
+
 vi.mock('./music', () => ({
   startBackgroundAudio: vi.fn().mockResolvedValue(undefined),
   toggleAudio: vi.fn(),
@@ -27,6 +32,7 @@ vi.mock('./drawContext', () => ({
 describe('eventListeners', () => {
   let keydownListeners: ((event: KeyboardEvent) => void)[] = []
   let keyupListeners: ((event: KeyboardEvent) => void)[] = []
+  let touchstartListeners: ((event: TouchEvent) => void)[] = []
   let touchendListeners: {
     handler: EventListener
     options?: AddEventListenerOptions | boolean
@@ -38,6 +44,7 @@ describe('eventListeners', () => {
     vi.clearAllMocks()
     keydownListeners = []
     keyupListeners = []
+    touchstartListeners = []
     touchendListeners = []
     resizeListeners = []
     visibilityListeners = []
@@ -53,6 +60,8 @@ describe('eventListeners', () => {
           keydownListeners.push(handler as (event: KeyboardEvent) => void)
         } else if (event === 'keyup') {
           keyupListeners.push(handler as (event: KeyboardEvent) => void)
+        } else if (event === 'touchstart') {
+          touchstartListeners.push(handler as (event: TouchEvent) => void)
         } else if (event === 'touchend') {
           touchendListeners.push({ handler: handler as EventListener, options })
         } else if (event === 'resize') {
@@ -465,6 +474,119 @@ describe('eventListeners', () => {
         expect(keys.s.pressed).toBe(false)
         expect(keys.d.pressed).toBe(false)
         expect(keys.g.pressed).toBe(false)
+        expect(event.preventDefault).toHaveBeenCalled()
+      })
+    })
+
+    describe('touchstart events', () => {
+      const createTouchEvent = (clientX: number, clientY: number) =>
+        ({
+          preventDefault: vi.fn(),
+          changedTouches: [{ clientX, clientY }],
+        }) as unknown as TouchEvent
+
+      beforeEach(() => {
+        initializeEventListeners()
+      })
+
+      it('should register touchstart listener', () => {
+        expect(touchstartListeners.length).toBe(1)
+      })
+
+      it('should set w and a keys for quadrant 7 (Up-Left)', () => {
+        mockGetSegmentNumber.mockReturnValue(7)
+        touchstartListeners[0](createTouchEvent(10, 10))
+
+        const keys = getKeys()
+        expect(keys.w.pressed).toBe(true)
+        expect(keys.a.pressed).toBe(true)
+      })
+
+      it('should set w key for quadrant 8 (Up)', () => {
+        mockGetSegmentNumber.mockReturnValue(8)
+        touchstartListeners[0](createTouchEvent(10, 10))
+
+        expect(getKeys().w.pressed).toBe(true)
+      })
+
+      it('should set w and d keys for quadrant 9 (Up-Right)', () => {
+        mockGetSegmentNumber.mockReturnValue(9)
+        touchstartListeners[0](createTouchEvent(10, 10))
+
+        const keys = getKeys()
+        expect(keys.w.pressed).toBe(true)
+        expect(keys.d.pressed).toBe(true)
+      })
+
+      it('should set a key for quadrant 4 (Left)', () => {
+        mockGetSegmentNumber.mockReturnValue(4)
+        touchstartListeners[0](createTouchEvent(10, 10))
+
+        expect(getKeys().a.pressed).toBe(true)
+      })
+
+      it('should set g key for quadrant 5 (Center)', () => {
+        mockGetSegmentNumber.mockReturnValue(5)
+        touchstartListeners[0](createTouchEvent(10, 10))
+
+        expect(getKeys().g.pressed).toBe(true)
+      })
+
+      it('should set d key for quadrant 6 (Right)', () => {
+        mockGetSegmentNumber.mockReturnValue(6)
+        touchstartListeners[0](createTouchEvent(10, 10))
+
+        expect(getKeys().d.pressed).toBe(true)
+      })
+
+      it('should set s and a keys for quadrant 1 (Down-Left)', () => {
+        mockGetSegmentNumber.mockReturnValue(1)
+        touchstartListeners[0](createTouchEvent(10, 10))
+
+        const keys = getKeys()
+        expect(keys.s.pressed).toBe(true)
+        expect(keys.a.pressed).toBe(true)
+      })
+
+      it('should set s key for quadrant 2 (Down)', () => {
+        mockGetSegmentNumber.mockReturnValue(2)
+        touchstartListeners[0](createTouchEvent(10, 10))
+
+        expect(getKeys().s.pressed).toBe(true)
+      })
+
+      it('should set s and d keys for quadrant 3 (Down-Right)', () => {
+        mockGetSegmentNumber.mockReturnValue(3)
+        touchstartListeners[0](createTouchEvent(10, 10))
+
+        const keys = getKeys()
+        expect(keys.s.pressed).toBe(true)
+        expect(keys.d.pressed).toBe(true)
+      })
+
+      it('should not set any keys for quadrant 0 (outside)', () => {
+        const keys = getKeys()
+        keys.w.pressed = false
+        keys.a.pressed = false
+        keys.s.pressed = false
+        keys.d.pressed = false
+        keys.g.pressed = false
+
+        mockGetSegmentNumber.mockReturnValue(0)
+        touchstartListeners[0](createTouchEvent(10, 10))
+
+        expect(keys.w.pressed).toBe(false)
+        expect(keys.a.pressed).toBe(false)
+        expect(keys.s.pressed).toBe(false)
+        expect(keys.d.pressed).toBe(false)
+        expect(keys.g.pressed).toBe(false)
+      })
+
+      it('should call preventDefault on touch event', () => {
+        mockGetSegmentNumber.mockReturnValue(0)
+        const event = createTouchEvent(10, 10)
+        touchstartListeners[0](event)
+
         expect(event.preventDefault).toHaveBeenCalled()
       })
     })

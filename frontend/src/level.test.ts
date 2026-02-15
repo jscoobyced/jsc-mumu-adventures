@@ -453,5 +453,65 @@ describe('level', () => {
 
       expect(handleInputSpy).not.toHaveBeenCalled()
     })
+
+    it('should draw gamePad when it exists', async () => {
+      const mockGamePad = { draw: vi.fn() }
+      const game = createMockGame({ gamePad: mockGamePad as never })
+
+      await startRendering(game)
+
+      expect(mockGamePad.draw).toHaveBeenCalled()
+    })
+
+    it('should log error when loadImage fails for a layer', async () => {
+      const { loadImage } = await import('./utils/loadImage')
+      const consoleSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {})
+
+      const game = createMockGame()
+      game.levelData.layersData = {
+        terrain: [[1, 2]],
+      }
+      game.levelData.frontRenderedLayersData = {}
+      game.levelData.tilesets = {
+        terrain: { imageUrl: './terrain.png', tileSize: 16 },
+      }
+
+      vi.mocked(loadImage).mockRejectedValueOnce(new Error('load failed'))
+
+      await startRendering(game)
+
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'Failed to load image for layer terrain:',
+        expect.any(Error),
+      )
+      consoleSpy.mockRestore()
+    })
+
+    it('should log error when rendering throws', async () => {
+      const consoleSpy = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {})
+
+      // Make document.createElement throw so renderStaticLayers fails
+      const origCreate = document.createElement
+      vi.spyOn(document, 'createElement').mockImplementation((tag: string) => {
+        if (tag === 'canvas') {
+          throw new Error('canvas creation failed')
+        }
+        return origCreate.call(document, tag)
+      })
+
+      const game = createMockGame()
+
+      await startRendering(game)
+
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'Error during rendering:',
+        expect.any(Error),
+      )
+      consoleSpy.mockRestore()
+    })
   })
 })
