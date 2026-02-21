@@ -1,5 +1,5 @@
 import config from '../config.json'
-import { Keys } from '../models/Keys'
+import { loadAudio } from './audio'
 
 let backgroundAudio: HTMLAudioElement | null = null
 let backgroundAudioStarted: boolean = false
@@ -25,29 +25,16 @@ export const startBackgroundAudio = async (): Promise<void> => {
   backgroundAudioStarted = true
 }
 
-export const loadAudio = async (url: string): Promise<HTMLAudioElement> => {
-  return new Promise((resolve, reject) => {
-    const audio = new Audio()
-    audio.src = url
-    audio.loop = true
-    audio.volume = 0.5
-    audio.oncanplaythrough = () => {
-      resolve(audio)
-    }
-    audio.onerror = (e) =>
-      reject(new Error(`Failed to load audio from ${url}: ${e}`))
-  })
+export const toggleAudio = (): void => {
+  if (backgroundAudio && backgroundAudio.paused) {
+    ;(async () => {
+      backgroundAudio.play()
+    })()
+  } else {
+    stopCurrentAudio()
+  }
 }
 
-export const toggleAudio = (keys: Keys): void => {
-  if (keys.q.pressed) {
-    if (backgroundAudio && backgroundAudio.paused) {
-      ;(async () => {
-        backgroundAudio.play()
-      })()
-    } else {
-      stopCurrentAudio()
-    }
-    keys.q.pressed = false
-  }
+export const isAudioPlaying = (): boolean => {
+  return backgroundAudio ? !backgroundAudio.paused : false
 }

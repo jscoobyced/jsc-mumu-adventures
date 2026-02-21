@@ -23,7 +23,8 @@
       }
     },
     "decorations": {
-      "heart": "./images/sprites/heart.png"
+      "heart": "./images/sprites/heart.png",
+      "audio": "./images/sprites/audio.png"
     },
     "ui": {
       "banner": {

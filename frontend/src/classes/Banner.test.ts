@@ -1,6 +1,11 @@
 import { describe, expect, it, vi } from 'vitest'
 import { Banner } from './Banner'
 import { Keys } from '../models'
+import { checkSpriteTouched } from '../utils/getTouchedCoordinates'
+
+const mocks = vi.hoisted(() => ({
+  checkSpriteTouched: vi.fn(() => false),
+}))
 
 vi.mock('../config.json', () => ({
   default: {
@@ -15,6 +20,10 @@ vi.mock('../config.json', () => ({
       },
     },
   },
+}))
+
+vi.mock('../utils/getTouchedCoordinates', () => ({
+  checkSpriteTouched: mocks.checkSpriteTouched,
 }))
 
 describe('Banner', () => {
@@ -52,6 +61,18 @@ describe('Banner', () => {
     // height = 340 * ratio ≈ 342.66
     expect(banner.height).toBeCloseTo(342.66, 0)
     expect(banner.loaded).toBe(false)
+  })
+
+  it('should use mobile font size when mobile mode is enabled', async () => {
+    const banner = new Banner({ x: 10, y: 10 }, true)
+    await new Promise((resolve) => setTimeout(resolve, 10))
+    banner.show(['Mobile text'])
+    const keys = createMockKeys()
+    const context = createMockContext() as unknown as CanvasRenderingContext2D
+
+    banner.draw(context, keys)
+
+    expect(context.font).toBe('46px MumuFont')
   })
 
   it('should load image on creation', () => {
@@ -165,6 +186,23 @@ describe('Banner', () => {
 
     expect(result).toBe(false)
     expect(context.drawImage).not.toHaveBeenCalled()
+  })
+
+  it('should delegate checkBannerTouched to checkSpriteTouched', () => {
+    const banner = new Banner({ x: 10, y: 10 })
+    vi.mocked(checkSpriteTouched).mockReturnValue(true)
+
+    const touched = banner.checkBannerTouched(100, 120)
+
+    expect(touched).toBe(true)
+    expect(checkSpriteTouched).toHaveBeenCalledWith(
+      100,
+      120,
+      banner.width,
+      banner.height,
+      10,
+      10,
+    )
   })
 
   it('should wrap long text correctly', async () => {

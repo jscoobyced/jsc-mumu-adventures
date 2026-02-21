@@ -1,8 +1,10 @@
-import { getSegmentNumber } from '../classes/GamePad'
+import { checkAudioSpriteTouched } from '../classes/AudioSprite'
+import { Banner } from '../classes/Banner'
 import config from '../config.json'
 import { Keys } from '../models/Keys'
 import { getDevicePixelRatio, isMobile, isTouchSupported } from './device'
 import { getDrawContext } from './drawContext'
+import { getSegmentNumber } from './getTouchedCoordinates'
 import { startBackgroundAudio, toggleAudio } from './music'
 
 // Declare global variables (these should be defined elsewhere in your project)
@@ -58,8 +60,7 @@ export const initializeEventListeners = (): void => {
         keys.g.pressed = true
         break
       case 'q':
-        keys.q.pressed = true
-        toggleAudio(keys)
+        toggleAudio()
         break
       default:
         break
@@ -97,6 +98,26 @@ export const initializeEventListeners = (): void => {
         break
     }
   })
+
+  const canvas = getDrawContext(isMobile)?.canvas
+  if (canvas) {
+    canvas.addEventListener('click', (event: MouseEvent): void => {
+      const x = event.offsetX
+      const y = event.offsetY
+      const audioClicked = checkAudioSpriteTouched(x, y)
+      if (audioClicked) {
+        toggleAudio()
+      }
+    })
+    canvas.addEventListener('touchend', (event: TouchEvent): void => {
+      const x = event.changedTouches[0].clientX
+      const y = event.changedTouches[0].clientY
+      const audioTouched = checkAudioSpriteTouched(x, y)
+      if (audioTouched) {
+        toggleAudio()
+      }
+    })
+  }
 
   window.addEventListener('touchstart', (event: TouchEvent): void => {
     event.preventDefault()
@@ -142,19 +163,15 @@ export const initializeEventListeners = (): void => {
   })
 
   // Clear keys pressed when user stop touching the screen
-  window.addEventListener(
-    'touchend',
-    (event: TouchEvent): void => {
-      event.preventDefault()
-      keys.w.pressed = false
-      keys.a.pressed = false
-      keys.s.pressed = false
-      keys.d.pressed = false
-      keys.g.pressed = false
-      keys.q.pressed = false
-    },
-    { passive: false },
-  )
+  window.addEventListener('touchend', (event: TouchEvent): void => {
+    event.preventDefault()
+    keys.w.pressed = false
+    keys.a.pressed = false
+    keys.s.pressed = false
+    keys.d.pressed = false
+    keys.g.pressed = false
+    keys.q.pressed = false
+  })
 
   if (isTouchSupported) {
     const context = getDrawContext(isMobile)
@@ -193,5 +210,29 @@ const handleResize = (context: CanvasRenderingContext2D | null) => {
     context.canvas.width = window.innerWidth * getDevicePixelRatio()
     context.canvas.height = window.innerHeight * getDevicePixelRatio()
     context.canvas.setAttribute('style', 'width: 100%; height: 100%;')
+  }
+}
+
+export const handleBannerTouch = (banner: Banner) => {
+  const canvas = getDrawContext(isMobile)?.canvas
+  if (canvas) {
+    const handleClick = (event: MouseEvent): void => {
+      const x = event.offsetX
+      const y = event.offsetY
+      if (banner.checkBannerTouched(x, y)) {
+        const keys = getKeys()
+        keys.space.pressed = true
+      }
+    }
+    const handleTouch = (event: TouchEvent): void => {
+      const x = event.changedTouches[0].clientX
+      const y = event.changedTouches[0].clientY
+      if (banner.checkBannerTouched(x, y)) {
+        const keys = getKeys()
+        keys.space.pressed = true
+      }
+    }
+    canvas.addEventListener('click', handleClick)
+    canvas.addEventListener('touchend', handleTouch)
   }
 }

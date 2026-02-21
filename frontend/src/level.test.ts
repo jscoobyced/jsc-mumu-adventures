@@ -137,6 +137,7 @@ vi.mock('./utils/eventListeners', () => ({
   })),
   getLastTime: vi.fn(() => 0),
   setLastTime: vi.fn(),
+  handleBannerTouch: vi.fn(),
 }))
 
 const mockOffscreenContext = {
@@ -362,15 +363,6 @@ describe('level', () => {
       expect(startGame).toHaveBeenCalledWith(true)
     })
 
-    it('should toggle audio each frame', async () => {
-      const { toggleAudio } = await import('./utils/music')
-
-      const game = createMockGame()
-      await startRendering(game)
-
-      expect(toggleAudio).toHaveBeenCalled()
-    })
-
     it('should render debug collisions when debug mode is on', async () => {
       const { isDebugMode } = await import('./utils/debug')
       vi.mocked(isDebugMode).mockReturnValue(true)
@@ -465,9 +457,7 @@ describe('level', () => {
 
     it('should log error when loadImage fails for a layer', async () => {
       const { loadImage } = await import('./utils/loadImage')
-      const consoleSpy = vi
-        .spyOn(console, 'error')
-        .mockImplementation(() => {})
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
       const game = createMockGame()
       game.levelData.layersData = {
@@ -490,9 +480,7 @@ describe('level', () => {
     })
 
     it('should log error when rendering throws', async () => {
-      const consoleSpy = vi
-        .spyOn(console, 'error')
-        .mockImplementation(() => {})
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
       // Make document.createElement throw so renderStaticLayers fails
       const origCreate = document.createElement

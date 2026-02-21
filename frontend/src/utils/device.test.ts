@@ -100,17 +100,49 @@ describe('device', () => {
     expect(device.isMobile).toBe(false)
   })
 
-  it('reports mobile when touch supported and innerWidth <= 840', async () => {
+  it('reports mobile when touch supported and innerWidth <= 920', async () => {
     const device = await importWithGlobals({ ontouchValue: null, maxTouchValue: 0, innerWidthValue: 800 })
 
     expect(device.isTouchSupported).toBe(true)
     expect(device.isMobile).toBe(true)
   })
 
-  it('considers edge width 840 as mobile when touch supported', async () => {
-    const device = await importWithGlobals({ ontouchValue: null, maxTouchValue: 0, innerWidthValue: 840 })
+  it('considers edge width 920 as mobile when touch supported', async () => {
+    const device = await importWithGlobals({ ontouchValue: null, maxTouchValue: 0, innerWidthValue: 920 })
 
     expect(device.isTouchSupported).toBe(true)
     expect(device.isMobile).toBe(true)
+  })
+
+  it('is not mobile when touch supported but width is above 920', async () => {
+    const device = await importWithGlobals({ ontouchValue: null, maxTouchValue: 1, innerWidthValue: 921 })
+
+    expect(device.isTouchSupported).toBe(true)
+    expect(device.isMobile).toBe(false)
+  })
+
+  it('getScreenSize returns current window dimensions', async () => {
+    vi.resetModules()
+    Object.defineProperty(window, 'innerWidth', { configurable: true, value: 1280 })
+    Object.defineProperty(window, 'innerHeight', { configurable: true, value: 720 })
+
+    const { getScreenSize } = await import('./device')
+    expect(getScreenSize()).toEqual({ x: 1280, y: 720 })
+  })
+
+  it('getDevicePixelRatio returns window devicePixelRatio when available', async () => {
+    vi.resetModules()
+    Object.defineProperty(window, 'devicePixelRatio', { configurable: true, value: 2 })
+
+    const { getDevicePixelRatio } = await import('./device')
+    expect(getDevicePixelRatio()).toBe(2)
+  })
+
+  it('getDevicePixelRatio falls back to 1 when devicePixelRatio is falsy', async () => {
+    vi.resetModules()
+    Object.defineProperty(window, 'devicePixelRatio', { configurable: true, value: 0 })
+
+    const { getDevicePixelRatio } = await import('./device')
+    expect(getDevicePixelRatio()).toBe(1)
   })
 })

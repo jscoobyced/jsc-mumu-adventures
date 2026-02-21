@@ -384,4 +384,26 @@ describe('SimpleNpc', () => {
     npc.update(0.2, [])
     expect(npc.currentFrame).toBe(2)
   })
+
+  it('should reverse vertical velocity via onVerticalCollision', () => {
+    class TestableSimpleNpc extends SimpleNpc {
+      public triggerVerticalCollision(): void {
+        this.onVerticalCollision()
+      }
+    }
+
+    const npc = new TestableSimpleNpc({
+      position: { x: 200, y: 300 },
+      size: 15,
+      imageSrc: './npc.png',
+      velocity: { x: 0, y: 12 },
+      sprites: mockSprites,
+      health: 2,
+    })
+    npc.velocity.y = 12
+
+    npc.triggerVerticalCollision()
+
+    expect(npc.velocity.y).toBe(-12)
+  })
 })

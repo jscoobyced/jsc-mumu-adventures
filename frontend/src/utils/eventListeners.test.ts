@@ -1,121 +1,95 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-import {
-  getKeys,
-  getLastTime,
-  initializeEventListeners,
-  setLastTime,
-} from './eventListeners'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-const mockContext = {
-  canvas: {
-    setAttribute: vi.fn(),
-    width: 0,
-    height: 0,
-    requestFullscreen: vi.fn().mockResolvedValue(undefined),
-  },
-} as unknown as CanvasRenderingContext2D
+const mockToggleAudio = vi.fn()
+const mockStartBackgroundAudio = vi.fn().mockResolvedValue(undefined)
+const mockCheckAudioSpriteTouched = vi.fn(() => false)
+const mockGetSegmentNumber = vi.fn(() => 0)
+const mockGetDevicePixelRatio = vi.fn(() => 2)
 
-const mockGetSegmentNumber = vi.fn().mockReturnValue(0)
-vi.mock('../classes/GamePad', () => ({
-  getSegmentNumber: (...args: unknown[]) => mockGetSegmentNumber(...args),
-}))
+let mockIsMobile = false
+let mockIsTouchSupported = false
+let mockCanvas: Record<string, unknown> | null = null
 
 vi.mock('./music', () => ({
-  startBackgroundAudio: vi.fn().mockResolvedValue(undefined),
-  toggleAudio: vi.fn(),
+  toggleAudio: mockToggleAudio,
+  startBackgroundAudio: mockStartBackgroundAudio,
+}))
+
+vi.mock('../classes/AudioSprite', () => ({
+  checkAudioSpriteTouched: mockCheckAudioSpriteTouched,
+}))
+
+vi.mock('./getTouchedCoordinates', () => ({
+  getSegmentNumber: mockGetSegmentNumber,
+}))
+
+vi.mock('./device', () => ({
+  get isMobile() {
+    return mockIsMobile
+  },
+  get isTouchSupported() {
+    return mockIsTouchSupported
+  },
+  getDevicePixelRatio: mockGetDevicePixelRatio,
 }))
 
 vi.mock('./drawContext', () => ({
-  getDrawContext: vi.fn(() => mockContext),
+  getDrawContext: vi.fn(() => {
+    if (!mockCanvas) return null
+    return { canvas: mockCanvas }
+  }),
 }))
 
 describe('eventListeners', () => {
-  let keydownListeners: ((event: KeyboardEvent) => void)[] = []
-  let keyupListeners: ((event: KeyboardEvent) => void)[] = []
-  let touchstartListeners: ((event: TouchEvent) => void)[] = []
-  let touchendListeners: {
-    handler: EventListener
-    options?: AddEventListenerOptions | boolean
-  }[] = []
-  let resizeListeners: (() => void)[] = []
-  let visibilityListeners: (() => void)[] = []
+  let windowListeners: Record<string, ((...args: unknown[]) => void)[]>
+  let documentListeners: Record<string, ((...args: unknown[]) => void)[]>
 
   beforeEach(() => {
-    vi.clearAllMocks()
-    keydownListeners = []
-    keyupListeners = []
-    touchstartListeners = []
-    touchendListeners = []
-    resizeListeners = []
-    visibilityListeners = []
+    windowListeners = {}
+    documentListeners = {}
 
-    // Mock window.addEventListener
-    window.addEventListener = vi.fn(
-      (
-        event: string,
-        handler: EventListenerOrEventListenerObject,
-        options?: AddEventListenerOptions | boolean,
-      ) => {
-        if (event === 'keydown') {
-          keydownListeners.push(handler as (event: KeyboardEvent) => void)
-        } else if (event === 'keyup') {
-          keyupListeners.push(handler as (event: KeyboardEvent) => void)
-        } else if (event === 'touchstart') {
-          touchstartListeners.push(handler as (event: TouchEvent) => void)
-        } else if (event === 'touchend') {
-          touchendListeners.push({ handler: handler as EventListener, options })
-        } else if (event === 'resize') {
-          resizeListeners.push(handler as () => void)
+    vi.spyOn(window, 'addEventListener').mockImplementation(
+      (type: string, handler: unknown) => {
+        if (!windowListeners[type]) windowListeners[type] = []
+        windowListeners[type].push(handler as (...args: unknown[]) => void)
+      },
+    )
+    vi.spyOn(window, 'removeEventListener').mockImplementation(
+      (type: string, handler: unknown) => {
+        if (windowListeners[type]) {
+          windowListeners[type] = windowListeners[type].filter(
+            (h) => h !== handler,
+          )
         }
       },
     )
+    vi.spyOn(document, 'addEventListener').mockImplementation(
+      (type: string, handler: unknown) => {
+        if (!documentListeners[type]) documentListeners[type] = []
+        documentListeners[type].push(handler as (...args: unknown[]) => void)
+      },
+    )
 
-    window.removeEventListener = vi.fn()
-
-    // Mock document.addEventListener
-    document.addEventListener = vi.fn((event: string, handler) => {
-      if (event === 'visibilitychange') {
-        visibilityListeners.push(handler as () => void)
-      }
-    })
-
-    // Mock document.querySelector to return a canvas-like element
-    document.querySelector = vi.fn(() => mockContext.canvas)
-
-    // Mock document.hidden
-    Object.defineProperty(document, 'hidden', {
-      configurable: true,
-      get: () => false,
-    })
-
-    // Mock performance.now
-    vi.spyOn(performance, 'now').mockReturnValue(1000)
-
-    // Enable touch support by default
-    Object.defineProperty(window, 'ontouchstart', {
-      configurable: true,
-      value: null,
-    })
+    mockCanvas = null
+    mockIsMobile = false
+    mockIsTouchSupported = false
+    mockGetDevicePixelRatio.mockReturnValue(2)
   })
 
-  describe('getKeys', () => {
-    it('should return keys object', () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+    vi.resetModules()
+  })
+
+  const loadModule = async () => {
+    const mod = await import('./eventListeners')
+    return mod
+  }
+
+  describe('getKeys / getLastTime / setLastTime', () => {
+    it('getKeys returns initialized keys', async () => {
+      const { getKeys } = await loadModule()
       const keys = getKeys()
-
-      expect(keys).toBeDefined()
-      expect(keys).toHaveProperty('w')
-      expect(keys).toHaveProperty('a')
-      expect(keys).toHaveProperty('s')
-      expect(keys).toHaveProperty('d')
-      expect(keys).toHaveProperty('g')
-      expect(keys).toHaveProperty('q')
-      expect(keys).toHaveProperty('space')
-      expect(keys).toHaveProperty('spaceEnabled')
-    })
-
-    it('should have all keys initially not pressed', () => {
-      const keys = getKeys()
-
       expect(keys.w.pressed).toBe(false)
       expect(keys.a.pressed).toBe(false)
       expect(keys.s.pressed).toBe(false)
@@ -123,552 +97,434 @@ describe('eventListeners', () => {
       expect(keys.g.pressed).toBe(false)
       expect(keys.q.pressed).toBe(false)
       expect(keys.space.pressed).toBe(false)
-    })
-
-    it('should have spaceEnabled initially true', () => {
-      const keys = getKeys()
-
       expect(keys.spaceEnabled).toBe(true)
     })
-  })
 
-  describe('lastTime', () => {
-    it('should get last time', () => {
-      const time = getLastTime()
-
-      expect(typeof time).toBe('number')
-    })
-
-    it('should set last time', () => {
-      setLastTime(5000)
-
-      expect(getLastTime()).toBe(5000)
-    })
-
-    it('should update last time with new value', () => {
-      setLastTime(1000)
-      expect(getLastTime()).toBe(1000)
-
-      setLastTime(2000)
-      expect(getLastTime()).toBe(2000)
+    it('getLastTime returns a number, setLastTime updates it', async () => {
+      const { getLastTime, setLastTime } = await loadModule()
+      expect(typeof getLastTime()).toBe('number')
+      setLastTime(12345)
+      expect(getLastTime()).toBe(12345)
     })
   })
 
   describe('initializeEventListeners', () => {
-    it('should register keydown listener', () => {
-      initializeEventListeners()
-
-      expect(window.addEventListener).toHaveBeenCalledWith(
-        'keydown',
-        expect.any(Function),
+    describe('keydown', () => {
+      it.each([
+        ['w', 'w'],
+        ['ArrowUp', 'w'],
+        ['a', 'a'],
+        ['ArrowLeft', 'a'],
+        ['s', 's'],
+        ['ArrowDown', 's'],
+        ['d', 'd'],
+        ['ArrowRight', 'd'],
+        ['g', 'g'],
+      ])(
+        'pressing "%s" sets keys.%s.pressed to true',
+        async (eventKey, keyProp) => {
+          const { getKeys, initializeEventListeners } = await loadModule()
+          initializeEventListeners()
+          const handler = windowListeners['keydown'][0]
+          handler({ key: eventKey } as unknown as KeyboardEvent)
+          expect(
+            getKeys()[keyProp as keyof ReturnType<typeof getKeys>],
+          ).toHaveProperty('pressed', true)
+        },
       )
-    })
 
-    it('should register keyup listener', () => {
-      initializeEventListeners()
-
-      expect(window.addEventListener).toHaveBeenCalledWith(
-        'keyup',
-        expect.any(Function),
-      )
-    })
-
-    it('should register visibilitychange listener', () => {
-      initializeEventListeners()
-
-      expect(document.addEventListener).toHaveBeenCalledWith(
-        'visibilitychange',
-        expect.any(Function),
-      )
-    })
-
-    describe('keydown events', () => {
-      beforeEach(() => {
+      it('pressing space sets keys.space.pressed when spaceEnabled', async () => {
+        const { getKeys, initializeEventListeners } = await loadModule()
         initializeEventListeners()
-      })
-
-      it('should set w key pressed on w keydown', () => {
-        const event = new KeyboardEvent('keydown', { key: 'w' })
-        keydownListeners[0](event)
-
-        expect(getKeys().w.pressed).toBe(true)
-      })
-
-      it('should set w key pressed on ArrowUp', () => {
-        const event = new KeyboardEvent('keydown', { key: 'ArrowUp' })
-        keydownListeners[0](event)
-
-        expect(getKeys().w.pressed).toBe(true)
-      })
-
-      it('should set a key pressed on a keydown', () => {
-        const event = new KeyboardEvent('keydown', { key: 'a' })
-        keydownListeners[0](event)
-
-        expect(getKeys().a.pressed).toBe(true)
-      })
-
-      it('should set a key pressed on ArrowLeft', () => {
-        const event = new KeyboardEvent('keydown', { key: 'ArrowLeft' })
-        keydownListeners[0](event)
-
-        expect(getKeys().a.pressed).toBe(true)
-      })
-
-      it('should set s key pressed on s keydown', () => {
-        const event = new KeyboardEvent('keydown', { key: 's' })
-        keydownListeners[0](event)
-
-        expect(getKeys().s.pressed).toBe(true)
-      })
-
-      it('should set s key pressed on ArrowDown', () => {
-        const event = new KeyboardEvent('keydown', { key: 'ArrowDown' })
-        keydownListeners[0](event)
-
-        expect(getKeys().s.pressed).toBe(true)
-      })
-
-      it('should set d key pressed on d keydown', () => {
-        const event = new KeyboardEvent('keydown', { key: 'd' })
-        keydownListeners[0](event)
-
-        expect(getKeys().d.pressed).toBe(true)
-      })
-
-      it('should set d key pressed on ArrowRight', () => {
-        const event = new KeyboardEvent('keydown', { key: 'ArrowRight' })
-        keydownListeners[0](event)
-
-        expect(getKeys().d.pressed).toBe(true)
-      })
-
-      it('should set g key pressed on g keydown', () => {
-        const event = new KeyboardEvent('keydown', { key: 'g' })
-        keydownListeners[0](event)
-
-        expect(getKeys().g.pressed).toBe(true)
-      })
-
-      it('should set q key pressed on q keydown', () => {
-        const event = new KeyboardEvent('keydown', { key: 'q' })
-        keydownListeners[0](event)
-
-        expect(getKeys().q.pressed).toBe(true)
-      })
-
-      it('should set space key pressed when spaceEnabled', () => {
-        getKeys().spaceEnabled = true
-        const event = new KeyboardEvent('keydown', { key: ' ' })
-        keydownListeners[0](event)
-
+        const handler = windowListeners['keydown'][0]
+        handler({ key: ' ' } as unknown as KeyboardEvent)
         expect(getKeys().space.pressed).toBe(true)
       })
 
-      it('should not set space key pressed when not spaceEnabled', () => {
-        const keys = getKeys()
-        keys.spaceEnabled = false
-        keys.space.pressed = false
-
-        const event = new KeyboardEvent('keydown', { key: ' ' })
-        keydownListeners[0](event)
-
-        expect(keys.space.pressed).toBe(false)
+      it('pressing space does not set keys.space.pressed when spaceEnabled is false', async () => {
+        const { getKeys, initializeEventListeners } = await loadModule()
+        initializeEventListeners()
+        getKeys().spaceEnabled = false
+        const handler = windowListeners['keydown'][0]
+        handler({ key: ' ' } as unknown as KeyboardEvent)
+        expect(getKeys().space.pressed).toBe(false)
       })
 
-      it('should toggle audio on q keydown', async () => {
-        const { toggleAudio } = await import('./music')
-        const event = new KeyboardEvent('keydown', { key: 'q' })
-        keydownListeners[0](event)
-
-        expect(toggleAudio).toHaveBeenCalledWith(getKeys())
+      it('pressing q calls toggleAudio', async () => {
+        const { initializeEventListeners } = await loadModule()
+        initializeEventListeners()
+        const handler = windowListeners['keydown'][0]
+        handler({ key: 'q' } as unknown as KeyboardEvent)
+        expect(mockToggleAudio).toHaveBeenCalled()
       })
 
-      it('should start background audio on any keydown', async () => {
-        const { startBackgroundAudio } = await import('./music')
-        const event = new KeyboardEvent('keydown', { key: 'w' })
-        keydownListeners[0](event)
-
-        expect(startBackgroundAudio).toHaveBeenCalled()
+      it('calls startBackgroundAudio on any keydown', async () => {
+        const { initializeEventListeners } = await loadModule()
+        initializeEventListeners()
+        const handler = windowListeners['keydown'][0]
+        handler({ key: 'x' } as unknown as KeyboardEvent)
+        expect(mockStartBackgroundAudio).toHaveBeenCalled()
       })
 
-      it('should log error when startBackgroundAudio rejects', async () => {
-        const { startBackgroundAudio } = await import('./music')
-        const error = new Error('audio failed')
-        vi.mocked(startBackgroundAudio).mockRejectedValueOnce(error)
-        const consoleSpy = vi
-          .spyOn(console, 'error')
-          .mockImplementation(() => {})
-
-        const event = new KeyboardEvent('keydown', { key: 'w' })
-        keydownListeners[0](event)
-
-        // Wait for the promise rejection to be handled
-        await vi.waitFor(() => {
-          expect(consoleSpy).toHaveBeenCalledWith(
+      it('logs error if startBackgroundAudio rejects', async () => {
+        mockStartBackgroundAudio.mockRejectedValueOnce(new Error('fail'))
+        const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+        const { initializeEventListeners } = await loadModule()
+        initializeEventListeners()
+        const handler = windowListeners['keydown'][0]
+        handler({ key: 'w' } as unknown as KeyboardEvent)
+        await vi.waitFor(() =>
+          expect(errorSpy).toHaveBeenCalledWith(
             'Error starting background audio:',
-            error,
-          )
-        })
+            expect.any(Error),
+          ),
+        )
       })
 
-      it('should handle unknown keys without error', () => {
-        const event = new KeyboardEvent('keydown', { key: 'x' })
-
-        expect(() => keydownListeners[0](event)).not.toThrow()
+      it('default case does not set any key', async () => {
+        const { getKeys, initializeEventListeners } = await loadModule()
+        initializeEventListeners()
+        const handler = windowListeners['keydown'][0]
+        handler({ key: 'z' } as unknown as KeyboardEvent)
+        const keys = getKeys()
+        expect(keys.w.pressed).toBe(false)
+        expect(keys.a.pressed).toBe(false)
+        expect(keys.s.pressed).toBe(false)
+        expect(keys.d.pressed).toBe(false)
       })
     })
 
-    describe('keyup events', () => {
-      beforeEach(() => {
-        initializeEventListeners()
-      })
+    describe('keyup', () => {
+      it.each([
+        ['w', 'w'],
+        ['ArrowUp', 'w'],
+        ['a', 'a'],
+        ['ArrowLeft', 'a'],
+        ['s', 's'],
+        ['ArrowDown', 's'],
+        ['d', 'd'],
+        ['ArrowRight', 'd'],
+        ['g', 'g'],
+        ['q', 'q'],
+      ])(
+        'releasing "%s" sets keys.%s.pressed to false',
+        async (eventKey, keyProp) => {
+          const { getKeys, initializeEventListeners } = await loadModule()
+          initializeEventListeners()
+          const keys = getKeys()
+          const keyObj = keys[keyProp as keyof typeof keys]
+          if (typeof keyObj === 'object' && 'pressed' in keyObj) {
+            keyObj.pressed = true
+          }
+          const handler = windowListeners['keyup'][0]
+          handler({ key: eventKey } as unknown as KeyboardEvent)
+          expect(
+            getKeys()[keyProp as keyof ReturnType<typeof getKeys>],
+          ).toHaveProperty('pressed', false)
+        },
+      )
 
-      it('should unset w key on w keyup', () => {
+      it('default case does nothing', async () => {
+        const { getKeys, initializeEventListeners } = await loadModule()
+        initializeEventListeners()
         getKeys().w.pressed = true
-        const event = new KeyboardEvent('keyup', { key: 'w' })
-        keyupListeners[0](event)
-
-        expect(getKeys().w.pressed).toBe(false)
-      })
-
-      it('should unset w key on ArrowUp keyup', () => {
-        getKeys().w.pressed = true
-        const event = new KeyboardEvent('keyup', { key: 'ArrowUp' })
-        keyupListeners[0](event)
-
-        expect(getKeys().w.pressed).toBe(false)
-      })
-
-      it('should unset a key on a keyup', () => {
-        getKeys().a.pressed = true
-        const event = new KeyboardEvent('keyup', { key: 'a' })
-        keyupListeners[0](event)
-
-        expect(getKeys().a.pressed).toBe(false)
-      })
-
-      it('should unset a key on ArrowLeft keyup', () => {
-        getKeys().a.pressed = true
-        const event = new KeyboardEvent('keyup', { key: 'ArrowLeft' })
-        keyupListeners[0](event)
-
-        expect(getKeys().a.pressed).toBe(false)
-      })
-
-      it('should unset s key on s keyup', () => {
-        getKeys().s.pressed = true
-        const event = new KeyboardEvent('keyup', { key: 's' })
-        keyupListeners[0](event)
-
-        expect(getKeys().s.pressed).toBe(false)
-      })
-
-      it('should unset s key on ArrowDown keyup', () => {
-        getKeys().s.pressed = true
-        const event = new KeyboardEvent('keyup', { key: 'ArrowDown' })
-        keyupListeners[0](event)
-
-        expect(getKeys().s.pressed).toBe(false)
-      })
-
-      it('should unset d key on d keyup', () => {
-        getKeys().d.pressed = true
-        const event = new KeyboardEvent('keyup', { key: 'd' })
-        keyupListeners[0](event)
-
-        expect(getKeys().d.pressed).toBe(false)
-      })
-
-      it('should unset d key on ArrowRight keyup', () => {
-        getKeys().d.pressed = true
-        const event = new KeyboardEvent('keyup', { key: 'ArrowRight' })
-        keyupListeners[0](event)
-
-        expect(getKeys().d.pressed).toBe(false)
-      })
-
-      it('should unset g key on g keyup', () => {
-        getKeys().g.pressed = true
-        const event = new KeyboardEvent('keyup', { key: 'g' })
-        keyupListeners[0](event)
-
-        expect(getKeys().g.pressed).toBe(false)
-      })
-
-      it('should unset q key on q keyup', () => {
-        getKeys().q.pressed = true
-        const event = new KeyboardEvent('keyup', { key: 'q' })
-        keyupListeners[0](event)
-
-        expect(getKeys().q.pressed).toBe(false)
-      })
-
-      it('should handle unknown keys without error', () => {
-        const event = new KeyboardEvent('keyup', { key: 'x' })
-
-        expect(() => keyupListeners[0](event)).not.toThrow()
+        const handler = windowListeners['keyup'][0]
+        handler({ key: 'z' } as unknown as KeyboardEvent)
+        expect(getKeys().w.pressed).toBe(true)
       })
     })
 
-    describe('visibilitychange events', () => {
-      beforeEach(() => {
+    describe('canvas click', () => {
+      it('calls toggleAudio when audio sprite is clicked', async () => {
+        mockCanvas = {
+          addEventListener: vi.fn(
+            (type: string, handler: (...args: unknown[]) => void) => {
+              if (!windowListeners['canvas_' + type])
+                windowListeners['canvas_' + type] = []
+              windowListeners['canvas_' + type].push(handler)
+            },
+          ),
+          setAttribute: vi.fn(),
+          width: 1024,
+          height: 576,
+        }
+        mockCheckAudioSpriteTouched.mockReturnValue(true)
+
+        const { initializeEventListeners } = await loadModule()
         initializeEventListeners()
+
+        const clickHandler = windowListeners['canvas_click'][0]
+        clickHandler({ offsetX: 100, offsetY: 200 } as unknown as MouseEvent)
+        expect(mockCheckAudioSpriteTouched).toHaveBeenCalledWith(100, 200)
+        expect(mockToggleAudio).toHaveBeenCalled()
       })
 
-      it('should reset lastTime when document becomes visible', () => {
-        vi.spyOn(performance, 'now').mockReturnValue(5000)
-        Object.defineProperty(document, 'hidden', {
-          configurable: true,
-          get: () => false,
-        })
+      it('does not call toggleAudio when audio sprite is not clicked', async () => {
+        mockCanvas = {
+          addEventListener: vi.fn(
+            (type: string, handler: (...args: unknown[]) => void) => {
+              if (!windowListeners['canvas_' + type])
+                windowListeners['canvas_' + type] = []
+              windowListeners['canvas_' + type].push(handler)
+            },
+          ),
+          setAttribute: vi.fn(),
+          width: 1024,
+          height: 576,
+        }
+        mockCheckAudioSpriteTouched.mockReturnValue(false)
 
-        visibilityListeners[0]()
+        const { initializeEventListeners } = await loadModule()
+        initializeEventListeners()
 
-        expect(getLastTime()).toBe(5000)
-      })
-
-      it('should not reset lastTime when document is hidden', () => {
-        const originalTime = getLastTime()
-        vi.spyOn(performance, 'now').mockReturnValue(5000)
-        Object.defineProperty(document, 'hidden', {
-          configurable: true,
-          get: () => true,
-        })
-
-        visibilityListeners[0]()
-
-        expect(getLastTime()).toBe(originalTime)
+        const clickHandler = windowListeners['canvas_click'][0]
+        clickHandler({ offsetX: 50, offsetY: 50 } as unknown as MouseEvent)
+        expect(mockToggleAudio).not.toHaveBeenCalled()
       })
     })
 
-    describe('touchend events', () => {
-      beforeEach(() => {
+    describe('canvas touchend', () => {
+      it('calls toggleAudio when audio sprite is touched', async () => {
+        mockCanvas = {
+          addEventListener: vi.fn(
+            (type: string, handler: (...args: unknown[]) => void) => {
+              if (!windowListeners['canvas_' + type])
+                windowListeners['canvas_' + type] = []
+              windowListeners['canvas_' + type].push(handler)
+            },
+          ),
+          setAttribute: vi.fn(),
+          width: 1024,
+          height: 576,
+        }
+        mockCheckAudioSpriteTouched.mockReturnValue(true)
+
+        const { initializeEventListeners } = await loadModule()
         initializeEventListeners()
+
+        const handler = windowListeners['canvas_touchend'][0]
+        handler({
+          changedTouches: [{ clientX: 10, clientY: 20 }],
+        } as unknown as TouchEvent)
+        expect(mockCheckAudioSpriteTouched).toHaveBeenCalledWith(10, 20)
+        expect(mockToggleAudio).toHaveBeenCalled()
+      })
+    })
+
+    describe('touchstart (gamepad)', () => {
+      it.each([
+        [7, { w: true, a: true }],
+        [8, { w: true }],
+        [9, { w: true, d: true }],
+        [4, { a: true }],
+        [5, { g: true }],
+        [6, { d: true }],
+        [1, { s: true, a: true }],
+        [2, { s: true }],
+        [3, { s: true, d: true }],
+        [0, {}],
+      ])('quadrant %i sets correct keys', async (quadrant, expectedPressed) => {
+        const { getKeys, initializeEventListeners } = await loadModule()
+        initializeEventListeners()
+        mockGetSegmentNumber.mockReturnValue(quadrant)
+
+        const handler = windowListeners['touchstart'][0]
+        handler({
+          preventDefault: vi.fn(),
+          changedTouches: [{ clientX: 50, clientY: 50 }],
+        } as unknown as TouchEvent)
+
+        const keys = getKeys()
+        for (const k of ['w', 'a', 's', 'd', 'g'] as const) {
+          const expected = !!(expectedPressed as Record<string, boolean>)[k]
+          expect(keys[k].pressed).toBe(expected)
+        }
       })
 
-      it('should register touchend listener with passive false', () => {
-        // First touchend is the key-reset handler (passive: false)
-        expect(touchendListeners.length).toBeGreaterThanOrEqual(1)
-        const hasPassiveFalse = touchendListeners.some((t) => {
-          const opts = t.options
-          if (typeof opts === 'boolean' || opts === undefined) return false
-          return (opts as AddEventListenerOptions).passive === false
-        })
-        expect(hasPassiveFalse).toBe(true)
+      it('calls preventDefault on touchstart', async () => {
+        const { initializeEventListeners } = await loadModule()
+        initializeEventListeners()
+        mockGetSegmentNumber.mockReturnValue(0)
+        const preventDefault = vi.fn()
+        const handler = windowListeners['touchstart'][0]
+        handler({
+          preventDefault,
+          changedTouches: [{ clientX: 0, clientY: 0 }],
+        } as unknown as TouchEvent)
+        expect(preventDefault).toHaveBeenCalled()
       })
+    })
 
-      it('should reset all movement keys on touchend', () => {
+    describe('window touchend (clear keys)', () => {
+      it('clears all keys on touchend', async () => {
+        const { getKeys, initializeEventListeners } = await loadModule()
+        initializeEventListeners()
         const keys = getKeys()
         keys.w.pressed = true
         keys.a.pressed = true
         keys.s.pressed = true
         keys.d.pressed = true
         keys.g.pressed = true
+        keys.q.pressed = true
 
-        const event = { preventDefault: vi.fn() } as unknown as TouchEvent
-        touchendListeners[0].handler(event)
-
-        expect(keys.w.pressed).toBe(false)
-        expect(keys.a.pressed).toBe(false)
-        expect(keys.s.pressed).toBe(false)
-        expect(keys.d.pressed).toBe(false)
-        expect(keys.g.pressed).toBe(false)
-        expect(event.preventDefault).toHaveBeenCalled()
-      })
-    })
-
-    describe('touchstart events', () => {
-      const createTouchEvent = (clientX: number, clientY: number) =>
-        ({
-          preventDefault: vi.fn(),
-          changedTouches: [{ clientX, clientY }],
-        }) as unknown as TouchEvent
-
-      beforeEach(() => {
-        initializeEventListeners()
-      })
-
-      it('should register touchstart listener', () => {
-        expect(touchstartListeners.length).toBe(1)
-      })
-
-      it('should set w and a keys for quadrant 7 (Up-Left)', () => {
-        mockGetSegmentNumber.mockReturnValue(7)
-        touchstartListeners[0](createTouchEvent(10, 10))
-
-        const keys = getKeys()
-        expect(keys.w.pressed).toBe(true)
-        expect(keys.a.pressed).toBe(true)
-      })
-
-      it('should set w key for quadrant 8 (Up)', () => {
-        mockGetSegmentNumber.mockReturnValue(8)
-        touchstartListeners[0](createTouchEvent(10, 10))
-
-        expect(getKeys().w.pressed).toBe(true)
-      })
-
-      it('should set w and d keys for quadrant 9 (Up-Right)', () => {
-        mockGetSegmentNumber.mockReturnValue(9)
-        touchstartListeners[0](createTouchEvent(10, 10))
-
-        const keys = getKeys()
-        expect(keys.w.pressed).toBe(true)
-        expect(keys.d.pressed).toBe(true)
-      })
-
-      it('should set a key for quadrant 4 (Left)', () => {
-        mockGetSegmentNumber.mockReturnValue(4)
-        touchstartListeners[0](createTouchEvent(10, 10))
-
-        expect(getKeys().a.pressed).toBe(true)
-      })
-
-      it('should set g key for quadrant 5 (Center)', () => {
-        mockGetSegmentNumber.mockReturnValue(5)
-        touchstartListeners[0](createTouchEvent(10, 10))
-
-        expect(getKeys().g.pressed).toBe(true)
-      })
-
-      it('should set d key for quadrant 6 (Right)', () => {
-        mockGetSegmentNumber.mockReturnValue(6)
-        touchstartListeners[0](createTouchEvent(10, 10))
-
-        expect(getKeys().d.pressed).toBe(true)
-      })
-
-      it('should set s and a keys for quadrant 1 (Down-Left)', () => {
-        mockGetSegmentNumber.mockReturnValue(1)
-        touchstartListeners[0](createTouchEvent(10, 10))
-
-        const keys = getKeys()
-        expect(keys.s.pressed).toBe(true)
-        expect(keys.a.pressed).toBe(true)
-      })
-
-      it('should set s key for quadrant 2 (Down)', () => {
-        mockGetSegmentNumber.mockReturnValue(2)
-        touchstartListeners[0](createTouchEvent(10, 10))
-
-        expect(getKeys().s.pressed).toBe(true)
-      })
-
-      it('should set s and d keys for quadrant 3 (Down-Right)', () => {
-        mockGetSegmentNumber.mockReturnValue(3)
-        touchstartListeners[0](createTouchEvent(10, 10))
-
-        const keys = getKeys()
-        expect(keys.s.pressed).toBe(true)
-        expect(keys.d.pressed).toBe(true)
-      })
-
-      it('should not set any keys for quadrant 0 (outside)', () => {
-        const keys = getKeys()
-        keys.w.pressed = false
-        keys.a.pressed = false
-        keys.s.pressed = false
-        keys.d.pressed = false
-        keys.g.pressed = false
-
-        mockGetSegmentNumber.mockReturnValue(0)
-        touchstartListeners[0](createTouchEvent(10, 10))
+        // The first window touchend handler is the key-clearing one
+        const handler = windowListeners['touchend'][0]
+        handler({ preventDefault: vi.fn() } as unknown as TouchEvent)
 
         expect(keys.w.pressed).toBe(false)
         expect(keys.a.pressed).toBe(false)
         expect(keys.s.pressed).toBe(false)
         expect(keys.d.pressed).toBe(false)
         expect(keys.g.pressed).toBe(false)
-      })
-
-      it('should call preventDefault on touch event', () => {
-        mockGetSegmentNumber.mockReturnValue(0)
-        const event = createTouchEvent(10, 10)
-        touchstartListeners[0](event)
-
-        expect(event.preventDefault).toHaveBeenCalled()
+        expect(keys.q.pressed).toBe(false)
       })
     })
 
-    describe('touch support', () => {
-      it('should set canvas style and dimensions when touch supported', () => {
+    describe('visibilitychange', () => {
+      it('resets lastTime when document becomes visible', async () => {
+        const { getLastTime, initializeEventListeners, setLastTime } =
+          await loadModule()
         initializeEventListeners()
+        setLastTime(0)
 
-        expect(mockContext.canvas.setAttribute).toHaveBeenCalledWith(
-          'style',
-          'width: 100%; height: 100%;',
-        )
-      })
-
-      it('should register resize listener when touch supported', () => {
-        initializeEventListeners()
-
-        expect(resizeListeners.length).toBeGreaterThanOrEqual(1)
-      })
-
-      it('should register handleTap touchend listener when touch supported', () => {
-        initializeEventListeners()
-
-        // Second touchend is the handleTap listener
-        expect(touchendListeners.length).toBeGreaterThanOrEqual(2)
-      })
-
-      it('should not set up canvas handlers when getDrawContext returns null', async () => {
-        const { getDrawContext } = await import('./drawContext')
-        vi.mocked(getDrawContext).mockReturnValueOnce(null)
-
-        initializeEventListeners()
-
-        expect(resizeListeners.length).toBe(0)
-      })
-    })
-
-    describe('handleTap', () => {
-      beforeEach(() => {
-        initializeEventListeners()
-      })
-
-      it('should request fullscreen, start audio and set space pressed', async () => {
-        const { startBackgroundAudio } = await import('./music')
-
-        // handleTap is the second touchend listener
-        const handleTap = touchendListeners[1].handler
-        await (handleTap as () => Promise<void>)()
-
-        expect(mockContext.canvas.requestFullscreen).toHaveBeenCalled()
-        expect(startBackgroundAudio).toHaveBeenCalled()
-        expect(getKeys().space.pressed).toBe(true)
-        expect(window.removeEventListener).toHaveBeenCalledWith(
-          'touchend',
-          handleTap,
-        )
-      })
-    })
-
-    describe('handleResize', () => {
-      beforeEach(() => {
-        initializeEventListeners()
-      })
-
-      it('should update canvas dimensions on resize', () => {
-        Object.defineProperty(window, 'innerWidth', {
+        Object.defineProperty(document, 'hidden', {
+          value: false,
+          writable: true,
           configurable: true,
-          value: 800,
+        })
+
+        const handler = documentListeners['visibilitychange'][0]
+        handler()
+
+        expect(getLastTime()).toBeGreaterThan(0)
+      })
+
+      it('does not reset lastTime when document is hidden', async () => {
+        const { getLastTime, initializeEventListeners, setLastTime } =
+          await loadModule()
+        initializeEventListeners()
+        setLastTime(999)
+
+        Object.defineProperty(document, 'hidden', {
+          value: true,
+          writable: true,
+          configurable: true,
+        })
+
+        const handler = documentListeners['visibilitychange'][0]
+        handler()
+
+        expect(getLastTime()).toBe(999)
+      })
+    })
+
+    describe('touch support branch', () => {
+      it('sets canvas style and dimensions when touch is supported', async () => {
+        mockIsTouchSupported = true
+        mockIsMobile = true
+        mockCanvas = {
+          addEventListener: vi.fn(),
+          setAttribute: vi.fn(),
+          width: 0,
+          height: 0,
+        }
+        Object.defineProperty(window, 'innerWidth', {
+          value: 400,
+          writable: true,
+          configurable: true,
         })
         Object.defineProperty(window, 'innerHeight', {
+          value: 800,
+          writable: true,
           configurable: true,
-          value: 600,
         })
+        mockGetDevicePixelRatio.mockReturnValue(2)
 
-        resizeListeners[0]()
+        const { initializeEventListeners } = await loadModule()
+        initializeEventListeners()
 
-        expect(mockContext.canvas.width).toBe(800)
-        expect(mockContext.canvas.height).toBe(600)
-        expect(mockContext.canvas.setAttribute).toHaveBeenCalledWith(
+        expect(mockCanvas.setAttribute).toHaveBeenCalledWith(
           'style',
           'width: 100%; height: 100%;',
         )
+        expect(mockCanvas.width).toBe(800)
+        expect(mockCanvas.height).toBe(1600)
+        // resize and touchend (handleTap) listeners added
+        expect(windowListeners['resize']).toBeDefined()
+        expect(windowListeners['touchend'].length).toBeGreaterThanOrEqual(2)
+      })
+
+      it('handleResize updates canvas dimensions', async () => {
+        mockIsTouchSupported = true
+        mockIsMobile = true
+        mockCanvas = {
+          addEventListener: vi.fn(),
+          setAttribute: vi.fn(),
+          width: 0,
+          height: 0,
+        }
+        mockGetDevicePixelRatio.mockReturnValue(3)
+        Object.defineProperty(window, 'innerWidth', {
+          value: 500,
+          writable: true,
+          configurable: true,
+        })
+        Object.defineProperty(window, 'innerHeight', {
+          value: 1000,
+          writable: true,
+          configurable: true,
+        })
+
+        const { initializeEventListeners } = await loadModule()
+        initializeEventListeners()
+
+        // Simulate resize
+        Object.defineProperty(window, 'innerWidth', {
+          value: 600,
+          writable: true,
+          configurable: true,
+        })
+        Object.defineProperty(window, 'innerHeight', {
+          value: 1200,
+          writable: true,
+          configurable: true,
+        })
+
+        const resizeHandler = windowListeners['resize'][0]
+        resizeHandler()
+
+        expect(mockCanvas.width).toBe(1800)
+        expect(mockCanvas.height).toBe(3600)
+      })
+
+      it('handleTap requests fullscreen, starts audio, sets space, and removes listener', async () => {
+        mockIsTouchSupported = true
+        mockIsMobile = true
+        const mockRequestFullscreen = vi.fn().mockResolvedValue(undefined)
+        mockCanvas = {
+          addEventListener: vi.fn(),
+          setAttribute: vi.fn(),
+          width: 0,
+          height: 0,
+          requestFullscreen: mockRequestFullscreen,
+        }
+        vi.spyOn(document, 'querySelector').mockReturnValue(
+          mockCanvas as unknown as HTMLCanvasElement,
+        )
+        mockStartBackgroundAudio.mockResolvedValue(undefined)
+
+        const { getKeys, initializeEventListeners } = await loadModule()
+        initializeEventListeners()
+
+        // handleTap is the last touchend handler
+        const tapHandlers = windowListeners['touchend']
+        const tapHandler = tapHandlers[tapHandlers.length - 1]
+
+        await tapHandler()
+
+        expect(mockRequestFullscreen).toHaveBeenCalled()
+        expect(mockStartBackgroundAudio).toHaveBeenCalled()
+        expect(getKeys().space.pressed).toBe(true)
       })
     })
   })

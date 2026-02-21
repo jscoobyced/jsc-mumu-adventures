@@ -1,19 +1,9 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { GamePad, getSegmentNumber } from './GamePad'
+import { describe, expect, it, vi } from 'vitest'
+import { GamePad, SPACING } from './GamePad'
 
-vi.mock('../utils/device', () => ({
-  getScreenSize: vi.fn(() => ({ x: 1024, y: 768 })),
-  isMobile: false,
-}))
-
-vi.mock('../utils/drawContext', () => ({
-  getDrawContext: vi.fn(() => ({
-    canvas: { width: 1024, height: 768 },
-  })),
-}))
-
-describe('GamePad', () => {
-  const createMockContext = () => ({
+const createGamePadContext = () => {
+  const ctx = {
+    canvas: { width: 1024, height: 576 },
     save: vi.fn(),
     restore: vi.fn(),
     beginPath: vi.fn(),
@@ -22,138 +12,88 @@ describe('GamePad', () => {
     strokeStyle: '',
     lineWidth: 0,
     globalAlpha: 1,
-    canvas: { width: 1024, height: 768 },
-  })
+  } as unknown as CanvasRenderingContext2D
+  return ctx
+}
 
-  beforeEach(() => {
-    vi.clearAllMocks()
+describe('SPACING', () => {
+  it('is 20', () => {
+    expect(SPACING).toBe(20)
   })
+})
 
+describe('GamePad', () => {
   describe('constructor', () => {
-    it('should create a gamepad with default values', () => {
-      const pad = new GamePad(200)
-
+    it('sets width, lineColor, and lineWidth from arguments', () => {
+      const pad = new GamePad(200, 'red', 3)
       expect(pad.width).toBe(200)
-      expect(pad.lineColor).toBe('white')
-      expect(pad.lineWidth).toBe(5)
-    })
-
-    it('should create a gamepad with custom values', () => {
-      const pad = new GamePad(300, 'red', 3)
-
-      expect(pad.width).toBe(300)
       expect(pad.lineColor).toBe('red')
       expect(pad.lineWidth).toBe(3)
+    })
+
+    it('defaults lineColor to white and lineWidth to 5', () => {
+      const pad = new GamePad(100)
+      expect(pad.lineColor).toBe('white')
+      expect(pad.lineWidth).toBe(5)
     })
   })
 
   describe('draw', () => {
-    it('should save and restore context', () => {
+    it('saves and restores context', () => {
+      const ctx = createGamePadContext()
       const pad = new GamePad(200)
-      const context = createMockContext() as unknown as CanvasRenderingContext2D
-
-      pad.draw(context)
-
-      expect(context.save).toHaveBeenCalledOnce()
-      expect(context.restore).toHaveBeenCalledOnce()
+      pad.draw(ctx)
+      expect(ctx.save).toHaveBeenCalledOnce()
+      expect(ctx.restore).toHaveBeenCalledOnce()
     })
 
-    it('should set stroke style and line width', () => {
+    it('sets strokeStyle, lineWidth, and globalAlpha', () => {
+      const ctx = createGamePadContext()
       const pad = new GamePad(200, 'blue', 4)
-      const context = createMockContext() as unknown as CanvasRenderingContext2D
-
-      pad.draw(context)
-
-      expect(context.strokeStyle).toBe('blue')
-      expect(context.lineWidth).toBe(4)
+      pad.draw(ctx)
+      expect(ctx.strokeStyle).toBe('blue')
+      expect(ctx.lineWidth).toBe(4)
+      expect(ctx.globalAlpha).toBe(0.5)
     })
 
-    it('should set global alpha to 0.5', () => {
-      const pad = new GamePad(200)
-      const context = createMockContext() as unknown as CanvasRenderingContext2D
+    it('draws a circle at the correct position and radius', () => {
+      const ctx = createGamePadContext()
+      ctx.canvas.height = 576
+      const width = 200
+      const pad = new GamePad(width)
 
-      pad.draw(context)
+      pad.draw(ctx)
 
-      expect(context.globalAlpha).toBe(0.5)
+      const expectedX = width / 2 + SPACING
+      const expectedY = 576 - width / 2 - SPACING
+      const expectedRadius = width / 2
+
+      expect(ctx.beginPath).toHaveBeenCalledOnce()
+      expect(ctx.arc).toHaveBeenCalledWith(
+        expectedX,
+        expectedY,
+        expectedRadius,
+        0,
+        2 * Math.PI,
+      )
+      expect(ctx.stroke).toHaveBeenCalledOnce()
     })
 
-    it('should draw a circle with correct parameters', () => {
-      const pad = new GamePad(200)
-      const context = createMockContext() as unknown as CanvasRenderingContext2D
+    it('computes position correctly for different canvas sizes', () => {
+      const ctx = createGamePadContext()
+      ctx.canvas.height = 800
+      const width = 150
+      const pad = new GamePad(width)
 
-      pad.draw(context)
+      pad.draw(ctx)
 
-      expect(context.beginPath).toHaveBeenCalledOnce()
-      // centerX = 200/2 + 20 = 120, centerY = 768 - 200/2 - 20 = 648, radius = 100
-      expect(context.arc).toHaveBeenCalledWith(120, 648, 100, 0, 2 * Math.PI)
-      expect(context.stroke).toHaveBeenCalledOnce()
-    })
-  })
-
-  describe('getSegmentNumber', () => {
-    const WIDTH = 200
-    // center of gamepad: x = 200/2 + 20 = 120, y = 768 - 200/2 - 20 = 648
-    const CENTER_X = 120
-    const CENTER_Y = 648
-
-    it('should return 0 for coordinates outside the circle', () => {
-      const result = getSegmentNumber(0, 0, WIDTH)
-
-      expect(result).toBe(0)
-    })
-
-    it('should return 6 (Right) for coordinates to the right of center', () => {
-      const result = getSegmentNumber(CENTER_X + 20, CENTER_Y, WIDTH)
-
-      expect(result).toBe(6)
-    })
-
-    it('should return 4 (Left) for coordinates to the left of center', () => {
-      const result = getSegmentNumber(CENTER_X - 20, CENTER_Y, WIDTH)
-
-      expect(result).toBe(4)
-    })
-
-    it('should return 8 (Up) for coordinates above center', () => {
-      const result = getSegmentNumber(CENTER_X, CENTER_Y - 20, WIDTH)
-
-      expect(result).toBe(8)
-    })
-
-    it('should return 2 (Down) for coordinates below center', () => {
-      const result = getSegmentNumber(CENTER_X, CENTER_Y + 20, WIDTH)
-
-      expect(result).toBe(2)
-    })
-
-    it('should return 9 (Up-Right) for diagonal up-right', () => {
-      const result = getSegmentNumber(CENTER_X + 20, CENTER_Y - 20, WIDTH)
-
-      expect(result).toBe(9)
-    })
-
-    it('should return 7 (Up-Left) for diagonal up-left', () => {
-      const result = getSegmentNumber(CENTER_X - 20, CENTER_Y - 20, WIDTH)
-
-      expect(result).toBe(7)
-    })
-
-    it('should return 3 (Down-Right) for diagonal down-right', () => {
-      const result = getSegmentNumber(CENTER_X + 20, CENTER_Y + 20, WIDTH)
-
-      expect(result).toBe(3)
-    })
-
-    it('should return 1 (Down-Left) for diagonal down-left', () => {
-      const result = getSegmentNumber(CENTER_X - 20, CENTER_Y + 20, WIDTH)
-
-      expect(result).toBe(1)
-    })
-
-    it('should return 0 for coordinates far outside the circle', () => {
-      const result = getSegmentNumber(900, 100, WIDTH)
-
-      expect(result).toBe(0)
+      expect(ctx.arc).toHaveBeenCalledWith(
+        width / 2 + SPACING,
+        800 - width / 2 - SPACING,
+        width / 2,
+        0,
+        2 * Math.PI,
+      )
     })
   })
 })

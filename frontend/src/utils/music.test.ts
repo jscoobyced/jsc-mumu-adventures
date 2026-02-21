@@ -1,121 +1,109 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest'
-import { Keys } from '../models/Keys'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+const mocks = vi.hoisted(() => ({
+  paused: true,
+  play: vi.fn(async () => {
+    mocks.paused = false
+  }),
+  pause: vi.fn(() => {
+    mocks.paused = true
+  }),
+  loadAudio: vi.fn(async () => {
+    return {
+      play: mocks.play,
+      pause: mocks.pause,
+      get paused() {
+        return mocks.paused
+      },
+    } as unknown as HTMLAudioElement
+  }),
+}))
 
 vi.mock('../config.json', () => ({
   default: {
     audio: {
-      backgroundMusic: './test-music.mp3',
+      backgroundMusic: './mumu-adventures.mp3',
     },
   },
 }))
 
-describe('music', () => {
+vi.mock('./audio', () => ({
+  loadAudio: mocks.loadAudio,
+}))
+
+describe('music utility functions', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-
-    // Mock Audio constructor that auto-triggers oncanplaythrough
-    global.Audio = class MockAudio {
-      src = ''
-      loop = false
-      volume = 1
-      paused = true
-      play = vi.fn().mockResolvedValue(undefined)
-      pause = vi.fn()
-      oncanplaythrough: ((this: HTMLAudioElement, ev: Event) => unknown) | null =
-        null
-      onerror: OnErrorEventHandler = null
-
-      constructor() {
-        // Auto-set properties when src is assigned
-        setTimeout(() => {
-          if (this.oncanplaythrough) {
-            this.oncanplaythrough.call(
-              this as unknown as HTMLAudioElement,
-              new Event('canplaythrough'),
-            )
-          }
-        }, 0)
-      }
-    } as unknown as typeof Audio
+    vi.resetModules()
+    mocks.paused = true
   })
 
-  describe('loadAudio', () => {
-    it('should load audio with correct properties', async () => {
-      const { loadAudio } = await import('./music')
-      
-      const audio = await loadAudio('./test.mp3')
+  const importMusic = async () => await import('./music')
 
-      expect(audio).toBeDefined()
-      expect(audio.loop).toBe(true)
-      expect(audio.volume).toBe(0.5)
-    })
+  it('starts background audio once and marks it started', async () => {
+    const music = await importMusic()
 
-    it('should set correct src', async () => {
-      const { loadAudio } = await import('./music')
-      
-      const audio = await loadAudio('./my-music.mp3')
+    expect(music.hasBackgroundAudioStarted()).toBe(false)
+    await music.startBackgroundAudio()
 
-      expect(audio.src).toBe('./my-music.mp3')
-    })
+    expect(music.hasBackgroundAudioStarted()).toBe(true)
+    expect(mocks.loadAudio).toHaveBeenCalledTimes(1)
+    expect(mocks.loadAudio).toHaveBeenCalledWith('./mumu-adventures.mp3')
+    expect(mocks.play).toHaveBeenCalledTimes(1)
   })
 
-  describe('hasBackgroundAudioStarted', () => {
-    it('should return boolean', async () => {
-      const { hasBackgroundAudioStarted } = await import('./music')
-      
-      const result = hasBackgroundAudioStarted()
-      expect(typeof result).toBe('boolean')
-    })
+  it('does not reload or replay when already started', async () => {
+    const music = await importMusic()
+
+    await music.startBackgroundAudio()
+    await music.startBackgroundAudio()
+
+    expect(mocks.loadAudio).toHaveBeenCalledTimes(1)
+    expect(mocks.play).toHaveBeenCalledTimes(1)
   })
 
-  describe('stopCurrentAudio', () => {
-    it('should not throw error', async () => {
-      const { stopCurrentAudio } = await import('./music')
-      
-      expect(() => stopCurrentAudio()).not.toThrow()
-    })
+  it('stopCurrentAudio pauses current background audio', async () => {
+    const music = await importMusic()
+    await music.startBackgroundAudio()
+
+    music.stopCurrentAudio()
+
+    expect(mocks.pause).toHaveBeenCalledTimes(1)
+    expect(music.isAudioPlaying()).toBe(false)
   })
 
-  describe('toggleAudio', () => {
-    const createMockKeys = (): Keys => ({
-      w: { pressed: false },
-      a: { pressed: false },
-      s: { pressed: false },
-      d: { pressed: false },
-      g: { pressed: false },
-      q: { pressed: false },
-      space: { pressed: false },
-      spaceEnabled: false,
-    })
+  it('toggleAudio plays when paused', async () => {
+    const music = await importMusic()
+    await music.startBackgroundAudio()
+    music.stopCurrentAudio()
 
-    it('should reset q.pressed to false when q is pressed', async () => {
-      const { toggleAudio } = await import('./music')
-      const keys = createMockKeys()
-      keys.q.pressed = true
+    expect(music.isAudioPlaying()).toBe(false)
+    music.toggleAudio()
+    await Promise.resolve()
 
-      toggleAudio(keys)
+    expect(mocks.play).toHaveBeenCalledTimes(2)
+    expect(music.isAudioPlaying()).toBe(true)
+  })
 
-      expect(keys.q.pressed).toBe(false)
-    })
+  it('toggleAudio pauses when currently playing', async () => {
+    const music = await importMusic()
+    await music.startBackgroundAudio()
 
-    it('should not change q.pressed when it is false', async () => {
-      const { toggleAudio } = await import('./music')
-      const keys = createMockKeys()
-      keys.q.pressed = false
+    expect(music.isAudioPlaying()).toBe(true)
+    music.toggleAudio()
 
-      toggleAudio(keys)
+    expect(mocks.pause).toHaveBeenCalledTimes(1)
+    expect(music.isAudioPlaying()).toBe(false)
+  })
 
-      expect(keys.q.pressed).toBe(false)
-    })
+  it('toggleAudio and stopCurrentAudio are safe before audio init', async () => {
+    const music = await importMusic()
 
-    it('should not throw when no audio exists', async () => {
-      const { toggleAudio } = await import('./music')
-      const keys = createMockKeys()
-      keys.q.pressed = true
-
-      expect(() => toggleAudio(keys)).not.toThrow()
-    })
+    expect(() => music.toggleAudio()).not.toThrow()
+    expect(() => music.stopCurrentAudio()).not.toThrow()
+    expect(music.hasBackgroundAudioStarted()).toBe(false)
+    expect(music.isAudioPlaying()).toBe(false)
+    expect(mocks.play).not.toHaveBeenCalled()
+    expect(mocks.pause).not.toHaveBeenCalled()
   })
 })
-
-

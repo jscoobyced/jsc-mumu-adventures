@@ -1,7 +1,8 @@
 import ActiveNpc from '../classes/ActiveNpc'
+import { AudioSprite } from '../classes/AudioSprite'
 import { Banner } from '../classes/Banner'
 import { CollisionBlock } from '../classes/CollisionBlock'
-import { GamePad } from '../classes/GamePad'
+import { GamePad, SPACING } from '../classes/GamePad'
 import { Heart } from '../classes/Heart'
 import { InteractiveNpc } from '../classes/InteractiveNpc'
 import { Player } from '../classes/Player'
@@ -31,6 +32,7 @@ export interface Game {
   hearts: Heart[]
   banner: Banner
   gamePad?: GamePad
+  audioSprite?: AudioSprite
 }
 
 export const startGame = (restart = false): void => {
@@ -78,6 +80,17 @@ export const startGame = (restart = false): void => {
     ),
   ]
 
+  // Initialize audio sprite in top-right corner
+  const audioSize = 32
+  const audioSprite = new AudioSprite(
+    {
+      x: SPACING,
+      y: SPACING,
+    },
+    audioSize,
+    0,
+  )
+
   const initialLevel: LevelData =
     currentStatusData.version !== CURRENT_STATUS_VERSION
       ? defaultLevel
@@ -85,14 +98,17 @@ export const startGame = (restart = false): void => {
           (config) => config.level.name === currentStatusData.currentLevel,
         )!.level || defaultLevel
 
+  const banner = new Banner({ x: 10, y: 10 }, isMobile)
+
   const game: Game = {
     playing: true,
     paused: false,
     levelData: initialLevel,
     player: initialPlayer,
     hearts: initialHearts,
-    banner: new Banner({ x: 10, y: 10 }, isMobile),
+    banner: banner,
     gamePad: isMobile ? new GamePad(config.gamepadSize) : undefined,
+    audioSprite: audioSprite,
   }
   startRendering(game)
 }

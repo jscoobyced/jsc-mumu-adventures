@@ -5,6 +5,10 @@ export const getDrawContext = (
   isMobile: boolean,
 ): CanvasRenderingContext2D | null => {
   const canvas = document.querySelector('canvas') as HTMLCanvasElement
+  if (!canvas) {
+    console.error('Canvas element not found')
+    return null
+  }
   const context = canvas.getContext('2d')
   canvas.width = isMobile
     ? window.innerWidth * getDevicePixelRatio()

@@ -1,4 +1,5 @@
 import { CollisionBlock } from './classes/CollisionBlock'
+import { SPACING } from './classes/GamePad'
 import { Heart } from './classes/Heart'
 import config from './config.json'
 import { levelConfig } from './levels'
@@ -8,10 +9,14 @@ import { TilesetInfo, Tilesets } from './models/TileSet'
 import { isDebugMode } from './utils/debug'
 import { getDevicePixelRatio, isMobile } from './utils/device'
 import { getDrawContext } from './utils/drawContext'
-import { getKeys, getLastTime, setLastTime } from './utils/eventListeners'
+import {
+  getKeys,
+  getLastTime,
+  handleBannerTouch,
+  setLastTime,
+} from './utils/eventListeners'
 import { Game, handleNpcs, startGame } from './utils/game'
 import { loadImage } from './utils/loadImage'
-import { toggleAudio } from './utils/music'
 import { initializeNpcs } from './utils/npc'
 
 const MAP_COLS: number = config.cols
@@ -29,14 +34,25 @@ if (!context) {
   throw new Error('Failed to get 2D context from canvas')
 }
 
-const VIEWPORT_WIDTH: number = context.canvas.width / MAP_SCALE
-const VIEWPORT_HEIGHT: number = context.canvas.height / MAP_SCALE
+const getScreenData = () => {
+  const VIEWPORT_WIDTH: number = context.canvas.width / MAP_SCALE
+  const VIEWPORT_HEIGHT: number = context.canvas.height / MAP_SCALE
 
-const VIEWPORT_CENTER_X: number = VIEWPORT_WIDTH / 2
-const VIEWPORT_CENTER_Y: number = VIEWPORT_HEIGHT / 2
+  const VIEWPORT_CENTER_X: number = VIEWPORT_WIDTH / 2
+  const VIEWPORT_CENTER_Y: number = VIEWPORT_HEIGHT / 2
 
-const MAX_SCROLL_X: number = MAP_WIDTH - VIEWPORT_WIDTH
-const MAX_SCROLL_Y: number = MAP_HEIGHT - VIEWPORT_HEIGHT
+  const MAX_SCROLL_X: number = MAP_WIDTH - VIEWPORT_WIDTH
+  const MAX_SCROLL_Y: number = MAP_HEIGHT - VIEWPORT_HEIGHT
+
+  return {
+    VIEWPORT_WIDTH,
+    VIEWPORT_HEIGHT,
+    VIEWPORT_CENTER_X,
+    VIEWPORT_CENTER_Y,
+    MAX_SCROLL_X,
+    MAX_SCROLL_Y,
+  }
+}
 
 const collisionBlocks: CollisionBlock[] = []
 
@@ -142,13 +158,13 @@ const animate = (
       : LevelDirection.NONE
 
   const horizontalScrollDistance: number = Math.min(
-    Math.max(0, game.player.center.x - VIEWPORT_CENTER_X),
-    MAX_SCROLL_X,
+    Math.max(0, game.player.center.x - getScreenData().VIEWPORT_CENTER_X),
+    getScreenData().MAX_SCROLL_X,
   )
 
   const verticalScrollDistance: number = Math.min(
-    Math.max(0, game.player.center.y - VIEWPORT_CENTER_Y),
-    MAX_SCROLL_Y,
+    Math.max(0, game.player.center.y - getScreenData().VIEWPORT_CENTER_Y),
+    getScreenData().MAX_SCROLL_Y,
   )
 
   // Render scene
@@ -162,7 +178,6 @@ const animate = (
   }
   game.player.draw(context)
   const keys = getKeys()
-  toggleAudio(keys)
   if (!game.paused) handleNpcs(game, context, collisionBlocks, deltaTime, keys)
 
   context.drawImage(frontRenderedCanvas, 0, 0)
@@ -173,6 +188,11 @@ const animate = (
   game.hearts.forEach((heart: Heart) => {
     heart.draw(context)
   })
+  if (game.audioSprite) {
+    game.audioSprite.x =
+      context.canvas.width / MAP_SCALE - game.audioSprite.width - SPACING
+    game.audioSprite.draw(context)
+  }
   context.restore()
 
   // Draw GamePad if it exists
@@ -253,6 +273,8 @@ export const startRendering = async (game: Game): Promise<void> => {
       console.error('Failed to create the background canvas')
       return
     }
+    handleBannerTouch(game.banner)
+
     animate(backgroundCanvas, game, frontRenderedCanvas)
   } catch (error) {
     console.error('Error during rendering:', error)

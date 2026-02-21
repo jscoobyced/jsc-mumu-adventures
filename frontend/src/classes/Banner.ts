@@ -1,5 +1,6 @@
 import config from '../config.json'
 import { Keys, Vector } from '../models'
+import { checkSpriteTouched } from '../utils/getTouchedCoordinates'
 
 export class Banner {
   public x: number
@@ -44,12 +45,17 @@ export class Banner {
     this.currentIndex = 0
   }
 
+  public checkBannerTouched = (x: number, y: number): boolean => {
+    return checkSpriteTouched(x, y, this.width, this.height, 10, 10)
+  }
+
   public draw(c: CanvasRenderingContext2D, keys: Keys): boolean {
     if (!this.loaded || this.texts.length === 0) return false
     if (keys.space.pressed) {
       keys.space.pressed = false
       this.currentIndex++
       if (this.currentIndex >= this.texts.length) {
+        this.currentIndex = 0
         keys.spaceEnabled = false
         this.close()
         return true
