@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
-import { Banner } from './Banner'
 import { Keys } from '../models'
 import { checkSpriteTouched } from '../utils/getTouchedCoordinates'
+import { Banner } from './Banner'
 
 const mocks = vi.hoisted(() => ({
   checkSpriteTouched: vi.fn(() => false),
@@ -32,7 +32,6 @@ describe('Banner', () => {
     a: { pressed: false },
     s: { pressed: false },
     d: { pressed: false },
-    g: { pressed: false },
     q: { pressed: false },
     space: { pressed: false },
     spaceEnabled: false,
@@ -209,7 +208,8 @@ describe('Banner', () => {
     const banner = new Banner({ x: 10, y: 10 })
     await new Promise((resolve) => setTimeout(resolve, 10))
 
-    const longMessage = 'This is a very long message that should wrap across multiple lines when displayed in the banner'
+    const longMessage =
+      'This is a very long message that should wrap across multiple lines when displayed in the banner'
     banner.show([longMessage])
 
     const keys = createMockKeys()

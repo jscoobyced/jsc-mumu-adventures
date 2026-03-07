@@ -23,7 +23,6 @@ const initializeKeys = (): void => {
     a: { pressed: false },
     s: { pressed: false },
     d: { pressed: false },
-    g: { pressed: false },
     q: { pressed: false },
     space: { pressed: false },
     spaceEnabled: true,
@@ -56,9 +55,6 @@ export const initializeEventListeners = (): void => {
           keys.space.pressed = true
         }
         break
-      case 'g':
-        keys.g.pressed = true
-        break
       case 'q':
         toggleAudio()
         break
@@ -87,9 +83,6 @@ export const initializeEventListeners = (): void => {
       case 'd':
       case 'ArrowRight':
         keys.d.pressed = false
-        break
-      case 'g':
-        keys.g.pressed = false
         break
       case 'q':
         keys.q.pressed = false
@@ -140,9 +133,6 @@ export const initializeEventListeners = (): void => {
       case 4:
         keys.a.pressed = true
         break
-      case 5:
-        keys.g.pressed = true
-        break
       case 6:
         keys.d.pressed = true
         break
@@ -169,7 +159,6 @@ export const initializeEventListeners = (): void => {
     keys.a.pressed = false
     keys.s.pressed = false
     keys.d.pressed = false
-    keys.g.pressed = false
     keys.q.pressed = false
   })
 

@@ -88,7 +88,6 @@ describe('intro', () => {
       a: { pressed: false },
       s: { pressed: false },
       d: { pressed: false },
-      g: { pressed: false },
       q: { pressed: false },
       space: { pressed: false },
       spaceEnabled: false,

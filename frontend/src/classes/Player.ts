@@ -72,9 +72,6 @@ export class Player extends Character {
       this.currentSprite = characterSprites.walkDown
       this.velocity.y = Y_VELOCITY
     }
-    if (keys.g.pressed) {
-      this.objectFound('coffee')
-    }
 
     if (this.velocity.x === 0 && this.velocity.y === 0) {
       this.currentSprite.frameCount = 1

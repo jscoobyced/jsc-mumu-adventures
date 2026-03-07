@@ -94,7 +94,6 @@ describe('eventListeners', () => {
       expect(keys.a.pressed).toBe(false)
       expect(keys.s.pressed).toBe(false)
       expect(keys.d.pressed).toBe(false)
-      expect(keys.g.pressed).toBe(false)
       expect(keys.q.pressed).toBe(false)
       expect(keys.space.pressed).toBe(false)
       expect(keys.spaceEnabled).toBe(true)
@@ -335,7 +334,7 @@ describe('eventListeners', () => {
         } as unknown as TouchEvent)
 
         const keys = getKeys()
-        for (const k of ['w', 'a', 's', 'd', 'g'] as const) {
+        for (const k of ['w', 'a', 's', 'd'] as const) {
           const expected = !!(expectedPressed as Record<string, boolean>)[k]
           expect(keys[k].pressed).toBe(expected)
         }
@@ -364,7 +363,6 @@ describe('eventListeners', () => {
         keys.a.pressed = true
         keys.s.pressed = true
         keys.d.pressed = true
-        keys.g.pressed = true
         keys.q.pressed = true
 
         // The first window touchend handler is the key-clearing one
@@ -375,7 +373,6 @@ describe('eventListeners', () => {
         expect(keys.a.pressed).toBe(false)
         expect(keys.s.pressed).toBe(false)
         expect(keys.d.pressed).toBe(false)
-        expect(keys.g.pressed).toBe(false)
         expect(keys.q.pressed).toBe(false)
       })
     })

@@ -1,7 +1,7 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest'
-import { Player } from './Player'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { Keys } from '../models'
 import { LevelDirection } from '../models/LevelData'
+import { Player } from './Player'
 
 vi.mock('../config.json', () => ({
   default: {
@@ -34,7 +34,6 @@ describe('Player', () => {
     a: { pressed: false },
     s: { pressed: false },
     d: { pressed: false },
-    g: { pressed: false },
     q: { pressed: false },
     space: { pressed: false },
     spaceEnabled: false,
@@ -271,24 +270,6 @@ describe('Player', () => {
 
     player.removeObject('key')
     expect(player.hasObject('key')).toBe(false)
-  })
-
-  it('should handle G key press to find coffee', () => {
-    const player = new Player({
-      position: { x: 100, y: 100 },
-      size: 15,
-      imageSrc: './player.png',
-      velocity: { x: 0, y: 0 },
-      sprites: mockSprites,
-      health: 3,
-    })
-
-    const keys = createMockKeys()
-    keys.g.pressed = true
-
-    player.handleInput(keys)
-
-    expect(player.hasObject('coffee')).toBe(true)
   })
 
   it('should return current player data', () => {

@@ -3,7 +3,6 @@ export interface Keys {
   a: KeyState
   s: KeyState
   d: KeyState
-  g: KeyState
   q: KeyState
   space: KeyState
   spaceEnabled: boolean

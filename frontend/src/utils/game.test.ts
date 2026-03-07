@@ -1,16 +1,19 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { startGame, handleNpcs, Game } from './game'
-import * as window from './window'
-import * as eventListeners from './eventListeners'
-import * as storage from './storage'
-import { CurrentStatusData, defaultStatusData } from '../models/CurrentStatusData'
-import { Player } from '../classes/Player'
+import ActiveNpc from '../classes/ActiveNpc'
+import { CollisionBlock } from '../classes/CollisionBlock'
 import { Heart } from '../classes/Heart'
 import { InteractiveNpc } from '../classes/InteractiveNpc'
-import ActiveNpc from '../classes/ActiveNpc'
+import { Player } from '../classes/Player'
 import SimpleNpc from '../classes/SimpleNpc'
-import { CollisionBlock } from '../classes/CollisionBlock'
+import {
+  CurrentStatusData,
+  defaultStatusData,
+} from '../models/CurrentStatusData'
 import { Keys } from '../models/Keys'
+import * as eventListeners from './eventListeners'
+import { Game, handleNpcs, startGame } from './game'
+import * as storage from './storage'
+import * as window from './window'
 
 vi.mock('../config.json', () => ({
   default: {
@@ -282,7 +285,6 @@ describe('game', () => {
         a: { pressed: false },
         s: { pressed: false },
         d: { pressed: false },
-        g: { pressed: false },
         q: { pressed: false },
         space: { pressed: false },
         spaceEnabled: false,
