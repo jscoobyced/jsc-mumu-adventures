@@ -3,7 +3,7 @@
     {
       "type": "ActiveNpc",
       "name": "Bob",
-      "position": { "x": 380, "y": 480 },
+      "position": { "x": 380, "y": 280 },
       "size": 15,
       "imageSrc": "./images/sprites/blond-purple-dress.png",
       "health": 1,

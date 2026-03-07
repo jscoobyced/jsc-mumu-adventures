@@ -36,9 +36,10 @@ export interface Game {
 }
 
 export const startGame = (restart = false): void => {
-  const currentStatusData = restart
-    ? defaultStatusData
-    : getJscData().currentStatusData || defaultStatusData
+  if (restart) {
+    setCurrentStatus(defaultStatusData)
+  }
+  const currentStatusData = getJscData().currentStatusData || defaultStatusData
   const initialPlayer: Player = new Player(
     {
       position: currentStatusData.playerData.position,

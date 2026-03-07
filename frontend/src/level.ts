@@ -176,9 +176,9 @@ const animate = (
   if (isDebugMode()) {
     debugCollisions(context)
   }
-  game.player.draw(context)
   const keys = getKeys()
   if (!game.paused) handleNpcs(game, context, collisionBlocks, deltaTime, keys)
+  game.player.draw(context)
 
   context.drawImage(frontRenderedCanvas, 0, 0)
   context.restore()
