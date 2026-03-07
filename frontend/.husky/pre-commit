@@ -1,1 +1,2 @@
+echo "Pre-commit hook."
 yarn --cwd frontend lint
