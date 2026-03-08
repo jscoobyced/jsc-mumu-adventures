@@ -87,7 +87,7 @@ export class Player extends Character {
     return this.objects.includes(object)
   }
 
-  public objectFound(object: string): void {
+  public receiveObject(object: string): void {
     if (!this.hasObject(object)) {
       jscLog(`Picked up a ${object}!`)
       this.objects.push(object.toLocaleLowerCase())

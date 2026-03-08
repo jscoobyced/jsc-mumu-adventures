@@ -7,6 +7,8 @@ import ActiveNpc from './ActiveNpc'
 export class InteractiveNpc extends ActiveNpc {
   private messages: string[]
   private expectedObject?: string
+  private objectToGive?: string
+  private objectGiven?: boolean
   private postObjectMessages: string[]
   private waitingMessages: string[]
   private finalMessages: string[]
@@ -21,6 +23,7 @@ export class InteractiveNpc extends ActiveNpc {
 
     this.messages = [...initializationOptions.messages]
     this.expectedObject = initializationOptions.expectedObject?.toLowerCase()
+    this.objectToGive = initializationOptions.objectToGive?.toLowerCase()
     this.postObjectMessages = [...initializationOptions.postObjectMessages]
     this.waitingMessages = [...initializationOptions.waitingMessages]
     this.finalMessages = [...initializationOptions.finalMessages]
@@ -34,6 +37,7 @@ export class InteractiveNpc extends ActiveNpc {
   public toString = (): string => {
     return `InteractiveNpc:\n\t${this.getName() || 'unknown'}\n\tInteraction: ${this.currentInteraction}\n\tExpected Object: ${
       this.expectedObject || 'none'
+    }\n\tObject Given: ${this.objectToGive || 'none'}
     }`
   }
 
@@ -66,10 +70,7 @@ export class InteractiveNpc extends ActiveNpc {
 
   public getMessages = (): string[] => {
     const currentMessages = [...this.messages]
-    if (
-      this.currentInteraction === Interaction.OBJECT &&
-      this.currentInteraction === Interaction.OBJECT
-    ) {
+    if (this.currentInteraction === Interaction.OBJECT) {
       this.setInteraction(Interaction.DONE)
     }
     if (this.currentInteraction === Interaction.NONE) {
@@ -88,6 +89,18 @@ export class InteractiveNpc extends ActiveNpc {
     ) {
       this.setInteraction(Interaction.OBJECT)
       return true
+    }
+    return false
+  }
+
+  public giveObjectToPlayer(): string | false {
+    if (this.objectGiven) {
+      this.setInteraction(Interaction.DONE)
+      return false
+    }
+    if (this.objectToGive) {
+      this.objectGiven = true
+      return this.objectToGive
     }
     return false
   }

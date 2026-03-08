@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { initializeNpcs } from './npc'
-import { NpcConfiguration } from '../models/NpcConfiguration'
-import { Interaction } from '../models/Interaction'
 import ActiveNpc from '../classes/ActiveNpc'
+import { Interaction } from '../models/Interaction'
+import { NpcConfiguration } from '../models/NpcConfiguration'
+import { initializeNpcs } from './npc'
 import * as window from './window'
 
 vi.mock('../sprites', () => ({

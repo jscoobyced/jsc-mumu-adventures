@@ -2,6 +2,7 @@ import { SimpleNpc } from '../classes/SimpleNpc'
 import { LayersData } from './Layer'
 import { NpcConfiguration } from './NpcConfiguration'
 import { Tilesets } from './TileSet'
+import { Vector } from './Vector'
 
 export interface LevelData {
   name: string
@@ -20,6 +21,10 @@ export interface LevelConfig {
 
 export interface LevelConnection {
   direction: LevelDirection
+  position?: {
+    to: Vector
+    from: Vector
+  }
   level: LevelData
 }
 
@@ -28,5 +33,6 @@ export enum LevelDirection {
   LEFT = 'left',
   UP = 'up',
   DOWN = 'down',
+  POSITION = 'position',
   NONE = 'none',
 }

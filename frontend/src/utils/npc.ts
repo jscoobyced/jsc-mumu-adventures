@@ -38,6 +38,7 @@ export const initializeNpcs = (name: string, npcs: NpcConfiguration[]) => {
       },
       messages: npcData.messages,
       expectedObject: npcData.expectedObject,
+      objectToGive: npcData.objectToGive,
       postObjectMessages: npcData.postObjectMessages,
       waitingMessages: npcData.waitingMessages,
       finalMessages: npcData.finalMessages,

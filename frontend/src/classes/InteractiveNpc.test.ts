@@ -1,6 +1,6 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest'
-import { InteractiveNpc } from './InteractiveNpc'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import Interaction from '../models/Interaction'
+import { InteractiveNpc } from './InteractiveNpc'
 
 vi.mock('../config.json', () => ({
   default: {

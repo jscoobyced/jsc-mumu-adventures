@@ -2,7 +2,6 @@ import { CollisionBlock } from './classes/CollisionBlock'
 import { SPACING } from './classes/GamePad'
 import { Heart } from './classes/Heart'
 import config from './config.json'
-import { levelConfig } from './levels'
 import { LayersData } from './models/Layer'
 import { LevelData, LevelDirection } from './models/LevelData'
 import { TilesetInfo, Tilesets } from './models/TileSet'
@@ -15,6 +14,7 @@ import {
   handleBannerTouch,
   setLastTime,
 } from './utils/eventListeners'
+import { findEntrances, findOutOfBoundsLevel } from './utils/findLevel'
 import { Game, handleNpcs, startGame } from './utils/game'
 import { loadImage } from './utils/loadImage'
 import { initializeNpcs } from './utils/npc'
@@ -25,8 +25,6 @@ const MAP_ROWS: number = config.rows
 const MAP_WIDTH: number = config.tileSize * MAP_COLS
 const MAP_HEIGHT: number = config.tileSize * MAP_ROWS
 const MAP_SCALE: number = getDevicePixelRatio() + config.mapScale
-
-const BUFFER = 0.0001
 
 const context = getDrawContext(isMobile)
 
@@ -212,29 +210,25 @@ const animate = (
   }
 
   // Check if change level
-  if (levelDirection !== LevelDirection.NONE) {
-    const currentConfig = levelConfig.find(
-      (config) => config.level.name === game.levelData.name,
-    )
-    if (currentConfig) {
-      const connection = currentConfig.connectedLevels?.find(
-        (conn) => conn.direction === levelDirection,
-      )
-      if (connection) {
-        if (levelDirection === LevelDirection.LEFT) {
-          game.player.position.x = MAP_WIDTH - game.player.width - BUFFER
-        } else if (levelDirection === LevelDirection.RIGHT) {
-          game.player.position.x = 0 + BUFFER
-        } else if (levelDirection === LevelDirection.UP) {
-          game.player.position.y = MAP_HEIGHT - game.player.height - BUFFER
-        } else if (levelDirection === LevelDirection.DOWN) {
-          game.player.position.y = 0 + BUFFER
-        }
-        game.levelData = connection.level
-        startRendering(game)
-        return
-      }
-    }
+  // Out of Map bounds
+  const nextMapLevel = findOutOfBoundsLevel(
+    levelDirection,
+    game.levelData.name,
+    game.player,
+    MAP_WIDTH,
+    MAP_HEIGHT,
+  )
+  if (nextMapLevel) {
+    game.levelData = nextMapLevel
+    startRendering(game)
+    return
+  }
+  // Entrance to another level
+  const enterPlaceLevel = findEntrances(game.player.position, game.levelData)
+  if (enterPlaceLevel) {
+    game.levelData = enterPlaceLevel
+    startRendering(game)
+    return
   }
 
   requestAnimationFrame(() =>

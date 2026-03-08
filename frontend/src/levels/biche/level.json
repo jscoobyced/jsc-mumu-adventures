@@ -1,0 +1,19 @@
+{
+  "npcs": [
+    {
+      "type": "InteractiveNpc",
+      "name": "Biche",
+      "position": { "x": 300, "y": 720 },
+      "size": 15,
+      "imageSrc": "./images/sprites/blond-purple-dress.png",
+      "health": 1,
+      "messages": ["Hello Mumu! How are you? You look so tired!, Have some coffee!", "And also take some for the road, you will need it!"],
+      "waitingMessages": [],
+      "postObjectMessages": [],
+      "expectedObject": "",
+      "objectToGive": "coffee",
+      "finalMessages": ["Come back any time, Mumu!"],
+      "portraitImageSrc": "./images/portraits/blond-purple-dress.png"
+    }
+  ]
+}

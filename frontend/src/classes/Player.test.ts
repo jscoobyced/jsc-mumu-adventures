@@ -218,7 +218,7 @@ describe('Player', () => {
       health: 3,
     })
 
-    player.objectFound('key')
+    player.receiveObject('key')
 
     expect(player.hasObject('key')).toBe(true)
   })
@@ -233,8 +233,8 @@ describe('Player', () => {
       health: 3,
     })
 
-    player.objectFound('key')
-    player.objectFound('key')
+    player.receiveObject('key')
+    player.receiveObject('key')
 
     expect(player.hasObject('key')).toBe(true)
   })
@@ -249,7 +249,7 @@ describe('Player', () => {
       health: 3,
     })
 
-    player.objectFound('sword')
+    player.receiveObject('sword')
 
     expect(player.getObject('sword')).toBe('sword')
     expect(player.getObject('shield')).toBe('')
@@ -265,7 +265,7 @@ describe('Player', () => {
       health: 3,
     })
 
-    player.objectFound('key')
+    player.receiveObject('key')
     expect(player.hasObject('key')).toBe(true)
 
     player.removeObject('key')
@@ -432,7 +432,7 @@ describe('Player', () => {
       health: 3,
     })
 
-    player.objectFound('SWORD')
+    player.receiveObject('SWORD')
 
     expect(player.hasObject('sword')).toBe(true)
   })

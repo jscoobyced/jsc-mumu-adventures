@@ -138,6 +138,10 @@ export const handleNpcs = (
       if (!npc.isInvincible) {
         if (npc instanceof InteractiveNpc) {
           const interactiveNpc = npc as unknown as InteractiveNpc
+          const objectToGive = interactiveNpc.giveObjectToPlayer()
+          if (objectToGive) {
+            game.player.receiveObject(objectToGive)
+          }
           // Check if NPC is expecting an object
           const expectedObject = interactiveNpc.expectingObjectName()
           jscLog(`NPC is expecting a ${expectedObject}`)

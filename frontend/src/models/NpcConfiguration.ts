@@ -7,6 +7,7 @@ export interface NpcConfiguration {
   name: string
   messages: string[]
   expectedObject: string
+  objectToGive: string
   postObjectMessages: string[]
   waitingMessages: string[]
   finalMessages: string[]

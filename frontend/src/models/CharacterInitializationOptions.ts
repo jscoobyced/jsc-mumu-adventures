@@ -20,6 +20,7 @@ export interface TalkingNpcInitializationOptions {
   npcInitializationOptions: NpcInitializationOptions
   messages: string[]
   expectedObject?: string
+  objectToGive?: string
   postObjectMessages: string[]
   waitingMessages: string[]
   finalMessages: string[]
