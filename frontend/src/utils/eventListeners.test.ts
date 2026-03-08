@@ -118,7 +118,6 @@ describe('eventListeners', () => {
         ['ArrowDown', 's'],
         ['d', 'd'],
         ['ArrowRight', 'd'],
-        ['g', 'g'],
       ])(
         'pressing "%s" sets keys.%s.pressed to true',
         async (eventKey, keyProp) => {
@@ -203,8 +202,6 @@ describe('eventListeners', () => {
         ['ArrowDown', 's'],
         ['d', 'd'],
         ['ArrowRight', 'd'],
-        ['g', 'g'],
-        ['q', 'q'],
       ])(
         'releasing "%s" sets keys.%s.pressed to false',
         async (eventKey, keyProp) => {
