@@ -5,11 +5,11 @@
     },
     "activeFile": "levels/biche/map.tmj",
     "expandedProjectPaths": [
+        ".",
         "levels/A/2",
         "levels",
-        ".",
-        "levels/A/1",
-        "levels/biche"
+        "levels/biche",
+        "levels/A/1"
     ],
     "fileStates": {
         "/home/cedric/workspaces/jsc-mumu-adventures/Decorations.tsx": {
@@ -41,11 +41,11 @@
             }
         },
         "levels/biche/map.tmj": {
-            "scale": 0.75525,
-            "selectedLayer": 4,
+            "scale": 1.5,
+            "selectedLayer": 3,
             "viewCenter": {
-                "x": 399.8675935120821,
-                "y": 411.1221449851042
+                "x": 334.6666666666667,
+                "y": 551
             }
         }
     },

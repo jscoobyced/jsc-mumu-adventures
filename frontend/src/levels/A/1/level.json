@@ -10,6 +10,7 @@
       "messages": ["Hello Mumu! You are finally here!. Welcome to our village. We have been waiting for you. We need your help urgently!", "But I am so sleepy now. Can you help me find some coffee to wake me up?"],
       "waitingMessages": ["I'm still so tired... Have you found the coffee?"],
       "expectedObject": "Coffee",
+      "objectToGive": "",
       "postObjectMessages": [
         "Thank you for the coffee! I feel so much better now.",
         "Here is the story of the evil black witch. There is a powerful and evil sorceress named Maginta Llennaspom. She was the most feared witch in the land and the most evil curse that she has ever cast was to unleash a black plague on the forest.",
